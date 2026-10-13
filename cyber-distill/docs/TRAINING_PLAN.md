@@ -29,7 +29,7 @@ checkpoint; only the number of GPUs and the training size change.
 | 1 | Yens | 1 H200 | 25,000 (`in_25k`) | `sbatch slurm/10_student_yens.slurm --size 25k --name ckpt1` | A full fine-tune on one GPU; score on the test set |
 | 2 | Yens | 4 H200 (one node) | 25,000 | `sbatch --gres=gpu:4 --cpus-per-task=60 --mem=240G slurm/10_student_yens.slurm --size 25k --name ckpt2-4gpu` | Scaling: seconds per step and samples per second from `timing.json` for 1 vs 4 GPUs, turned into a GPU-hour estimate for a Marlowe application |
 | 3 | Marlowe | 1 H100 | 25,000 | `sbatch slurm/marlowe/10_student.slurm --size 25k --name ckpt3` | Same job on Marlowe; time per step H100 vs H200 |
-| 4 | Marlowe | 8 H100 (one node) | 200,000 (`in_200k`) | `sbatch --gres=gpu:8 --exclusive slurm/marlowe/10_student.slurm --size 200k --name ckpt4` | Data-parallel training on a full node |
+| 4 | Marlowe | 8 H100 (one node) | 200,000 (`in_200k`) | `sbatch -G 8 --exclusive slurm/marlowe/10_student.slurm --size 200k --name ckpt4` | Data-parallel training on a full node |
 | 5 | Marlowe | 16 H100 (two nodes) | 400,000 | `sbatch slurm/marlowe/10_student_2node.slurm --size 400k --name ckpt5`, then the same with `--resume` | Multi-node training and resuming from `checkpoint-last` |
 
 For timing-only runs (for example the scaling table), add `--max-steps 100`.

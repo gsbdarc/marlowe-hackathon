@@ -4,7 +4,7 @@
 #SBATCH --partition=FILL_PARTITION
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:8
+#SBATCH --gpus-per-node=8
 #SBATCH --exclusive
 #SBATCH --output=logs/cyber_student_2n_%j.out
 #SBATCH --error=logs/cyber_student_2n_%j.err
@@ -16,6 +16,9 @@
 #   sbatch slurm/marlowe/10_student_2node.slurm --size 400k --name ckpt5
 # Resume after a stop (same name):  sbatch slurm/marlowe/10_student_2node.slurm --size 400k --name ckpt5 --resume
 # Multi-node runs need DARC's go-ahead (runbook ground rule 5).
+# FILL per our allocation (Marlowe Slurm docs): partition preempt with account marlowe-m000106,
+# or batch with marlowe-m000106-pm01 (hero: -pl01). Preempted jobs restart from the beginning:
+# the teacher skips finished shards; add --resume to a student run.
 set -euo pipefail
 source scripts/marlowe/env.sh
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)

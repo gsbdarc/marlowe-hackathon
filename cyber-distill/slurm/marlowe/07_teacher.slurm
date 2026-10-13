@@ -3,7 +3,7 @@
 #SBATCH --account=FILL_ACCOUNT
 #SBATCH --partition=FILL_PARTITION
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:8
+#SBATCH -G 8
 #SBATCH --exclusive
 #SBATCH --output=logs/cyber_teacher_%j.out
 #SBATCH --error=logs/cyber_teacher_%j.err
@@ -18,6 +18,9 @@
 #                         --samples train val test test_incident_slice
 # Submit from the code directory; mkdir -p logs first. If vLLM rejects tensor parallel 8 for the
 # FP8 checkpoint, set VLLM_EXTRA="--enable-expert-parallel" (or VLLM_TP=4) and record what worked.
+# FILL per our allocation (Marlowe Slurm docs): partition preempt with account marlowe-m000106,
+# or batch with marlowe-m000106-pm01 (hero: -pl01). Preempted jobs restart from the beginning:
+# the teacher skips finished shards; add --resume to a student run.
 set -euo pipefail
 command -v apptainer >/dev/null || module load apptainer
 source scripts/marlowe/env.sh
