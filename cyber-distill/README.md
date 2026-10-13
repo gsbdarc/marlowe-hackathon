@@ -46,7 +46,7 @@ Outputs are deterministic given the same Redivis table version (`v3_206`) and mi
 
 ## Status
 
-Updated 2026-10-13. Hackathon: November 13, 2026.
+Updated 2026-10-13. Hackathon: November 13, 2026. See Pipeline overview for what each stage does.
 
 | Stage | State | Result |
 |---|---|---|
@@ -59,6 +59,45 @@ Updated 2026-10-13. Hackathon: November 13, 2026.
 | 10-13. Student, labeling, plots | Not started | |
 
 Open items: Marlowe Slurm account and partition, model cache and room for 240 GB of weights in `/scratch`; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`). Code is in the private GitHub repository `gsbdarc/marlowe-hackathon` under `cyber-distill/`.
+
+## Pipeline overview
+
+A large model labels a sample of 10-K paragraphs, a small model learns from those labels, and the small model then labels every candidate paragraph from 30 years of filings.
+
+```
+ YENS (CPU)                         MARLOWE (8 x H100)            YENS (H200, then CPU)
+ ---------------------------        ---------------------         --------------------------
+ EDGAR mirror (1.6 TB)              Teacher: Qwen3-235B           Student labels all
+   0 list filings (Redivis)           7 label ~410k paragraphs      11 keyword-hit paragraphs
+   1 one report/company/year          8 300-paragraph hand check    12 score vs teacher, hand
+   2-3 text -> 115M paragraphs        9 automatic checks            13 30-year plots
+   4 keyword filter                  10 train student Qwen3-1.7B
+   5 company split                      (hackathon checkpoints)
+   6 build samples  --Globus-->         --------Globus-------->
+```
+
+| Stage | What it does | Output |
+|---|---|---|
+| 0. Inventory | List every 10-K, 10-Q and 8-K in the EDGAR mirror from the Redivis catalog; nothing is downloaded | Filing lists with paths on `/zfs` |
+| 1. Select | Read each header (fiscal year, SIC, 8-K items); keep one annual report per company and fiscal year 1996-2025, Item 1.05 and 8.01 8-Ks, and the filing after each Item 1.05 8-K | `filings.parquet` |
+| 2-3. Extract | Main document only; text, HTML or inline XBRL to clean blocks; sections 1A, 1C, 7 and 8-K items; paragraphs of 15-400 words | `paragraphs/` (115M rows) |
+| 4. Keyword filter | Cyber terms plus deliberate trap terms, and a 1% random sample of paragraphs without a keyword to measure misses | Keyword-hit pool |
+| 5. Company split | Each company to train, validation or test (80/10/10) by a fixed hash; frozen | `company_split.parquet` |
+| 6. Samples | 400k training sample with nested 25k and 200k subsets, incident enrichment, 2k validation and 5k test sets by era; frozen | About 410k paragraphs, under 1 GB, sent to Marlowe |
+| 7. Teacher | Qwen3-235B FP8 on vLLM labels each sampled paragraph with one letter and keeps the five label probabilities; 10k pilot first | `teacher_labels.parquet` |
+| 8. Hand check | Two DARC staff label 300 test paragraphs blind | Teacher accuracy |
+| 9. Automatic checks | Item 1.05 follow-ups, Item 1C, 2020-22 "virus", prefilter recall | Known-answer checks |
+| 10. Student | Qwen3-1.7B with LoRA on 25k, 200k and 400k paragraphs (the hackathon checkpoints) | Adapters and merged model |
+| 11. Full labeling | Best student labels every keyword-hit paragraph on one H200; the rest count as NONE | `labels_full.parquet` |
+| 12. Evaluation | Keywords, untrained student, teacher and the three students on the frozen test set | Scores table |
+| 13. Plots | Cyber disclosure by year (marked at the 2011, 2018 and 2023 SEC actions), label mix, keywords vs model, incidents by industry, cyber 8-Ks by month, disclosure lag | `reports/plots/` |
+
+Design choices:
+
+- Raw filings never leave the Yens. Only the samples (under 1 GB) go to Marlowe; the teacher weights are downloaded there.
+- The expensive model runs once, on about 410k paragraphs. The small student does the bulk labeling, which is the point of the exercise.
+- Every stage reports by fiscal year and has a **Stop and ask** threshold.
+- Every step is a script, logged with its git commit in `reports/run_log.md`; the data card records measured numbers.
 
 ## Changes from v1
 
@@ -249,6 +288,17 @@ Scripts: `scripts/01_headers.py` (Slurm array `slurm/01_headers.slurm`, one task
 6. Output `data/interim/paragraphs.parquet`.
 
 **Check:** report section detection rates by fiscal year. **Stop and ask** if Item 1A is found in fewer than 80% of filings from fiscal 2006 on, or Item 1C in fewer than 80% from fiscal 2024 on.
+
+**How it works** (`scripts/02_extract.py`, one pass per filing; stages 2 and 3 run together so the full text is never stored):
+
+1. **Read** the first `<DOCUMENT>` of the submission and stop at its end. A truncated file is read to its end; a main document over 200 MB is an error.
+2. **Blocks, HTML and inline XBRL** (lxml): remove scripts, styles, the hidden `ix:header` and anything styled `display:none`; drop tables with more than half numeric cells and keep other tables one row per block; treat `<pre>` like plain text; put a paragraph break around every block element (`p`, `div`, `tr`, `li`, `h1`-`h6`, `table` and similar), a line break at `<br>`, a space between table cells; split on blank lines.
+3. **Blocks, plain text**: drop `<TABLE>` sections with more numbers than words; remove SGML markup lines (`<PAGE>`, `<S>`, `<C>`); split on blank lines and join wrapped lines inside a paragraph.
+4. **Clean**: drop page numbers, "Table of Contents" lines, and running headers (blocks of 10 words or fewer repeated 3 or more times in the filing).
+5. **Sections**: as in Stage 3 step 3, mapped by heading title, then item number.
+6. **Paragraphs**: a block under 15 words is skipped, and becomes the current heading if it looks like one (12 words or fewer, no final period); a block over 400 words is cut at sentence ends into pieces of at most 400 words (`chunk` records the piece).
+
+Known weak spots, not yet measured: HTML with one `<div>` per line splits paragraphs into fragments, and fragments under 15 words are lost; plain-text filings without blank lines become long blocks cut at 400 words; heading detection is a heuristic; text-table rows under 15 words are dropped.
 
 ### Stage 4. Keyword prefilter (Yens, CPU)
 
