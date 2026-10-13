@@ -64,11 +64,16 @@ def read_main_doc(path):
     return (m.group(1).strip().decode("latin-1") if m else None), doc[t0 + 6:t1 if t1 > t0 else len(doc)]
 
 
+CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+
 def decode(b):
+    """Text of the main document; control characters (which lxml rejects) become spaces."""
     try:
-        return b.decode("utf-8")
+        t = b.decode("utf-8")
     except UnicodeDecodeError:
-        return b.decode("cp1252", errors="replace")
+        t = b.decode("cp1252", errors="replace")
+    return CONTROL.sub(" ", t)
 
 
 HTML_SNIFF = re.compile(r"<(html|body|p|div|font|br)\b", re.I)
@@ -114,17 +119,18 @@ def html_blocks(text, stats):
     for pre in list(root.iter("pre")):
         paras = text_blocks(pre.text_content(), stats)
         pre.clear()
-        pre.text = "\n\n" + "\n\n".join(paras) + "\n\n"
+        pre.text = "\n\n" + CONTROL.sub(" ", "\n\n".join(paras)) + "\n\n"
         pre.tag = "div"
     for el in root.iter():
         tag = el.tag if isinstance(el.tag, str) else ""
+        # Entities such as &#1; decode to control characters, which lxml will not accept back.
         if tag in BLOCK_TAGS:
-            el.text = "\n\n" + (el.text or "")
-            el.tail = "\n\n" + (el.tail or "")
+            el.text = "\n\n" + CONTROL.sub(" ", el.text or "")
+            el.tail = "\n\n" + CONTROL.sub(" ", el.tail or "")
         elif tag == "br":
-            el.tail = "\n" + (el.tail or "")
+            el.tail = "\n" + CONTROL.sub(" ", el.tail or "")
         elif tag in ("td", "th"):
-            el.tail = " " + (el.tail or "")
+            el.tail = " " + CONTROL.sub(" ", el.tail or "")
     out = []
     for raw in re.split(r"\n[ \t ]*\n", root.text_content()):
         b = WS.sub(" ", raw).strip()

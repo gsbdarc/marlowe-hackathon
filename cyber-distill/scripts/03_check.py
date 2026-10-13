@@ -46,7 +46,8 @@ def main():
 
     a = st.merge(f[f.is_annual][["accession", "fiscal_year", "form_type", "abs_issuer"]], on="accession")
     a["not_ok"] = a.status != "ok"
-    exp_1a = ~a.abs_issuer & ~a.item_1a_na.fillna(False).astype(bool)
+    # Form 10-KSB never had an Item 1A, so 10-KSB filers are not expected to have one.
+    exp_1a = ~a.abs_issuer & ~a.item_1a_na.fillna(False).astype(bool) & ~a.form_type.isin(["10KSB", "10KSB40"])
     by = a.groupby("fiscal_year").agg(filings=("accession", "size"), failed=("status", lambda s: (s == "failed").sum()),
                                       empty=("status", lambda s: (s == "empty").sum()), abs_issuer=("abs_issuer", "sum"),
                                       text=("format", lambda s: (s == "text").sum()), html=("format", lambda s: (s == "html").sum()),
@@ -55,7 +56,7 @@ def main():
     by["item_1a"] = a[exp_1a].groupby("fiscal_year").has_1a.mean()
     by["item_1c"] = a[~a.abs_issuer].groupby("fiscal_year").has_1c.mean()
     by["item_7"] = a.groupby("fiscal_year").has_7.mean()
-    by["paragraphs"] = a.groupby("fiscal_year").n_paras.sum()
+    by["paragraphs"] = a.groupby("fiscal_year").n_paras.sum().astype(int)
     pct = ["fail_rate", "item_1a", "item_1c", "item_7"]
     shown = by.copy()
     for c in pct:
@@ -91,7 +92,7 @@ def main():
 
     lines = [SECTION, "",
              "Annual reports by fiscal year. `fail_rate` counts failed and empty filings. `item_1a` is the share of "
-             "filings expected to have Item 1A (not asset-backed, not \"not applicable\") where it was found; "
+             "filings expected to have Item 1A (not asset-backed, not 10-KSB, not \"not applicable\") where it was found; "
              "`item_1c` excludes asset-backed issuers. Item 1A is required from fiscal 2005-06 and Item 1C from fiscal 2023-24, "
              "so earlier values count voluntary sections only.", "",
              md_table(shown), "",
