@@ -32,11 +32,33 @@ bash scripts/globus/mkdirs.sh         # creates the Marlowe directories
 sbatch slurm/01_headers.slurm         # array of 31 tasks, filing years 1996-2026, <2 min each
 ../.venv/bin/python scripts/01_select.py   # login node, ~1 min, after the array finishes
 
+# Stages 2-3: main-document text, sections and paragraphs
+sbatch slurm/02_extract.slurm         # array of 64 tasks (shards of filings.parquet), a few minutes each
+sbatch slurm/03_check.slurm           # after the array: failure and section-detection checks
+#   test first on a few fiscal years:
+#   sbatch --array=0 slurm/02_extract.slurm --test-years 1998 2008 2022 --limit 200
+
 # Transfers to Marlowe (any time after the files exist)
 bash scripts/globus/push.sh data/final
 ```
 
 Outputs are deterministic given the same Redivis table version (`v3_206`) and mirror contents. `data/interim/*.json` records the query and its time.
+
+## Status
+
+Updated 2026-10-13. Hackathon: November 13, 2026.
+
+| Stage | State | Result |
+|---|---|---|
+| Setup | Done | Project directory and git repository on the Yens; pinned `requirements.txt`; Redivis token in `.env`; Globus CLI set up and tested Yens to Marlowe (`scripts/globus/`); Marlowe directories created under `/scratch/m000106/gsb_hackathon/cyber-distill` |
+| 0. Inventory | Done | Filing lists from Redivis v3_206 (mirror ends 2026-10-02): 358,372 10-K-family rows, 878,478 10-Q-family rows, 188,038 8-Ks since 2023-12-18 |
+| 1. Select filings | Done | 277,329 annual reports from 42,883 companies, fiscal 1996-2025; 58 Item 1.05 8-Ks (57 companies), 46,873 Item 8.01 8-Ks, 49 follow-up 10-Q/10-Ks. `data/final/filings.parquet` |
+| 2-3. Text and paragraphs | Running | Tests on fiscal 1998, 2008, 2022 and 2024: no failures; Item 1A found in 85-96% of filings expected to have it (2008-2024), Item 1C in 96% (2024), Item 7 in 88-100%. Full run: Slurm jobs 749166 (extract) and 749172 (check) |
+| 4-6. Prefilter, split, samples | Next | |
+| 7-9. Teacher and checks | Not started | Needs the Marlowe Slurm account, partition and model cache |
+| 10-13. Student, labeling, plots | Not started | |
+
+Open items: Marlowe Slurm account and partition, model cache and room for 240 GB of weights in `/scratch`; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`); the GitHub repository (`gsbdarc/marlowe-hackathon`) must be made private before this project is pushed.
 
 ## Changes from v1
 
@@ -47,6 +69,9 @@ Outputs are deterministic given the same Redivis table version (`v3_206`) and mi
 | Stage 1, fiscal year | Fiscal year from `CONFORMED PERIOD OF REPORT` | Same, but Redivis has only the filing year, so the headers of all filings from filing years 1996-2026 are read and fiscal year is set from the header | Redivis has no period of report, SIC or state |
 | Stage 1, Item 1.05 | Header lists Item 1.05 | Header writes it as `ITEM INFORMATION: <ITEMS>1.05`, without a name; match that or the name | Matching the name "Material Cybersecurity Incidents" finds none |
 | Stage 1, SIC | SIC from the header | SIC from the header, filled from the same CIK's most common SIC when missing; `sic_from_header` flags which | About 25% of fiscal 2000 headers have no SIC line |
+| Stage 2, main document | The document whose type matches the form type | The first document in the submission, which matched the form type in every test filing; reading stops at its end, so exhibits and XBRL are never read | Cuts most of the 1.63 TB |
+| Stage 3, sections | Match Item headings | Map a heading by its title first (risk factors, cybersecurity, management's discussion), then by number; 10-KSB Item 6 is MD&A; a bare "Risk Factors" heading starts 1A; item headings followed by fewer than 30 words (table of contents, "None") are not section starts | 10-KSB numbering differs; small companies put risk factors inside Item 1 |
+| Stage 3, check | Item 1A in 80% of filings from fiscal 2006 | Counted among filings expected to have Item 1A: not asset-backed (Regulation AB cited or SIC 6189) and not saying Item 1A is not applicable | Asset-backed trusts and smaller reporting companies legitimately have no risk factors |
 | Stage 1, joint filings | Not covered | One accession listed under several CIKs (utility and subsidiaries, REIT and operating partnership, ABS trust and depositor) is kept once, under the CIK with the most selected annual reports, then the lowest CIK | Otherwise the same document counts several times |
 
 ## Goal
