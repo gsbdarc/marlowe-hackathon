@@ -65,6 +65,7 @@ Updated 2026-10-13. Hackathon: November 13, 2026. See Pipeline overview for what
 | 1. Select filings | Done | 277,329 annual reports from 42,883 companies, fiscal 1996-2025; 58 Item 1.05 8-Ks (57 companies), 46,873 Item 8.01 8-Ks, 49 follow-up 10-Q/10-Ks. `data/final/filings.parquet` |
 | 2-3. Text and paragraphs | Done | 115,226,431 paragraphs (32.3 GB) from 324,293 filings; 0 failures, 59 empty; Item 1A 93.3% (fiscal 2006 on, expected filings), Item 1C 96.4% (fiscal 2024 on), Item 7 87.7%; no stop-and-ask flags. Jobs 749355 and 749356 at `f27bd7c` |
 | 4-6. Prefilter, split, samples | Done | 1,405,923 keyword hits (1.22%); split 34,646 / 4,345 / 4,374 companies; `train_400k` (nested 25k, 200k), `val` 2,000, `test` 5,000, `test_incident_slice` 500: 407,500 teacher items. Jobs 749567, 749579 at `bcd5f85` |
+| Transfer to Marlowe | Done | `data/final/` (7 files, 239 MB) and `config/` (4 files) copied with Globus checksum verification on 2026-10-13; names and sizes on Marlowe match the Yens. Tasks `ccc63028-c740-11f1-830e-02ffe792127d` and `f212625c-c740-11f1-bb68-02ffe792127d` |
 | 7-9. Teacher and checks | Not started | Needs the Marlowe Slurm account, partition and model cache |
 | 10-13. Student, labeling, plots | Not started | |
 
@@ -108,6 +109,28 @@ Design choices:
 - The expensive model runs once, on about 410k paragraphs. The small student does the bulk labeling, which is the point of the exercise.
 - Every stage reports by fiscal year and has a **Stop and ask** threshold.
 - Every step is a script, logged with its git commit in `reports/run_log.md`; the data card records measured numbers.
+
+## On Marlowe
+
+Everything the teacher run needs is in `/scratch/m000106/gsb_hackathon/cyber-distill/`:
+
+| Path | Contents |
+|---|---|
+| `data/final/train_400k.parquet` | 400,000 training paragraphs; `in_25k` and `in_200k` mark the hackathon subsets |
+| `data/final/val.parquet`, `test.parquet`, `test_incident_slice.parquet` | Frozen evaluation sets (2,000, 5,000 and 500) |
+| `data/final/filings.parquet`, `company_split.parquet` | Filing metadata and the frozen company split |
+| `config/prompt_v1.txt`, `codebook.md`, `keywords.yaml` | Teacher prompt, codebook v1, prefilter terms |
+| `data/teacher/` | Empty; Stage 7 writes the teacher shards here |
+| `models/` | Empty; for the teacher weights (about 240 GB) unless a shared cache is used |
+
+Check the copy on Marlowe after any transfer:
+
+```bash
+cd /scratch/m000106/gsb_hackathon/cyber-distill/data/final && sha256sum -c MANIFEST.sha256
+cd ../../config && sha256sum -c MANIFEST.sha256
+```
+
+Code: clone `gsbdarc/marlowe-hackathon` on Marlowe and work in `cyber-distill/`; data stays in `/scratch`. Before relying on these files for November 13, confirm that `/scratch` is not purged before then (open item).
 
 ## Changes from v1
 
