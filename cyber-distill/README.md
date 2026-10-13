@@ -58,7 +58,7 @@ Updated 2026-10-13. Hackathon: November 13, 2026.
 | 7-9. Teacher and checks | Not started | Needs the Marlowe Slurm account, partition and model cache |
 | 10-13. Student, labeling, plots | Not started | |
 
-Open items: Marlowe Slurm account and partition, model cache and room for 240 GB of weights in `/scratch`; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`); the GitHub repository (`gsbdarc/marlowe-hackathon`) must be made private before this project is pushed.
+Open items: Marlowe Slurm account and partition, model cache and room for 240 GB of weights in `/scratch`; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`). Code is in the private GitHub repository `gsbdarc/marlowe-hackathon` under `cyber-distill/`.
 
 ## Changes from v1
 
