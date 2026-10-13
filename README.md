@@ -2,7 +2,7 @@
 
 Runbook for an AI coding agent (or a person) preparing the cybersecurity exercise for the Marlowe hackathon on November 6, 2026. It describes the data, the labeling codebook, each pipeline stage with its checks, and a data card the agent fills in as it works.
 
-Owner: DARC, Stanford GSB (nrapstin@stanford.edu). Last updated: 2026-10-13. Runbook version: v1.1 (v1 on Drive, plus the changes listed under Changes from v1).
+Owner: DARC, Stanford GSB (nrapstin@stanford.edu). Last updated: 2026-10-13. Runbook version: v2 (v1 plus the changes listed under Changes from v1). The copy in the project directory on the Yens is the master; the Drive copy is a snapshot.
 
 ## How to use this file
 
