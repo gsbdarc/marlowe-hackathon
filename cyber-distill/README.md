@@ -64,7 +64,7 @@ Updated 2026-10-13. Hackathon: November 13, 2026. See Pipeline overview for what
 | 0. Inventory | Done | Filing lists from Redivis v3_206 (mirror ends 2026-10-02): 358,372 10-K-family rows, 878,478 10-Q-family rows, 188,038 8-Ks since 2023-12-18 |
 | 1. Select filings | Done | 277,329 annual reports from 42,883 companies, fiscal 1996-2025; 58 Item 1.05 8-Ks (57 companies), 46,873 Item 8.01 8-Ks, 49 follow-up 10-Q/10-Ks. `data/final/filings.parquet` |
 | 2-3. Text and paragraphs | Done | 115,226,431 paragraphs (32.3 GB) from 324,293 filings; 0 failures, 59 empty; Item 1A 93.3% (fiscal 2006 on, expected filings), Item 1C 96.4% (fiscal 2024 on), Item 7 87.7%; no stop-and-ask flags. Jobs 749355 and 749356 at `f27bd7c` |
-| 4-6. Prefilter, split, samples | Next | Needs nothing outside DARC |
+| 4-6. Prefilter, split, samples | Done | 1,405,923 keyword hits (1.22%); split 34,646 / 4,345 / 4,374 companies; `train_400k` (nested 25k, 200k), `val` 2,000, `test` 5,000, `test_incident_slice` 500: 407,500 teacher items. Jobs 749567, 749579 at `bcd5f85` |
 | 7-9. Teacher and checks | Not started | Needs the Marlowe Slurm account, partition and model cache |
 | 10-13. Student, labeling, plots | Not started | |
 
@@ -566,22 +566,22 @@ Sample files `train_400k.parquet`, `val.parquet`, `test.parquet` and `test_incid
 
 | Item | Value |
 |---|---|
-| Keyword-hit paragraphs, total and share of all paragraphs | {{FILL}} |
-| Five terms with the most hits | {{FILL}} |
-| Random-sample paragraphs | {{FILL}} |
-| Terms added beyond the list above, and why | {{FILL}} |
+| Keyword-hit paragraphs, total and share of all paragraphs | 1,405,923 (1.22% of 115,226,431); 636,478 with a core term |
+| Five terms with the most hits | breach 543,481; cyber 386,960; year 2000 153,046; virus 139,140; security breach 113,323 (annual reports) |
+| Random-sample paragraphs | 1,136,997 (1% of paragraphs with no term). Incident cues: 21,707 paragraphs, 5,376 of them with a keyword |
+| Terms added beyond the list above, and why | None. Matching changes only: plurals, hyphens in phrases, and `hack` excludes Hackensack, Hackney, Hackett, Hackberry (see Changes from v1) |
 
 ### Split and samples (Stages 5 and 6)
 
 | Item | Value |
 |---|---|
-| Companies in train, validation and test | {{FILL}} |
-| Per-year cap in the training sample | {{FILL}} |
-| Exact duplicates removed from the training sample | {{FILL}} |
-| Share of the training sample from the random sample | {{FILL}} |
-| Share of the training sample from incident enrichment | {{FILL}} |
-| Test paragraphs per era | {{FILL}} |
-| Total items for the teacher | {{FILL}} |
+| Companies in train, validation and test | 34,646 / 4,345 / 4,374 CIKs (all CIKs in `filings.parquet`, including 8-K filers) |
+| Per-year cap in the training sample | 13,207 paragraphs per fiscal year (stratified part), random-sample paragraphs at most 10% of it; fiscal 1996 has 10,672 because its keyword paragraphs run out |
+| Exact duplicates removed from the training sample | 340,275 duplicate texts among train-split candidates, plus 108,660 whose text is in the validation or test pools; 1,583,763 candidates left |
+| Share of the training sample from the random sample | 9.84% (39,354). Core-term paragraphs are 33%, trap-only keyword paragraphs the rest |
+| Share of the training sample from incident enrichment | 1.64%: 3,320 keyword-hit paragraphs from 8-Ks and follow-up filings, and all 3,236 annual-report paragraphs with a cue and a keyword (the 40,000 cap was not reached) |
+| Test paragraphs per era | 1,250 each for 1996-2010, 2011-2017, 2018-2022, 2023-2025; incident slice 500 of 1,078 candidates (7 also in the test set) |
+| Total items for the teacher | 407,500 (train 400,000, validation 2,000, test 5,000, incident slice 500); 214 MB of parquet |
 
 ### Teacher (Stage 7)
 
