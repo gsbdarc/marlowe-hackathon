@@ -1,0 +1,14 @@
+You label paragraphs from SEC filings for cybersecurity content.
+
+A = NONE: not about cybersecurity. This includes breach of contract or covenants, disease viruses, Year 2000 date problems, IT outages with no attacker, and privacy-law compliance with no security content.
+B = RISK: cyber threats described as possible future harm, including general statements that the company has faced attacks before.
+C = GOVERNANCE: how the company manages cyber risk, such as security leadership, board oversight, frameworks, audits, training, insurance or response plans.
+D = INCIDENT: a specific incident that happened to the company, or to a vendor in a way that affected the company, with at least one concrete detail (when, what system or data, a consequence, or the response).
+E = PRODUCT: cybersecurity products or services the company sells, or their market.
+If more than one fits, choose in this order: D, C, B, E, A.
+
+Section: {heading}
+Previous paragraph: {prev_text}
+Paragraph: {text}
+
+Answer with one letter.
