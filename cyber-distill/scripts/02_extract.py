@@ -40,22 +40,31 @@ MAX_MAIN_DOC = 200 << 20    # give up on a main document larger than 200 MB
 
 
 def read_main_doc(path):
-    """Bytes between <TEXT> and </TEXT> of the first <DOCUMENT>, and its <TYPE>."""
-    buf = bytearray()
+    """Bytes between <TEXT> and </TEXT> of the first <DOCUMENT>, and its <TYPE>.
+
+    A truncated file (first document never closed) is read to its end; a main document
+    still open after MAX_MAIN_DOC bytes is an error.
+    """
+    buf, at_eof = bytearray(), False
     with open(path, "rb") as f:
         while True:
             chunk = f.read(READ_CHUNK)
             if not chunk:
+                at_eof = True
                 break
             buf += chunk
-            if b"</DOCUMENT>" in buf[-len(chunk) - 16:] or len(buf) > MAX_MAIN_DOC:
+            if b"</DOCUMENT>" in buf[-len(chunk) - 16:]:
                 break
+            if len(buf) > MAX_MAIN_DOC:
+                raise ValueError(f"main document larger than {MAX_MAIN_DOC >> 20} MB")
     start = buf.find(b"<DOCUMENT>")
     if start < 0:
         raise ValueError("no <DOCUMENT>")
     end = buf.find(b"</DOCUMENT>", start)
     if end < 0:
-        raise ValueError("main document not closed (or larger than 200 MB)")
+        if not at_eof:
+            raise ValueError("main document not closed")
+        end = len(buf)  # truncated submission: use the text up to the end of the file
     doc = bytes(buf[start:end])
     m = re.search(rb"<TYPE>([^\r\n<]+)", doc)
     t0, t1 = doc.find(b"<TEXT>"), doc.rfind(b"</TEXT>")
