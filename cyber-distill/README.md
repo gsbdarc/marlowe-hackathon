@@ -76,7 +76,7 @@ Updated 2026-10-13. Hackathon: November 13, 2026. See Pipeline overview for what
 | 10. Student | Ready to run | `scripts/10_train_student.py` (LoRA, DDP via torchrun, resume) and Slurm jobs for all five checkpoints; smoke-tested on 1 and 2 Yen GPUs with resume. Plan in `docs/TRAINING_PLAN.md` |
 | 11-13. Labeling, evaluation, plots | Not started | |
 
-Open items: model cache or room for 240 GB of weights in `/scratch`, and no purge before November 13; preempt time and GPU caps; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`). Code is in the private GitHub repository `gsbdarc/marlowe-hackathon` under `cyber-distill/`.
+Open items: confirm `/scratch/m000106` (10 TB limit, enough for the 240 GB weights) is not purged before November 13; preempt time and GPU caps; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`). Code is in the private GitHub repository `gsbdarc/marlowe-hackathon` under `cyber-distill/`.
 
 ## Pipeline overview
 

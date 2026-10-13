@@ -27,3 +27,4 @@ The runs above predate the git repository; commit `96f23a0` contains the code th
 | 2026-10-13 | docs | Marlowe Apptainer and Slurm documentation | Account format `marlowe-m000106` (preempt) or `-pm01` (batch); GPUs with `-G`; Apptainer on PATH, cache in scratch. Marlowe Slurm scripts updated; partition still FILL |
 | 2026-10-13 | docs | Marlowe Slurm documentation (full page) | Added `module load slurm mps` to every Marlowe job (docs: avoids CUDA_ERROR_MPS_CONNECTION_FAILED), a 1-GPU smoke test `slurm/marlowe/07_teacher_smoke.slurm` to run before the 240 GB download, and the `sreport` GPU-hours command to docs/MARLOWE.md |
 | 2026-10-13 | config | `sacctmgr show assoc user=$USER` on Marlowe (by the user): basic access | Marlowe jobs set to `--account=marlowe-m000106 --partition=preempt` |
+| 2026-10-13 | config | User confirmed Marlowe `/scratch/m000106` has a 10 TB limit | Enough for the image and teacher weights; purge policy still to confirm |
