@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=cyber_student
-#SBATCH --account=FILL_ACCOUNT
-#SBATCH --partition=FILL_PARTITION
+#SBATCH --account=marlowe-m000106
+#SBATCH --partition=preempt
 #SBATCH --nodes=1
 #SBATCH -G 1
 #SBATCH --output=logs/cyber_student_%j.out
@@ -13,9 +13,8 @@
 # Stage 10 on one Marlowe node. Arguments go to scripts/10_train_student.py.
 # Checkpoint 3 (1 H100):  sbatch slurm/marlowe/10_student.slurm --size 25k --name ckpt3
 # Checkpoint 4 (8 H100):  sbatch -G 8 --exclusive slurm/marlowe/10_student.slurm --size 200k --name ckpt4
-# FILL per our allocation (Marlowe Slurm docs): partition preempt with account marlowe-m000106,
-# or batch with marlowe-m000106-pm01 (hero: -pl01). Preempted jobs restart from the beginning:
-# the teacher skips finished shards; add --resume to a student run.
+# Basic access: account marlowe-m000106 on partition preempt (Marlowe Slurm docs). A preempted job
+# restarts from the beginning: the teacher skips finished shards; add --resume to a student run.
 set -euo pipefail
 # Marlowe Slurm docs: load mps to avoid CUDA_ERROR_MPS_CONNECTION_FAILED (and slurm for srun).
 module load slurm mps

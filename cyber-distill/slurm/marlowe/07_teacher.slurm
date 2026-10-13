@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=cyber_teacher
-#SBATCH --account=FILL_ACCOUNT
-#SBATCH --partition=FILL_PARTITION
+#SBATCH --account=marlowe-m000106
+#SBATCH --partition=preempt
 #SBATCH --nodes=1
 #SBATCH -G 8
 #SBATCH --exclusive
@@ -18,9 +18,8 @@
 #                         --samples train val test test_incident_slice
 # Submit from the code directory; mkdir -p logs first. If vLLM rejects tensor parallel 8 for the
 # FP8 checkpoint, set VLLM_EXTRA="--enable-expert-parallel" (or VLLM_TP=4) and record what worked.
-# FILL per our allocation (Marlowe Slurm docs): partition preempt with account marlowe-m000106,
-# or batch with marlowe-m000106-pm01 (hero: -pl01). Preempted jobs restart from the beginning:
-# the teacher skips finished shards; add --resume to a student run.
+# Basic access: account marlowe-m000106 on partition preempt (Marlowe Slurm docs). A preempted job
+# restarts from the beginning: the teacher skips finished shards; add --resume to a student run.
 set -euo pipefail
 # Marlowe Slurm docs: load mps to avoid CUDA_ERROR_MPS_CONNECTION_FAILED (and slurm for srun).
 module load slurm mps

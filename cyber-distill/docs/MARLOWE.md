@@ -33,7 +33,7 @@ cd /scratch/m000106/gsb_hackathon/cyber-distill/data/final && sha256sum -c MANIF
 
 | What | Where | Status |
 |---|---|---|
-| Slurm account and partition | `FILL_ACCOUNT`, `FILL_PARTITION` in `slurm/marlowe/*.slurm`. Per the [Marlowe Slurm docs](https://marlowe-research.stanford.edu/documentation/slurm/): `preempt` with `marlowe-m000106` (basic access; preempted jobs restart from the beginning), `batch` with `marlowe-m000106-pm01` (medium projects, 16 nodes, 2 days) or `hero` with `-pl01`. GPUs are requested with `-G N` | Which allocation m000106 has: from the Marlowe team |
+| Slurm account and partition | `marlowe-m000106` on `preempt` (basic access), set in `slurm/marlowe/*.slurm`. Preempt time and GPU caps vary: check `sinfo -p preempt -o "%P %l"` and `sacctmgr show qos normal format=Name,MaxTRESPerAccount%40`, and shorten `--time` if the full run exceeds the limit (the teacher resumes from finished shards) | Done (2026-10-13) |
 | Apptainer on Marlowe | On the PATH, no module needed ([Marlowe Apptainer docs](https://marlowe-research.stanford.edu/documentation/software/apptainer/)). Home is 32 GB, so `APPTAINER_CACHEDIR` must be in scratch: `scripts/vllm/env.sh` sets it to `$SCRATCH_BASE/.apptainer` | Done in the scripts |
 | Python for the client and training venv | Load a module first if Marlowe needs one; note it in `reports/environment.md` | Check `module avail python` |
 | Room in scratch for the image (12 GB) and teacher weights (~240 GB), and no purge before Nov 13 | `SCRATCH_BASE` in `scripts/vllm/env.sh` (default `/scratch/m000106/gsb_hackathon/$USER`) | From the Marlowe team |
@@ -148,4 +148,4 @@ sreport cluster UserUtilizationByAccount -T gres/gpu Start=<start of billing cyc
 
 On one Yen H200 (`reports/run_log.md`): the container setup, the server start and the client with a
 small model (Qwen3-1.7B); student training on 1 and 2 GPUs, and resume. The Marlowe Slurm scripts
-have not run: they need the account and partition, and the two-node script has not been tried.
+have not run yet; the two-node script has not been tried.

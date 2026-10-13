@@ -72,11 +72,11 @@ Updated 2026-10-13. Hackathon: November 13, 2026. See Pipeline overview for what
 | 2-3. Text and paragraphs | Done | 115,226,431 paragraphs (32.3 GB) from 324,293 filings; 0 failures, 59 empty; Item 1A 93.3% (fiscal 2006 on, expected filings), Item 1C 96.4% (fiscal 2024 on), Item 7 87.7%; no stop-and-ask flags. Jobs 749355 and 749356 at `f27bd7c` |
 | 4-6. Prefilter, split, samples | Done | 1,405,923 keyword hits (1.22%); split 34,646 / 4,345 / 4,374 companies; `train_400k` (nested 25k, 200k), `val` 2,000, `test` 5,000, `test_incident_slice` 500: 407,500 teacher items. Jobs 749567, 749579 at `bcd5f85` |
 | Transfer to Marlowe | Done | `data/final/` (7 files, 239 MB) and `config/` (4 files) copied with Globus checksum verification on 2026-10-13; names and sizes on Marlowe match the Yens. Tasks `ccc63028-c740-11f1-830e-02ffe792127d` and `f212625c-c740-11f1-bb68-02ffe792127d` |
-| 7-9. Teacher and checks | Ready to run | Teacher client (`scripts/07_teacher.py`), report (`07_report.py`) and Marlowe job (`slurm/marlowe/07_teacher.slurm`) written; vLLM in a container per gsbdarc/vllm_helper. Smoke-tested on one Yen H200 with Qwen3-1.7B. Needs the Marlowe Slurm account and partition, scratch room for the weights, and the weights download. See `docs/MARLOWE.md` |
+| 7-9. Teacher and checks | Ready to run | Teacher client (`scripts/07_teacher.py`), report (`07_report.py`) and Marlowe job (`slurm/marlowe/07_teacher.slurm`) written; vLLM in a container per gsbdarc/vllm_helper. Smoke-tested on one Yen H200 with Qwen3-1.7B. Account `marlowe-m000106`, partition `preempt`. Needs scratch room for the weights and the weights download; run `slurm/marlowe/07_teacher_smoke.slurm` first. See `docs/MARLOWE.md` |
 | 10. Student | Ready to run | `scripts/10_train_student.py` (LoRA, DDP via torchrun, resume) and Slurm jobs for all five checkpoints; smoke-tested on 1 and 2 Yen GPUs with resume. Plan in `docs/TRAINING_PLAN.md` |
 | 11-13. Labeling, evaluation, plots | Not started | |
 
-Open items: Marlowe Slurm account and partition, model cache and room for 240 GB of weights in `/scratch`; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`). Code is in the private GitHub repository `gsbdarc/marlowe-hackathon` under `cyber-distill/`.
+Open items: model cache or room for 240 GB of weights in `/scratch`, and no purge before November 13; preempt time and GPU caps; GPU-hour limit (ground rule 5); whether to drop asset-backed issuers from the plot denominators (flag `abs_issuer` in `filings.parquet`). Code is in the private GitHub repository `gsbdarc/marlowe-hackathon` under `cyber-distill/`.
 
 ## Pipeline overview
 
@@ -222,7 +222,7 @@ Amendments (forms ending in `/A`) are excluded.
 | Yens project directory | `/zfs/projects/darc/marlowe_hackathon/cyber-distill` |
 | Yen GPU partition name | `{{FILL}}` |
 | Marlowe project directory | `/scratch/m000106/gsb_hackathon/cyber-distill` (`data/final`, `data/interim`, `data/teacher`, `models`, `config`) |
-| Marlowe Slurm account and partition | `{{FILL}}` |
+| Marlowe Slurm account and partition | `marlowe-m000106` on `preempt` (basic access); GPUs requested with `-G` |
 | Marlowe model cache (shared, or our own directory) | `{{FILL}}` |
 | Transfer method, Yens to Marlowe, and the command used | Globus CLI 3.43.0. Yens collection "GSB/DARC yen" `2556f515-7a87-407b-a24d-18ed16237588` (full `/zfs` paths); Marlowe collection "Marlowe /scratch directories" `56ac92ca-0bad-4009-baaa-513525b3e648`, whose root is `/scratch`, so `/scratch/m000106/...` is `/m000106/...` in Globus. Command: `bash scripts/globus/push.sh <path>` (checksum sync, MANIFEST.sha256 per directory) |
 
@@ -251,7 +251,7 @@ cyber-distill/
     globus/              setup.sh, mkdirs.sh, push.sh, env.sh (Yens to Marlowe transfers)
     vllm/                env.sh, setup.sh, download_model.sh, wait_ready.sh (vLLM container, gsbdarc/vllm_helper)
     marlowe/             env.sh, setup_venv.sh (paths and venv on Marlowe)
-  slurm/marlowe/         Marlowe jobs (FILL account and partition): teacher, student 1 node, student 2 nodes
+  slurm/marlowe/         Marlowe jobs (marlowe-m000106, preempt): teacher smoke test, teacher, student 1 node, student 2 nodes
   docs/                  MARLOWE.md (how to run on Marlowe), TRAINING_PLAN.md (student and checkpoints)
   requirements-marlowe.txt  client and training venv on Marlowe
   runs/                  student training outputs (not in git)

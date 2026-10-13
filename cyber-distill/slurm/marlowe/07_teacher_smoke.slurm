@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=cyber_teacher_smoke
-#SBATCH --account=FILL_ACCOUNT
-#SBATCH --partition=FILL_PARTITION
+#SBATCH --account=marlowe-m000106
+#SBATCH --partition=preempt
 #SBATCH --nodes=1
 #SBATCH -G 1
 #SBATCH --output=logs/cyber_teacher_smoke_%j.out
@@ -15,8 +15,7 @@
 # Apptainer, MPS inside the container, the model download and the client. Same as the Yens test
 # (slurm/07_teacher_test_yens.slurm). Labels from this model are not used.
 #   sbatch slurm/marlowe/07_teacher_smoke.slurm
-# FILL per our allocation (Marlowe Slurm docs): partition preempt with account marlowe-m000106,
-# or batch with marlowe-m000106-pm01 (hero: -pl01).
+# Basic access: account marlowe-m000106 on partition preempt (Marlowe Slurm docs).
 set -euo pipefail
 # Marlowe Slurm docs: load mps to avoid CUDA_ERROR_MPS_CONNECTION_FAILED (and slurm for srun).
 module load slurm mps

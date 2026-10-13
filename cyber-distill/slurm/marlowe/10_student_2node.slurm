@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=cyber_student_2n
-#SBATCH --account=FILL_ACCOUNT
-#SBATCH --partition=FILL_PARTITION
+#SBATCH --account=marlowe-m000106
+#SBATCH --partition=preempt
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=8
@@ -16,9 +16,8 @@
 #   sbatch slurm/marlowe/10_student_2node.slurm --size 400k --name ckpt5
 # Resume after a stop (same name):  sbatch slurm/marlowe/10_student_2node.slurm --size 400k --name ckpt5 --resume
 # Multi-node runs need DARC's go-ahead (runbook ground rule 5).
-# FILL per our allocation (Marlowe Slurm docs): partition preempt with account marlowe-m000106,
-# or batch with marlowe-m000106-pm01 (hero: -pl01). Preempted jobs restart from the beginning:
-# the teacher skips finished shards; add --resume to a student run.
+# Basic access: account marlowe-m000106 on partition preempt (Marlowe Slurm docs). A preempted job
+# restarts from the beginning: the teacher skips finished shards; add --resume to a student run.
 set -euo pipefail
 # Marlowe Slurm docs: load mps to avoid CUDA_ERROR_MPS_CONNECTION_FAILED (and slurm for srun).
 module load slurm mps
