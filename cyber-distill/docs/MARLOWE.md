@@ -54,7 +54,23 @@ bash scripts/vllm/setup.sh               # vllm_helper at db1c923 and vllm/vllm-
 
 `setup.sh` builds a 12 GB image; if Marlowe's login nodes discourage that, run it in a short CPU job.
 
-## 2. Teacher weights (once, ~240 GB)
+## 2. Smoke test on one GPU (before the big download)
+
+```bash
+sbatch slurm/marlowe/07_teacher_smoke.slurm
+```
+
+Same container, wrapper and client as the pilot, with Qwen3-1.7B on one GPU and 400 items (as
+tested on the Yens). It checks Apptainer, the model download from inside the container, MPS and
+the client. Marlowe GPUs run NVIDIA MPS; the Marlowe Slurm docs say to `module load mps` to avoid
+`CUDA_ERROR_MPS_CONNECTION_FAILED`, and every job in `slurm/marlowe/` does. `vllm.sh` starts the
+container with `--contain --cleanenv` and its own `/tmp`, so if the server log
+(`logs/vllm_server_<jobid>.log`) still shows an MPS connection error, the container cannot reach
+the MPS daemon: try `srun -N 1 -G 1 -A <account> -p <partition> --pty bash`, `module load mps`,
+then `env | grep -i mps` to find its pipe directory, and pass it through (an extra `--bind` and
+`--env CUDA_MPS_PIPE_DIRECTORY=...` in a local copy of `vllm.sh`), or ask the Marlowe team.
+
+## 3. Teacher weights (once, ~240 GB)
 
 ```bash
 source scripts/vllm/env.sh
@@ -64,7 +80,7 @@ bash scripts/vllm/download_model.sh Qwen/Qwen3-235B-A22B-Instruct-2507-FP8   # i
 It saves into `$SCRATCH_BASE/vllm/models` (the container's `/models`) and prints the revision.
 Put the revision in `scripts/marlowe/env.sh` (`TEACHER_REVISION`) and in the README data card.
 
-## 3. Pilot: 10,000 training items (by October 23)
+## 4. Pilot: 10,000 training items (by October 23)
 
 ```bash
 sbatch slurm/marlowe/07_teacher.slurm --run-id pilot --samples train --limit 10000
@@ -90,7 +106,7 @@ error in the server log), resubmit with `VLLM_EXTRA="--enable-expert-parallel" s
 with `VLLM_TP=4`, and record what worked. The full-run GPU-hour estimate is
 `gpu_hours_per_100k_items` x 4.075 (407,500 items).
 
-## 4. Full run: 407,500 items
+## 5. Full run: 407,500 items
 
 ```bash
 sbatch --time=12:00:00 slurm/marlowe/07_teacher.slurm --run-id full \
@@ -101,7 +117,7 @@ $VENV/bin/python scripts/07_report.py --run-id full --gpus 8 --write-final
 The client writes 10,000-item shards and skips finished ones, so if the job stops, submit the same
 command again. `--write-final` writes `data/final/teacher_labels.parquet`.
 
-## 5. Back to the Yens
+## 6. Back to the Yens
 
 From the Yens (the Globus CLI is set up there):
 
@@ -118,6 +134,15 @@ Then the hand check (Stage 8) and the free checks (Stage 9) on the Yens. Student
 [TRAINING_PLAN.md](TRAINING_PLAN.md). Labeling the full corpus with the trained student
 (Stage 11) can use the same container with the adapter (`VLLM_ENABLE_LORA=1`,
 `VLLM_LORAS="student=/models/<adapter>"`), as in the vllm_helper guide.
+
+## GPU-hours used
+
+From the Marlowe Slurm docs, for the allocation and the go/no-go estimate:
+
+```bash
+sreport cluster UserUtilizationByAccount -T gres/gpu Start=<start of billing cycle> End=now \
+    account=<our account> -t hours
+```
 
 ## Tested so far
 

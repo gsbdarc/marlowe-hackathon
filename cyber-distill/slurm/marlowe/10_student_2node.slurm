@@ -20,6 +20,8 @@
 # or batch with marlowe-m000106-pm01 (hero: -pl01). Preempted jobs restart from the beginning:
 # the teacher skips finished shards; add --resume to a student run.
 set -euo pipefail
+# Marlowe Slurm docs: load mps to avoid CUDA_ERROR_MPS_CONNECTION_FAILED (and slurm for srun).
+module load slurm mps
 source scripts/marlowe/env.sh
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
 export MASTER_PORT=29500

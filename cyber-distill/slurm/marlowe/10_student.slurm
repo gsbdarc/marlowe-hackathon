@@ -17,6 +17,8 @@
 # or batch with marlowe-m000106-pm01 (hero: -pl01). Preempted jobs restart from the beginning:
 # the teacher skips finished shards; add --resume to a student run.
 set -euo pipefail
+# Marlowe Slurm docs: load mps to avoid CUDA_ERROR_MPS_CONNECTION_FAILED (and slurm for srun).
+module load slurm mps
 source scripts/marlowe/env.sh
 NGPU=$(nvidia-smi -L | wc -l)
 nvidia-smi --query-gpu=name,memory.total --format=csv
