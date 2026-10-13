@@ -1,0 +1,12 @@
+# Marlowe venv for the Stage 7 client and Stage 10 student training (vLLM itself runs in the
+# container, see scripts/vllm/). Versions match the Yens shared .venv used for the smoke tests.
+accelerate==1.15.0
+numpy==2.4.6
+pandas==3.0.6
+peft==0.21.2
+pyarrow==25.0.1
+PyYAML==6.0.3
+requests==2.34.2
+safetensors==0.8.0
+torch==2.14.1
+transformers==5.19.0
