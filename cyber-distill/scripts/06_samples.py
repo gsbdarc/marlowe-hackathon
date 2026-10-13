@@ -15,10 +15,12 @@ Training sample:
     8-Ks and Item 1.05 follow-up filings; (b) annual-report paragraphs with an incident cue and a
     keyword, drawn at random to fill the cap.
   - The rest is annual-report paragraphs stratified by fiscal year: an equal share per year,
-    with a year's unused share passed to the others.
+    with a year's unused share passed to the others. Within a year, random-sample (no keyword)
+    paragraphs are capped at RANDOM_SHARE of the year's share.
   - Subsets of N = 25,000 and 200,000 take the first rows of each stratum in a fixed random
     order, so 25k is inside 200k inside 400k; each has the same enrichment share.
-  - sample_weight = candidates in the row's stratum / rows drawn from it (400k sample), so
+  - sample_weight = candidates in the row's stratum (fiscal year x keyword/random, or the
+    enrichment group) / rows drawn from it (400k sample), so
     weighted counts estimate the train-split candidate pool.
 
 Validation and test are frozen: if a file exists, the script stops unless its para_ids match
@@ -43,6 +45,7 @@ SECTION = "## Samples (Stages 5-6)"
 SEED = 20261106
 TRAIN_N, SUBSETS = 400_000, (25_000, 200_000)
 ENRICH_CAP = 40_000
+RANDOM_SHARE = 0.10  # cap on random-sample (no keyword) paragraphs per fiscal year in the training sample
 VAL_N, TEST_PER_ERA, INCIDENT_N = 2_000, 1_250, 500
 ERAS = [(1996, 2010), (2011, 2017), (2018, 2022), (2023, 2025)]
 ANNUAL = {"10-K", "10-K405", "10KSB", "10KSB40", "10-KT", "10KT405"}
@@ -174,23 +177,43 @@ def main():
 
     strat_pool = tr[tr.annual & ~tr.para_id.isin(enrich.para_id)].copy()
     strat_pool["fiscal_year"] = strat_pool.fiscal_year.astype(int)
-    avail = strat_pool.fiscal_year.value_counts().sort_index()
+    strat_pool["source"] = strat_pool.in_random_sample.map({True: "random", False: "keyword"})
+    strat_pool["stratum"] = strat_pool.fiscal_year.astype(str) + "/" + strat_pool.source
+    avail_s = strat_pool.stratum.value_counts()
+    years = sorted(strat_pool.fiscal_year.unique())
+    kw_n = pd.Series({y: avail_s.get(f"{y}/keyword", 0) for y in years})
+    rd_n = pd.Series({y: avail_s.get(f"{y}/random", 0) for y in years})
+    # A year can take at most what keeps random rows within RANDOM_SHARE; the rest of its
+    # equal share goes to other years.
+    avail = np.minimum(kw_n + rd_n, np.floor(kw_n / (1 - RANDOM_SHARE))).astype(int)
+
+    def by_stratum(year_alloc):
+        """Split each year's allocation: random at most RANDOM_SHARE unless keyword rows run out."""
+        out = {}
+        for y, n in year_alloc.items():
+            kw, rd = avail_s.get(f"{y}/keyword", 0), avail_s.get(f"{y}/random", 0)
+            r = min(rd, max(int(np.ceil(RANDOM_SHARE * n)), n - kw))
+            out[f"{y}/keyword"], out[f"{y}/random"] = n - r, r
+        return out
+
     alloc = {N: waterfill(avail, N - round(len(enrich) * N / TRAIN_N)) for N in (*SUBSETS, TRAIN_N)}
-    strat = strat_pool[take_ranked(strat_pool, "fiscal_year", alloc[TRAIN_N])].copy()
-    strat["source"] = strat.in_random_sample.map({True: "random", False: "keyword"})
-    strat["sample_weight"] = strat.fiscal_year.map(avail) / strat.fiscal_year.map(alloc[TRAIN_N])
-    rank = strat.sort_values("_key").groupby("fiscal_year").cumcount().reindex(strat.index)
+    alloc_s = {N: by_stratum(a) for N, a in alloc.items()}
+    strat = strat_pool[take_ranked(strat_pool, "stratum", alloc_s[TRAIN_N])].copy()
+    strat["sample_weight"] = strat.stratum.map(avail_s) / strat.stratum.map(alloc_s[TRAIN_N])
+    rank = strat.sort_values("_key").groupby("stratum").cumcount().reindex(strat.index)
     erank = enrich.sort_values("_key").reset_index(drop=False)
     for N in SUBSETS:
         col = f"in_{N // 1000}k"
-        strat[col] = rank < strat.fiscal_year.map(alloc[N])
+        strat[col] = rank < strat.stratum.map(alloc_s[N])
         k = round(len(enrich) * N / TRAIN_N)
         enrich[col] = enrich.para_id.isin(set(erank.para_id.head(k)))
     train = pd.concat([strat, enrich], ignore_index=True)
     assert len(train) == TRAIN_N, len(train)
     for N in SUBSETS:
         assert train[f"in_{N // 1000}k"].sum() == N, (N, train[f"in_{N // 1000}k"].sum())
-    assert (train.in_200k | ~train.in_25k).all()
+    cols = [f"in_{N // 1000}k" for N in SUBSETS]
+    for small, big in zip(cols, cols[1:]):
+        assert (train[big] | ~train[small]).all(), f"{small} not inside {big}"
     stats["train_per_year_cap"] = int(alloc[TRAIN_N].max())
     stats["train_by_source"] = {k: int(v) for k, v in train.source.value_counts().items()}
     stats["train_random_share"] = round(float((train.source == "random").mean()), 4)
@@ -201,7 +224,7 @@ def main():
     frozen_write(val[out_cols + ["sample_weight"]], "val.parquet")
     frozen_write(test[out_cols + ["era", "sample_weight"]], "test.parquet")
     frozen_write(inc[out_cols + ["sample_weight"]], "test_incident_slice.parquet")
-    tcols = out_cols + ["source", "in_25k", "in_200k", "sample_weight"]
+    tcols = out_cols + ["source"] + [f"in_{N // 1000}k" for N in SUBSETS] + ["sample_weight"]
     tpath = FINAL / "train_400k.parquet"
     if tpath.exists() and not args.overwrite_train:
         frozen_write(train[tcols], "train_400k.parquet")
@@ -212,7 +235,8 @@ def main():
     (INTERIM / "samples_stats.json").write_text(json.dumps(stats, indent=2))
 
     by_year = pd.DataFrame({
-        "candidates": avail, "allocated_400k": alloc[TRAIN_N], "in_200k": alloc[200_000], "in_25k": alloc[25_000],
+        "keyword_candidates": kw_n, "random_candidates": rd_n, "allocated": alloc[TRAIN_N],
+        **{f"in_{N // 1000}k": alloc[N] for N in SUBSETS},
         "random_share": strat.groupby("fiscal_year").source.apply(lambda s: f"{100 * (s == 'random').mean():.0f}%"),
     })
     by_year.index.name = "fiscal_year"
