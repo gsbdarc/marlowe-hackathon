@@ -53,8 +53,8 @@ Updated 2026-10-13. Hackathon: November 13, 2026. See Pipeline overview for what
 | Setup | Done | Project directory and git repository on the Yens; pinned `requirements.txt`; Redivis token in `.env`; Globus CLI set up and tested Yens to Marlowe (`scripts/globus/`); Marlowe directories created under `/scratch/m000106/gsb_hackathon/cyber-distill` |
 | 0. Inventory | Done | Filing lists from Redivis v3_206 (mirror ends 2026-10-02): 358,372 10-K-family rows, 878,478 10-Q-family rows, 188,038 8-Ks since 2023-12-18 |
 | 1. Select filings | Done | 277,329 annual reports from 42,883 companies, fiscal 1996-2025; 58 Item 1.05 8-Ks (57 companies), 46,873 Item 8.01 8-Ks, 49 follow-up 10-Q/10-Ks. `data/final/filings.parquet` |
-| 2-3. Text and paragraphs | Running | Tests on fiscal 1998, 2008, 2022 and 2024: no failures; Item 1A found in 85-96% of filings expected to have it (2008-2024), Item 1C in 96% (2024), Item 7 in 88-100%. Full run: Slurm jobs 749166 (extract) and 749172 (check) |
-| 4-6. Prefilter, split, samples | Next | |
+| 2-3. Text and paragraphs | Done | 115,226,431 paragraphs (32.3 GB) from 324,293 filings; 0 failures, 59 empty; Item 1A 93.3% (fiscal 2006 on, expected filings), Item 1C 96.4% (fiscal 2024 on), Item 7 87.7%; no stop-and-ask flags. Jobs 749355 and 749356 at `f27bd7c` |
+| 4-6. Prefilter, split, samples | Next | Needs nothing outside DARC |
 | 7-9. Teacher and checks | Not started | Needs the Marlowe Slurm account, partition and model cache |
 | 10-13. Student, labeling, plots | Not started | |
 
@@ -528,16 +528,16 @@ Sample files `train_400k.parquet` (with `in_25k`, `in_200k`, `sample_weight`), `
 
 | Item | Value |
 |---|---|
-| Parser and version | {{FILL}} |
-| Parse failure rate, overall and worst year | {{FILL}} |
-| Paragraphs, total | {{FILL}} |
-| Median and 95th percentile words per paragraph | {{FILL}} |
-| Paragraphs split for length | {{FILL}} |
-| Item 1A found, share of 10-Ks from fiscal 2006 | {{FILL}} |
-| Item 1C found, share of 10-Ks from fiscal 2024 | {{FILL}} |
-| Item 7 found, share of all 10-Ks | {{FILL}} |
-| Size on disk of paragraphs.parquet | {{FILL}} |
-| Wall time and CPU-hours for Stages 2 and 3 | {{FILL}} |
+| Parser and version | lxml 6.1.3 for HTML and inline XBRL; regex rules for plain text (`scripts/02_extract.py`) |
+| Parse failure rate, overall and worst year | 0 failed, 59 empty of 324,293 filings (annual reports 0.02%); worst fiscal 2000, 21 empty of 12,942 (0.16%) |
+| Paragraphs, total | 115,226,431 (114,647,042 from annual reports; the rest from 8-Ks and follow-up 10-Qs) |
+| Median and 95th percentile words per paragraph | 53 and 189 |
+| Paragraphs split for length | 418,572 pieces (0.36%) came from blocks over 400 words |
+| Item 1A found, share of 10-Ks from fiscal 2006 | 93.3% of filings expected to have it (not asset-backed, not 10-KSB, not "not applicable"); 95.6% in fiscal 2006, 97.9% in fiscal 2025 |
+| Item 1C found, share of 10-Ks from fiscal 2024 | 96.4% of non-asset-backed filings |
+| Item 7 found, share of all 10-Ks | 87.7% (asset-backed issuers have no MD&A; 22,726 annual reports are flagged `abs_issuer`) |
+| Size on disk of paragraphs.parquet | 32.3 GB in 64 zstd parts, `data/interim/paragraphs/part-NNN.parquet` |
+| Wall time and CPU-hours for Stages 2 and 3 | 64 tasks of 8 CPUs, at most 4.5 min each; 24 allocated CPU-hours (job 749355); check 18 s (job 749356) |
 
 ### Prefilter (Stage 4)
 
@@ -599,6 +599,9 @@ Sample files `train_400k.parquet` (with `in_25k`, `in_200k`, `sample_weight`), `
 - 2,660 selected annual reports have no SIC even after filling, mostly trusts and asset-backed issuers.
 - Asset-backed issuers (SIC 6189 and many without SIC) file boilerplate 10-Ks. They are still in the selection; decide before Stage 6 whether to exclude them from the denominator of plot 1.
 - Fiscal 2025 is incomplete: the mirror ends 2026-10-02, so late filers are missing.
+- 59 filings produce no paragraphs (`data/interim/parse_failures.csv`). Most have a main document of a few KB that refers to an exhibit (often Exhibit 13, the annual report to shareholders), which is not read. Two are extraction misses: GulfWest Energy, fiscal 2001 (218 KB, no blocks found), and one filing with 3,579 blocks but no paragraph of 15 words or more.
+- Before about 2010 many companies put MD&A in Exhibit 13 and incorporate it by reference, so Item 7 text is missing for them. Reading Exhibit 13 is a possible extension.
+- Item 1C is 74.8% in fiscal 2023 because fiscal years ending before December 15, 2023 did not require it.
 
 ## Stop and ask
 
