@@ -38,8 +38,18 @@ sbatch slurm/03_check.slurm           # after the array: failure and section-det
 #   test first on a few fiscal years:
 #   sbatch --array=0 slurm/02_extract.slurm --test-years 1998 2008 2022 --limit 200
 
-# Transfers to Marlowe (any time after the files exist)
+# Stage 4: keyword prefilter (flags every paragraph, writes the candidate pool)
+sbatch slurm/04_prefilter.slurm       # array of 64 tasks, a few minutes each
+
+# Stage 5: company split (login node, seconds; frozen: refuses to change an existing split)
+../.venv/bin/python scripts/05_split.py
+
+# Stage 6: Stage 4 report, then the teacher samples (one job, after the Stage 4 array)
+sbatch slurm/06_samples.slurm
+
+# Transfers to Marlowe (after Stage 6)
 bash scripts/globus/push.sh data/final
+bash scripts/globus/push.sh config
 ```
 
 Outputs are deterministic given the same Redivis table version (`v3_206`) and mirror contents. `data/interim/*.json` records the query and its time.
@@ -111,6 +121,12 @@ Design choices:
 | Stage 2, main document | The document whose type matches the form type | The first document in the submission, which matched the form type in every test filing; reading stops at its end, so exhibits and XBRL are never read | Cuts most of the 1.63 TB |
 | Stage 3, sections | Match Item headings | Map a heading by its title first (risk factors, cybersecurity, management's discussion), then by number; 10-KSB Item 6 is MD&A; a bare "Risk Factors" heading starts 1A; item headings followed by fewer than 30 words (table of contents, "None") are not section starts | 10-KSB numbering differs; small companies put risk factors inside Item 1 |
 | Stage 3, check | Item 1A in 80% of filings from fiscal 2006 | Counted among filings expected to have Item 1A: not asset-backed (Regulation AB cited or SIC 6189) and not saying Item 1A is not applicable | Asset-backed trusts and smaller reporting companies legitimately have no risk factors |
+| Stage 4, matching | Word boundaries; prefix match for `cyber` and `hack` | Also plurals (s, es) for non-prefix terms; spaces or hyphens between the words of a phrase; `hack` excludes Hackensack, Hackney, Hackett, Hackberry. Where terms overlap ("data breach" and "breach") only the first listed is recorded | "viruses", "denial-of-service" and "data breaches" would otherwise be missed |
+| Stage 4, random sample | 1% per fiscal year with seed 20261106 | 1% of paragraphs with no term, chosen by a hash of the seed and `para_id` | Same answer on every rerun and in every shard; gives about 1% in each fiscal year |
+| Stage 5, split column | Add `split` to the paragraphs file | `company_split.parquet` only; later stages join on `cik` | Avoids rewriting 32 GB |
+| Stage 6, enrichment | Follow-up filings and incident-cue paragraphs | All keyword-hit paragraphs from 8-Ks and follow-up filings, plus annual-report paragraphs with an incident cue and a keyword, capped at 40,000 in total | A cue without a keyword ("we discovered" an error) is almost always an accounting restatement |
+| Stage 6, leakage | Remove exact duplicates within the training sample | Also remove training paragraphs whose exact text appears in the validation or test pools | Boilerplate shared across companies would otherwise appear in both training and test |
+| Stage 6, test | 5,000 by era, natural distribution | 1,250 per era from annual reports, with `sample_weight` to restore the natural distribution; 8-Ks are tested through the incident slice | Equal eras keep the early years from being drowned out |
 | Stage 1, joint filings | Not covered | One accession listed under several CIKs (utility and subsidiaries, REIT and operating partnership, ABS trust and depositor) is kept once, under the CIK with the most selected annual reports, then the lowest CIK | Otherwise the same document counts several times |
 
 ## Goal
@@ -342,6 +358,8 @@ traps:
 
 **Check:** report hits per term per fiscal year in `reports/data_report.md`.
 
+**How it works** (`scripts/04_prefilter.py`, one task per paragraph shard): every paragraph gets `kw_terms`, `kw_core`, `incident_cue` and `in_random_sample` in `data/interim/prefilter/flags-NNN.parquet`. Keyword hits, the random sample and incident-cue matches are also written with their full rows to `data/interim/pool/part-NNN.parquet`, so later stages read the pool instead of all 115M paragraphs. `scripts/04_report.py` writes the hits per term and fiscal year.
+
 ### Stage 5. Company split (Yens, CPU)
 
 1. For each CIK, compute `int(sha256(str(cik)), 16) % 10`. Values 0 to 7 are train, 8 is validation, 9 is test.
@@ -358,6 +376,8 @@ The pool is the keyword hits plus the random sample.
 4. **Validation, 2,000 paragraphs** from validation-split companies, natural distribution.
 5. **Test, 5,000 paragraphs** from test-split companies, natural distribution, stratified by era: fiscal 1996 to 2010, 2011 to 2017, 2018 to 2022, and 2023 to 2025. Add a separate 500-paragraph incident-enriched slice, reported on its own.
 6. Freeze validation and test before Stage 7. Do not change them after the teacher has seen them.
+
+**How it works** (`scripts/06_samples.py`, one job): the pool is keyword hits plus the random sample. Training candidates are train-split rows with one row per exact text and no text shared with the validation or test pools. Enrichment comes first (up to 40,000), and the rest of the 400,000 is annual-report paragraphs stratified by fiscal year: an equal share per year, with a year's unused share passed to the others. The 25,000 and 200,000 subsets take the first rows of each stratum in a fixed random order, so they are nested and keep the same enrichment share. `sample_weight` is candidates per row drawn in the row's stratum. Validation, test and the incident slice are frozen: the script stops rather than change them.
 
 ### Stage 7. Teacher labeling (Marlowe, 1 node)
 
@@ -492,7 +512,9 @@ Save each plot as a PNG and the plotted values as a CSV in `reports/plots/`. Eve
 | in_random_sample | bool | |
 | split | string | train, val or test |
 
-Sample files `train_400k.parquet` (with `in_25k`, `in_200k`, `sample_weight`), `val.parquet`, `test.parquet` and `test_incident_slice.parquet` carry the paragraph columns plus the teacher columns once Stage 7 is done.
+`data/interim/paragraphs/part-NNN.parquet` (64 parts) hold the paragraph columns above except `kw_terms`, `in_random_sample` and `split`, plus `chunk` (piece number for a split block, -1 otherwise). `data/interim/prefilter/flags-NNN.parquet` add `kw_terms`, `kw_core`, `incident_cue` and `in_random_sample` for every paragraph, and `data/interim/pool/part-NNN.parquet` hold full rows for keyword hits, the random sample and incident-cue matches. `data/final/company_split.parquet`: `cik`, `split`.
+
+Sample files `train_400k.parquet`, `val.parquet`, `test.parquet` and `test_incident_slice.parquet` carry the paragraph columns plus `kw_core`, `incident_cue`, `split`, `abs_issuer` and `sample_weight`. `train_400k.parquet` adds `in_25k`, `in_200k` and `source` (`keyword`, `random`, `enrich_event` or `enrich_cue`); `test.parquet` adds `era`. Teacher columns are added after Stage 7.
 
 `data/final/teacher_labels.parquet`: `para_id`, `label`, `confidence`, `p_A` to `p_E`, `use_for_training`, `invalid`, `teacher_model`, `teacher_revision`, `prompt_version`, `run_id`.
 
