@@ -1,0 +1,15 @@
+# Whitelist: only listed paths are tracked. Each example opts in by adding a "!/<dir>/" line
+# after checking it holds no secrets (.env), licensed data (CUSIPs) or large data files.
+/*
+!/.gitignore
+!/README.md
+!/cyber-distill/
+
+# Never commit these anywhere in the tree
+.env
+**/data/
+**/logs/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.ipynb_checkpoints/
