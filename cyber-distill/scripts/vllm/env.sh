@@ -15,6 +15,9 @@ export APPTAINER_CACHEDIR=$SCRATCH_BASE/.apptainer                  # image laye
 export APPTAINER_CONFIGDIR=${APPTAINER_CONFIGDIR:-$SCRATCH_BASE/.apptainer-config}  # default ~/.apptainer
 # Writable home for the container (what vllm.sh uses), so `apptainer exec` never writes to the real ~.
 export VLLM_CONTAINER_HOME=$SCRATCH_BASE/vllm/home
+for v in SCRATCH_BASE APPTAINER_CACHEDIR APPTAINER_CONFIGDIR VLLM_CONTAINER_HOME; do
+  case "${!v}" in "$HOME"|"$HOME"/*) echo "scripts/vllm/env.sh: $v=${!v} is in home; point it at scratch" >&2; return 1 ;; esac
+done
 mkdir -p "$APPTAINER_CACHEDIR" "$APPTAINER_CONFIGDIR" "$VLLM_CONTAINER_HOME"
 export VLLM_HELPER=$SCRATCH_BASE/vllm_helper
 export VLLM_SIF=$SCRATCH_BASE/vllm/vllm-openai_${VLLM_IMAGE_TAG}.sif

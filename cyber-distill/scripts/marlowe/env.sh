@@ -21,6 +21,11 @@ export CUDA_CACHE_PATH=$XDG_CACHE_HOME/nv                          # default ~/.
 export MPLCONFIGDIR=$XDG_CACHE_HOME/matplotlib
 export APPTAINER_CONFIGDIR=$USER_SCRATCH/.apptainer-config         # default ~/.apptainer (image cache: scripts/vllm/env.sh)
 export PYTHONPYCACHEPREFIX=$XDG_CACHE_HOME/pycache
+for v in CYBER_ROOT VENV HF_HOME XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME PIP_CACHE_DIR UV_CACHE_DIR \
+         UV_PYTHON_INSTALL_DIR TORCH_HOME TORCHINDUCTOR_CACHE_DIR TRITON_CACHE_DIR CUDA_CACHE_PATH MPLCONFIGDIR \
+         APPTAINER_CONFIGDIR PYTHONPYCACHEPREFIX; do
+  case "${!v}" in "$HOME"|"$HOME"/*) echo "scripts/marlowe/env.sh: $v=${!v} is in home; point it at scratch" >&2; return 1 ;; esac
+done
 mkdir -p "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$APPTAINER_CONFIGDIR" "$HF_HOME"
 export TEACHER_MODEL=Qwen/Qwen3-235B-A22B-Instruct-2507-FP8
 export TEACHER_REVISION=${TEACHER_REVISION:-}                      # FILL with the revision printed by scripts/vllm/download_model.sh

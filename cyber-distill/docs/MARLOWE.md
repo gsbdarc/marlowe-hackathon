@@ -61,15 +61,19 @@ at scratch:
 `$SCRATCH_BASE` is `$MARLOWE_SHARE/$USER`. Inside the container, `vllm.sh` binds its Hugging Face,
 compile caches and `/tmp` to `$SCRATCH_BASE/vllm`; `setup.sh` and `download_model.sh` run the
 container with `--contain --cleanenv` and the same scratch home (without `--cleanenv`, the host's
-cache variables point at `/scratch` paths the contained container cannot see). Checked 2026-10-15:
-after setup and the image check, `find ~ -newer <marker>` lists nothing.
+cache variables point at `/scratch` paths the contained container cannot see).
+
+Two checks keep it that way: both env files refuse to load (return 1, which stops a Slurm job, since
+the jobs run `set -e`) if any of these paths is inside `$HOME`; and `setup_venv.sh`, `setup.sh` and
+`download_model.sh` end with `home_check` (`scripts/home_check.sh`), which lists any file the step
+wrote under `$HOME` and exits 1. Both passed on Marlowe on 2026-10-15.
 
 ## 1. Setup (once)
 
 ```bash
 cd /scratch/m000106/gsb_hackathon/cyber-distill
 mkdir -p logs
-source scripts/marlowe/env.sh
+source scripts/marlowe/env.sh && source scripts/vllm/env.sh   # each refuses (returns 1) if a cache path is in home
 bash scripts/marlowe/setup_venv.sh       # uv 0.13.1 + Python 3.12 venv in $VENV (requirements-marlowe.txt)
 bash scripts/vllm/setup.sh               # vllm_helper at db1c923 and vllm/vllm-openai:v0.31.0 as a SIF in SCRATCH_BASE
 ```
@@ -95,7 +99,7 @@ then `env | grep -i mps` to find its pipe directory, and pass it through (an ext
 ## 3. Teacher weights (once, ~240 GB)
 
 ```bash
-source scripts/vllm/env.sh
+source scripts/marlowe/env.sh && source scripts/vllm/env.sh
 bash scripts/vllm/download_model.sh Qwen/Qwen3-235B-A22B-Instruct-2507-FP8   # in tmux, on a node with internet
 ```
 

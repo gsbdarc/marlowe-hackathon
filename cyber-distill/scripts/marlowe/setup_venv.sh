@@ -5,17 +5,19 @@
 # uv (a single binary, pinned) into scratch and lets it provide Python 3.12. The uv binary, the
 # Python it downloads and its cache all live in scratch (home is 32 GB).
 set -euo pipefail
-: "${VENV:?source scripts/marlowe/env.sh first}"
+: "${VENV:?source scripts/marlowe/env.sh first}" "${XDG_CONFIG_HOME:?source scripts/marlowe/env.sh first}"
+source "$(dirname "$0")/../home_check.sh"; home_mark
 UV_VERSION=0.13.1
 PY_VERSION=3.12
 TOOLS=$MARLOWE_SHARE/tools
-# UV_CACHE_DIR, UV_PYTHON_INSTALL_DIR and XDG_CONFIG_HOME (where the installer writes its receipt)
-# come from scripts/marlowe/env.sh, so nothing lands in home.
+# UV_CACHE_DIR, UV_PYTHON_INSTALL_DIR and XDG_CONFIG_HOME come from scripts/marlowe/env.sh; the uv
+# installer writes its receipt to $XDG_CONFIG_HOME/uv, so nothing lands in home (checked at the end).
 if [ ! -x "$TOOLS/uv" ] || ! "$TOOLS/uv" --version | grep -q " $UV_VERSION"; then
     curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | env UV_INSTALL_DIR="$TOOLS" UV_NO_MODIFY_PATH=1 sh
 fi
 "$TOOLS/uv" --version
-"$TOOLS/uv" venv --python "$PY_VERSION" "$VENV"
+[ -x "$VENV/bin/python" ] || "$TOOLS/uv" venv --python "$PY_VERSION" "$VENV"   # rerunnable: reuses the venv
 "$TOOLS/uv" pip install --python "$VENV/bin/python" -r "$(dirname "$0")/../../requirements-marlowe.txt"
 "$VENV/bin/python" --version
 "$VENV/bin/python" -c "import torch, transformers, peft; print('torch', torch.__version__, 'cuda', torch.version.cuda, '| transformers', transformers.__version__, '| peft', peft.__version__)"
+home_check

@@ -5,6 +5,7 @@
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 command -v apptainer >/dev/null || module load apptainer
+source "$(dirname "$0")/../home_check.sh"; home_mark
 mkdir -p "$SCRATCH_BASE/vllm" "$APPTAINER_CACHEDIR"
 if [ ! -d "$VLLM_HELPER/.git" ]; then
   git clone -q https://github.com/gsbdarc/vllm_helper.git "$VLLM_HELPER"
@@ -16,3 +17,4 @@ if [ ! -f "$VLLM_SIF" ]; then
 fi
 ls -lh "$VLLM_SIF"
 apptainer exec --contain --cleanenv --home "$VLLM_CONTAINER_HOME:/root" "$VLLM_SIF" python3 -c "import vllm, torch; print('vllm', vllm.__version__, '| torch', torch.__version__)"
+home_check

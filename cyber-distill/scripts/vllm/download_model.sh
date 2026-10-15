@@ -6,6 +6,7 @@
 set -euo pipefail
 : "${SCRATCH_BASE:?source scripts/vllm/env.sh first}"
 command -v apptainer >/dev/null || module load apptainer
+source "$(dirname "$0")/../home_check.sh"; home_mark
 MODEL=${1:?model id}; REV=${2:-}
 mkdir -p "$SCRATCH_BASE/vllm/models"
 df -h "$SCRATCH_BASE" | tail -1
@@ -20,3 +21,4 @@ print("downloaded to", path)
 print("REVISION =", HfApi().model_info(model, revision=rev).sha, " <- record this (TEACHER_REVISION, README data card)")
 PY
 du -sh "$SCRATCH_BASE/vllm/models"
+home_check
