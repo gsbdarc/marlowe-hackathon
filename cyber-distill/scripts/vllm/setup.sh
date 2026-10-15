@@ -15,4 +15,4 @@ if [ ! -f "$VLLM_SIF" ]; then
   apptainer pull "$VLLM_SIF" "docker://vllm/vllm-openai:${VLLM_IMAGE_TAG}"
 fi
 ls -lh "$VLLM_SIF"
-apptainer exec "$VLLM_SIF" python3 -c "import vllm, torch; print('vllm', vllm.__version__, '| torch', torch.__version__)"
+apptainer exec --contain --cleanenv --home "$VLLM_CONTAINER_HOME:/root" "$VLLM_SIF" python3 -c "import vllm, torch; print('vllm', vllm.__version__, '| torch', torch.__version__)"

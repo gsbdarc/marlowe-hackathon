@@ -9,7 +9,8 @@ set -euo pipefail
 UV_VERSION=0.13.1
 PY_VERSION=3.12
 TOOLS=$MARLOWE_SHARE/tools
-export UV_CACHE_DIR=$MARLOWE_SHARE/.cache/uv UV_PYTHON_INSTALL_DIR=$TOOLS/python
+# UV_CACHE_DIR, UV_PYTHON_INSTALL_DIR and XDG_CONFIG_HOME (where the installer writes its receipt)
+# come from scripts/marlowe/env.sh, so nothing lands in home.
 if [ ! -x "$TOOLS/uv" ] || ! "$TOOLS/uv" --version | grep -q " $UV_VERSION"; then
     curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | env UV_INSTALL_DIR="$TOOLS" UV_NO_MODIFY_PATH=1 sh
 fi

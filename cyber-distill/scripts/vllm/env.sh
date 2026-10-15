@@ -11,6 +11,10 @@ if [ -z "${SCRATCH_BASE:-}" ]; then
   esac
 fi
 export SCRATCH_BASE
-export APPTAINER_CACHEDIR=$SCRATCH_BASE/.apptainer
+export APPTAINER_CACHEDIR=$SCRATCH_BASE/.apptainer                  # image layers (default ~/.apptainer/cache)
+export APPTAINER_CONFIGDIR=${APPTAINER_CONFIGDIR:-$SCRATCH_BASE/.apptainer-config}  # default ~/.apptainer
+# Writable home for the container (what vllm.sh uses), so `apptainer exec` never writes to the real ~.
+export VLLM_CONTAINER_HOME=$SCRATCH_BASE/vllm/home
+mkdir -p "$APPTAINER_CACHEDIR" "$APPTAINER_CONFIGDIR" "$VLLM_CONTAINER_HOME"
 export VLLM_HELPER=$SCRATCH_BASE/vllm_helper
 export VLLM_SIF=$SCRATCH_BASE/vllm/vllm-openai_${VLLM_IMAGE_TAG}.sif

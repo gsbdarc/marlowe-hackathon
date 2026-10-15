@@ -9,7 +9,9 @@ command -v apptainer >/dev/null || module load apptainer
 MODEL=${1:?model id}; REV=${2:-}
 mkdir -p "$SCRATCH_BASE/vllm/models"
 df -h "$SCRATCH_BASE" | tail -1
-apptainer exec --bind "$SCRATCH_BASE/vllm/models:/models" "$VLLM_SIF" python3 - "$MODEL" "$REV" <<'PY'
+# --contain --cleanenv + a scratch home (as in vllm.sh): huggingface_hub's cache, token and lock files stay out of the real home.
+apptainer exec --contain --cleanenv --home "$VLLM_CONTAINER_HOME:/root" --bind "$SCRATCH_BASE/vllm/models:/models" \
+  --env HF_HOME=/root/.cache/huggingface "$VLLM_SIF" python3 - "$MODEL" "$REV" <<'PY'
 import sys
 from huggingface_hub import HfApi, snapshot_download
 model, rev = sys.argv[1], sys.argv[2] or None

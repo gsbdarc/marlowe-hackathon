@@ -42,6 +42,28 @@ cd /scratch/m000106/gsb_hackathon/cyber-distill/data/final && sha256sum -c MANIF
 The scripts read data relative to `CYBER_ROOT` (set in `scripts/marlowe/env.sh`), so the code can
 run from this directory or from a clone of the repository. Run everything from the code directory.
 
+## Nothing in home
+
+Marlowe home is 32 GB, so nothing from this project is written there. `scripts/marlowe/env.sh`
+(sourced by every Marlowe job and by setup) and `scripts/vllm/env.sh` point every cache and config
+at scratch:
+
+| Variable | Set to | Replaces default |
+|---|---|---|
+| `VENV` | `$MARLOWE_SHARE/envs/cyber` | |
+| `HF_HOME` | `$MARLOWE_SHARE/hf_cache` (student base model) | `~/.cache/huggingface` |
+| `UV_CACHE_DIR`, `UV_PYTHON_INSTALL_DIR` | `$MARLOWE_SHARE/.cache/uv`, `$MARLOWE_SHARE/tools/python` (uv itself: `$MARLOWE_SHARE/tools/uv`) | `~/.cache/uv`, `~/.local/share/uv` |
+| `XDG_CACHE_HOME`, `XDG_CONFIG_HOME`, `XDG_DATA_HOME` | `$MARLOWE_SHARE/$USER/{.cache,.config,.local/share}` | `~/.cache`, `~/.config`, `~/.local/share` |
+| `PIP_CACHE_DIR`, `TORCH_HOME`, `TORCHINDUCTOR_CACHE_DIR`, `TRITON_CACHE_DIR`, `CUDA_CACHE_PATH`, `MPLCONFIGDIR`, `PYTHONPYCACHEPREFIX` | under `$XDG_CACHE_HOME` | `~/.cache/...`, `~/.triton`, `~/.nv` |
+| `APPTAINER_CACHEDIR`, `APPTAINER_CONFIGDIR` | `$SCRATCH_BASE/.apptainer`, `$SCRATCH_BASE/.apptainer-config` | `~/.apptainer` |
+| `VLLM_CONTAINER_HOME` | `$SCRATCH_BASE/vllm/home`: the container's `/root` | real home mounted in the container |
+
+`$SCRATCH_BASE` is `$MARLOWE_SHARE/$USER`. Inside the container, `vllm.sh` binds its Hugging Face,
+compile caches and `/tmp` to `$SCRATCH_BASE/vllm`; `setup.sh` and `download_model.sh` run the
+container with `--contain --cleanenv` and the same scratch home (without `--cleanenv`, the host's
+cache variables point at `/scratch` paths the contained container cannot see). Checked 2026-10-15:
+after setup and the image check, `find ~ -newer <marker>` lists nothing.
+
 ## 1. Setup (once)
 
 ```bash
