@@ -6,26 +6,10 @@ export CYBER_ROOT=/scratch/m000106/gsb_hackathon/cyber-distill     # data/, conf
 export MARLOWE_SHARE=/scratch/m000106/gsb_hackathon                # shared by the hackathon team
 export HF_HOME=${HF_HOME:-$MARLOWE_SHARE/hf_cache}                 # student base model (Qwen3-1.7B) for training
 export VENV=${VENV:-$MARLOWE_SHARE/envs/cyber}                     # client + training venv (requirements-marlowe.txt)
-# Caches and configs out of home: per user, under $MARLOWE_SHARE/$USER (next to SCRATCH_BASE)
+# Caches and configs out of home (scripts/cache_env.sh): per user, under $MARLOWE_SHARE/$USER
 export USER_SCRATCH=$MARLOWE_SHARE/$USER
-export XDG_CACHE_HOME=$USER_SCRATCH/.cache                         # default for pip, torch hub, etc.
-export XDG_CONFIG_HOME=$USER_SCRATCH/.config                       # uv receipt, matplotlib, etc.
-export XDG_DATA_HOME=$USER_SCRATCH/.local/share
-export PIP_CACHE_DIR=$XDG_CACHE_HOME/pip
 export UV_CACHE_DIR=$MARLOWE_SHARE/.cache/uv                       # shared: the venv is shared
 export UV_PYTHON_INSTALL_DIR=$MARLOWE_SHARE/tools/python
-export TORCH_HOME=$XDG_CACHE_HOME/torch
-export TORCHINDUCTOR_CACHE_DIR=$XDG_CACHE_HOME/torchinductor
-export TRITON_CACHE_DIR=$XDG_CACHE_HOME/triton                     # default ~/.triton
-export CUDA_CACHE_PATH=$XDG_CACHE_HOME/nv                          # default ~/.nv
-export MPLCONFIGDIR=$XDG_CACHE_HOME/matplotlib
-export APPTAINER_CONFIGDIR=$USER_SCRATCH/.apptainer-config         # default ~/.apptainer (image cache: scripts/vllm/env.sh)
-export PYTHONPYCACHEPREFIX=$XDG_CACHE_HOME/pycache
-for v in CYBER_ROOT VENV HF_HOME XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME PIP_CACHE_DIR UV_CACHE_DIR \
-         UV_PYTHON_INSTALL_DIR TORCH_HOME TORCHINDUCTOR_CACHE_DIR TRITON_CACHE_DIR CUDA_CACHE_PATH MPLCONFIGDIR \
-         APPTAINER_CONFIGDIR PYTHONPYCACHEPREFIX; do
-  case "${!v}" in "$HOME"|"$HOME"/*) echo "scripts/marlowe/env.sh: $v=${!v} is in home; point it at scratch" >&2; return 1 ;; esac
-done
-mkdir -p "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$APPTAINER_CONFIGDIR" "$HF_HOME"
+source "$(dirname "${BASH_SOURCE[0]}")/../cache_env.sh" || return 1
 export TEACHER_MODEL=Qwen/Qwen3-235B-A22B-Instruct-2507-FP8
 export TEACHER_REVISION=${TEACHER_REVISION:-}                      # FILL with the revision printed by scripts/vllm/download_model.sh

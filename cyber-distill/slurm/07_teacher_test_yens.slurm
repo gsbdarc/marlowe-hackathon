@@ -15,6 +15,7 @@
 # items. These labels are not used for anything. Needs scripts/vllm/setup.sh done once.
 set -euo pipefail
 cd /zfs/projects/darc/marlowe_hackathon/cyber-distill
+source scripts/yens/env.sh || exit 1   # caches and configs in /scratch/users/$USER, not home
 module load apptainer
 source scripts/vllm/env.sh
 source "$VLLM_HELPER/vllm.sh"

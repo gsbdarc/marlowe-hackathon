@@ -6,13 +6,13 @@ VLLM_IMAGE_TAG=v0.31.0                                # docker://vllm/vllm-opena
 VLLM_HELPER_COMMIT=db1c923                            # gsbdarc/vllm_helper commit used
 if [ -z "${SCRATCH_BASE:-}" ]; then
   case "$(hostname -f)" in
-    *yen*) export SCRATCH_BASE=/scratch/shared/$USER ;;                 # Yens (as in the guide)
+    *yen*) export SCRATCH_BASE=/scratch/users/$USER ;;                  # Yens (per-user scratch; the guide uses /scratch/shared/$USER)
     *)     export SCRATCH_BASE=/scratch/m000106/gsb_hackathon/$USER ;;  # Marlowe
   esac
 fi
 export SCRATCH_BASE
 export APPTAINER_CACHEDIR=$SCRATCH_BASE/.apptainer                  # image layers (default ~/.apptainer/cache)
-export APPTAINER_CONFIGDIR=${APPTAINER_CONFIGDIR:-$SCRATCH_BASE/.apptainer-config}  # default ~/.apptainer
+export APPTAINER_CONFIGDIR=${APPTAINER_CONFIGDIR:-$SCRATCH_BASE/.apptainer-config}  # default ~/.apptainer (same as scripts/cache_env.sh)
 # Writable home for the container (what vllm.sh uses), so `apptainer exec` never writes to the real ~.
 export VLLM_CONTAINER_HOME=$SCRATCH_BASE/vllm/home
 for v in SCRATCH_BASE APPTAINER_CACHEDIR APPTAINER_CONFIGDIR VLLM_CONTAINER_HOME; do

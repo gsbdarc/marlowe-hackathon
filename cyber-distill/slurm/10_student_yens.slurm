@@ -17,7 +17,7 @@
 # (A Yen GPU node has 4 GPUs and 257 GB; Slurm gives about 3.9 GB per CPU, so keep --mem near the CPU count x 3.9.)
 set -euo pipefail
 cd /zfs/projects/darc/marlowe_hackathon/cyber-distill
-export HF_HOME=/scratch/users/$USER/hf_cache
+source scripts/yens/env.sh || exit 1   # caches and configs in /scratch/users/$USER, not home
 NGPU=$(nvidia-smi -L | wc -l)
 nvidia-smi --query-gpu=name,memory.total --format=csv
 ../.venv/bin/torchrun --standalone --nproc_per_node "$NGPU" scripts/10_train_student.py "$@"

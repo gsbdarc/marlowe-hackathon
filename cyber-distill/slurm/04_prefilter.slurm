@@ -14,4 +14,5 @@
 # ~2,600 paragraphs/s/core measured, so a few minutes on 8 CPUs).
 # Submit from the project root: sbatch slurm/04_prefilter.slurm
 cd /zfs/projects/darc/marlowe_hackathon/cyber-distill
+source scripts/yens/env.sh || exit 1   # caches and configs in /scratch/users/$USER, not home
 ../.venv/bin/python scripts/04_prefilter.py --workers "$SLURM_CPUS_PER_TASK"

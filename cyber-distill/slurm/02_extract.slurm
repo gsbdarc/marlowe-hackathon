@@ -15,4 +15,5 @@
 # Test on three fiscal years instead (single task):
 #   sbatch --array=0 slurm/02_extract.slurm --test-years 1998 2008 2022 --limit 200
 cd /zfs/projects/darc/marlowe_hackathon/cyber-distill
+source scripts/yens/env.sh || exit 1   # caches and configs in /scratch/users/$USER, not home
 ../.venv/bin/python scripts/02_extract.py --n-shards 64 --workers "$SLURM_CPUS_PER_TASK" "$@"

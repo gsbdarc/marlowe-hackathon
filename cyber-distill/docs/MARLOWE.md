@@ -45,8 +45,10 @@ run from this directory or from a clone of the repository. Run everything from t
 ## Nothing in home
 
 Marlowe home is 32 GB, so nothing from this project is written there. `scripts/marlowe/env.sh`
-(sourced by every Marlowe job and by setup) and `scripts/vllm/env.sh` point every cache and config
-at scratch:
+(sourced by every Marlowe job and by setup) sets the project paths and sources
+`scripts/cache_env.sh`, which points every cache and config at scratch; `scripts/vllm/env.sh` does
+the same for Apptainer and the container. The Yens use the same `cache_env.sh` through
+`scripts/yens/env.sh`, with `/scratch/users/$USER` as the base (every job in `slurm/` sources it):
 
 | Variable | Set to | Replaces default |
 |---|---|---|
@@ -63,7 +65,7 @@ compile caches and `/tmp` to `$SCRATCH_BASE/vllm`; `setup.sh` and `download_mode
 container with `--contain --cleanenv` and the same scratch home (without `--cleanenv`, the host's
 cache variables point at `/scratch` paths the contained container cannot see).
 
-Two checks keep it that way: both env files refuse to load (return 1, which stops a Slurm job, since
+Two checks keep it that way: the env files refuse to load (return 1, which stops a Slurm job, since
 the jobs run `set -e`) if any of these paths is inside `$HOME`; and `setup_venv.sh`, `setup.sh` and
 `download_model.sh` end with `home_check` (`scripts/home_check.sh`), which lists any file the step
 wrote under `$HOME` and exits 1. Both passed on Marlowe on 2026-10-15.

@@ -54,7 +54,7 @@ for p in scripts slurm docs README.md requirements-marlowe.txt; do bash scripts/
 
 # Stages 7 and 10 on Marlowe: see docs/MARLOWE.md and docs/TRAINING_PLAN.md.
 # Smoke tests of the same code on one Yen GPU (vLLM in a container, as in gsbdarc/vllm_helper):
-sbatch slurm/vllm_setup_yens.slurm    # once: vllm_helper + vllm/vllm-openai:v0.31.0 into /scratch/shared/$USER
+sbatch slurm/vllm_setup_yens.slurm    # once: vllm_helper + vllm/vllm-openai:v0.31.0 into /scratch/users/$USER
 sbatch slurm/07_teacher_test_yens.slurm
 ```
 
@@ -220,10 +220,11 @@ Amendments (forms ending in `/A`) are excluded.
 | Filing list with paths | Redivis `stanfordgsblibrary.edgar_filings` v3_206; token in `.env` (`REDIVIS_API_TOKEN`, data scope) |
 | Mirror documentation | https://github.com/gsbdarc/edgar-yens-mirror |
 | Yens project directory | `/zfs/projects/darc/marlowe_hackathon/cyber-distill` |
-| Yen GPU partition name | `{{FILL}}` |
+| Yen GPU partition name | `gpu` (H200 NVL, 4 per node) |
 | Marlowe project directory | `/scratch/m000106/gsb_hackathon/cyber-distill` (`data/final`, `data/interim`, `data/teacher`, `models`, `config`) |
 | Marlowe Slurm account and partition | `marlowe-m000106` on `preempt` (basic access, 4-hour job limit); GPUs requested with `-G`; venv Python 3.12 via uv (system Python is 3.10) |
-| Marlowe model cache (shared, or our own directory) | `{{FILL}}` |
+| Marlowe model cache (shared, or our own directory) | Teacher weights: `$SCRATCH_BASE/vllm/models` = `/scratch/m000106/gsb_hackathon/$USER/vllm/models` (the container's `/models`); student base model: `HF_HOME=/scratch/m000106/gsb_hackathon/hf_cache` (shared) |
+| Scratch for caches, venvs, container images (never home) | Yens: `/scratch/users/$USER` (`scripts/yens/env.sh`). Marlowe: `/scratch/m000106/gsb_hackathon/$USER`, shared venv and uv in `/scratch/m000106/gsb_hackathon` (`scripts/marlowe/env.sh`). Both source `scripts/cache_env.sh`, which points XDG, pip, uv, torch, Triton, CUDA, matplotlib, pycache and Apptainer caches at scratch and refuses to load if any is in `$HOME`. Every job sources the cluster's env file; details in [docs/MARLOWE.md](docs/MARLOWE.md#nothing-in-home) |
 | Transfer method, Yens to Marlowe, and the command used | Globus CLI 3.43.0. Yens collection "GSB/DARC yen" `2556f515-7a87-407b-a24d-18ed16237588` (full `/zfs` paths); Marlowe collection "Marlowe /scratch directories" `56ac92ca-0bad-4009-baaa-513525b3e648`, whose root is `/scratch`, so `/scratch/m000106/...` is `/m000106/...` in Globus. Command: `bash scripts/globus/push.sh <path>` (checksum sync, MANIFEST.sha256 per directory) |
 
 Read the mirror documentation before Stage 0 and describe the directory structure in the Data card.

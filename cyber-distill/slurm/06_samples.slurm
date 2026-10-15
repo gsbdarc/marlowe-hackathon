@@ -12,5 +12,6 @@
 # Stage 4 report, then Stage 6 samples. Run after every task of slurm/04_prefilter.slurm
 # and after scripts/05_split.py. Loads the whole candidate pool (a few million rows with text).
 cd /zfs/projects/darc/marlowe_hackathon/cyber-distill
+source scripts/yens/env.sh || exit 1   # caches and configs in /scratch/users/$USER, not home
 ../.venv/bin/python scripts/04_report.py
 ../.venv/bin/python scripts/06_samples.py "$@"

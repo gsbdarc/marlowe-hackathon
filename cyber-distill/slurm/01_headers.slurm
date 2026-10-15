@@ -14,4 +14,5 @@
 # Test runs read ~2,000 headers/s with 16 threads; a full year is under 30,000 filings.
 # Submit from the project root: sbatch slurm/01_headers.slurm
 cd /zfs/projects/darc/marlowe_hackathon/cyber-distill
+source scripts/yens/env.sh || exit 1   # caches and configs in /scratch/users/$USER, not home
 ../.venv/bin/python scripts/01_headers.py --year $((1996 + SLURM_ARRAY_TASK_ID)) --threads 16

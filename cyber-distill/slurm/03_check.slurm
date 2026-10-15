@@ -12,4 +12,5 @@
 # Stage 2-3 checks; run after every task of slurm/02_extract.slurm has finished.
 # Reads five small columns of every paragraph (about 120M rows), hence the memory.
 cd /zfs/projects/darc/marlowe_hackathon/cyber-distill
+source scripts/yens/env.sh || exit 1   # caches and configs in /scratch/users/$USER, not home
 ../.venv/bin/python scripts/03_check.py
