@@ -33,9 +33,9 @@ cd /scratch/m000106/gsb_hackathon/cyber-distill/data/final && sha256sum -c MANIF
 
 | What | Where | Status |
 |---|---|---|
-| Slurm account and partition | `marlowe-m000106` on `preempt` (basic access), set in `slurm/marlowe/*.slurm`. Preempt time and GPU caps vary: check `sinfo -p preempt -o "%P %l"` and `sacctmgr show qos normal format=Name,MaxTRESPerAccount%40`, and shorten `--time` if the full run exceeds the limit (the teacher resumes from finished shards) | Done (2026-10-13) |
+| Slurm account and partition | `marlowe-m000106` on `preempt` (basic access), set in `slurm/marlowe/*.slurm`. `sinfo -p preempt` shows a **4:00:00 time limit** (31 nodes, 8 GPUs each; checked 2026-10-15), so every job asks for at most 4 hours and the full teacher run is a chain of jobs (step 5). Preempted jobs restart from the beginning: the teacher skips finished shards, the student takes `--resume` | Done (2026-10-15) |
 | Apptainer on Marlowe | On the PATH, no module needed ([Marlowe Apptainer docs](https://marlowe-research.stanford.edu/documentation/software/apptainer/)). Home is 32 GB, so `APPTAINER_CACHEDIR` must be in scratch: `scripts/vllm/env.sh` sets it to `$SCRATCH_BASE/.apptainer` | Done in the scripts |
-| Python for the client and training venv | Load a module first if Marlowe needs one; note it in `reports/environment.md` | Check `module avail python` |
+| Python for the client and training venv | Marlowe's system Python is 3.10 (modules: only `python3`, `python39`), too old for pandas 3 and numpy 2.4. `setup_venv.sh` installs uv 0.13.1 into `$MARLOWE_SHARE/tools` and builds the venv with Python 3.12; uv's Python and cache stay in scratch. Login nodes have internet (Hugging Face reachable) | Done in the scripts (2026-10-15) |
 | Room in scratch for the image (12 GB) and teacher weights (~240 GB) | `/scratch/m000106` has a 10 TB limit (confirmed 2026-10-13); `SCRATCH_BASE` in `scripts/vllm/env.sh` defaults to `/scratch/m000106/gsb_hackathon/$USER` | Done. Still to confirm: no purge before Nov 13 |
 | Teacher revision (commit hash) | `TEACHER_REVISION` in `scripts/marlowe/env.sh` | Printed by `download_model.sh` |
 
@@ -48,7 +48,7 @@ run from this directory or from a clone of the repository. Run everything from t
 cd /scratch/m000106/gsb_hackathon/cyber-distill
 mkdir -p logs
 source scripts/marlowe/env.sh
-bash scripts/marlowe/setup_venv.sh       # client + training venv in $VENV (requirements-marlowe.txt)
+bash scripts/marlowe/setup_venv.sh       # uv 0.13.1 + Python 3.12 venv in $VENV (requirements-marlowe.txt)
 bash scripts/vllm/setup.sh               # vllm_helper at db1c923 and vllm/vllm-openai:v0.31.0 as a SIF in SCRATCH_BASE
 ```
 
@@ -109,13 +109,17 @@ with `VLLM_TP=4`, and record what worked. The full-run GPU-hour estimate is
 ## 5. Full run: 407,500 items
 
 ```bash
-sbatch --time=12:00:00 slurm/marlowe/07_teacher.slurm --run-id full \
-    --samples train val test test_incident_slice
+ARGS="--run-id full --samples train val test test_incident_slice"
+J=$(sbatch --parsable slurm/marlowe/07_teacher.slurm $ARGS)
+for i in 1 2 3; do J=$(sbatch --parsable --dependency=afterany:$J slurm/marlowe/07_teacher.slurm $ARGS); done
+# when the last one finishes (ls data/teacher/full | wc -l: 40 train + 1 val + 1 test + 1 slice shards):
 $VENV/bin/python scripts/07_report.py --run-id full --gpus 8 --write-final
 ```
 
-The client writes 10,000-item shards and skips finished ones, so if the job stops, submit the same
-command again. `--write-final` writes `data/final/teacher_labels.parquet`.
+`preempt` allows 4 hours per job, so the run is a chain: each job starts the server again (count
+its load time from the server log), and the client writes 10,000-item shards and skips finished
+ones. Set the number of jobs from the pilot's `gpu_hours_per_100k_items`; if shards remain after
+the chain, submit the same command again. `--write-final` writes `data/final/teacher_labels.parquet`.
 
 ## 6. Back to the Yens
 

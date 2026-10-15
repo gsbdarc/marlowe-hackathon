@@ -222,7 +222,7 @@ Amendments (forms ending in `/A`) are excluded.
 | Yens project directory | `/zfs/projects/darc/marlowe_hackathon/cyber-distill` |
 | Yen GPU partition name | `{{FILL}}` |
 | Marlowe project directory | `/scratch/m000106/gsb_hackathon/cyber-distill` (`data/final`, `data/interim`, `data/teacher`, `models`, `config`) |
-| Marlowe Slurm account and partition | `marlowe-m000106` on `preempt` (basic access); GPUs requested with `-G` |
+| Marlowe Slurm account and partition | `marlowe-m000106` on `preempt` (basic access, 4-hour job limit); GPUs requested with `-G`; venv Python 3.12 via uv (system Python is 3.10) |
 | Marlowe model cache (shared, or our own directory) | `{{FILL}}` |
 | Transfer method, Yens to Marlowe, and the command used | Globus CLI 3.43.0. Yens collection "GSB/DARC yen" `2556f515-7a87-407b-a24d-18ed16237588` (full `/zfs` paths); Marlowe collection "Marlowe /scratch directories" `56ac92ca-0bad-4009-baaa-513525b3e648`, whose root is `/scratch`, so `/scratch/m000106/...` is `/m000106/...` in Globus. Command: `bash scripts/globus/push.sh <path>` (checksum sync, MANIFEST.sha256 per directory) |
 
