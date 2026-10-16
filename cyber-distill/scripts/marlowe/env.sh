@@ -12,4 +12,4 @@ export UV_CACHE_DIR=$MARLOWE_SHARE/.cache/uv                       # shared: the
 export UV_PYTHON_INSTALL_DIR=$MARLOWE_SHARE/tools/python
 source "$(dirname "${BASH_SOURCE[0]}")/../cache_env.sh" || return 1
 export TEACHER_MODEL=Qwen/Qwen3-235B-A22B-Instruct-2507-FP8
-export TEACHER_REVISION=${TEACHER_REVISION:-}                      # FILL with the revision printed by scripts/vllm/download_model.sh
+export TEACHER_REVISION=${TEACHER_REVISION:-e156cb4efae43fbee1a1ab073f946a1377e6b969}  # from scripts/vllm/download_model.sh, 2026-10-16

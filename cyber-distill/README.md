@@ -624,7 +624,7 @@ Sample files `train_400k.parquet`, `val.parquet`, `test.parquet` and `test_incid
 
 | Item | Value |
 |---|---|
-| Model revision hash | {{FILL}} |
+| Model revision hash | `e156cb4efae43fbee1a1ab073f946a1377e6b969` (downloaded 2026-10-16, 224 GB, to `/scratch/m000106/gsb_hackathon/$USER/vllm/models`) |
 | vLLM version and parallel settings that worked | {{FILL}} |
 | Pilot: items per second, GPU-hours | {{FILL}} |
 | Full run: items, wall time, GPU-hours | {{FILL}} |
