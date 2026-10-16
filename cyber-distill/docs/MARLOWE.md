@@ -179,5 +179,9 @@ sreport cluster UserUtilizationByAccount -T gres/gpu Start=<start of billing cyc
 ## Tested so far
 
 On one Yen H200 (`reports/run_log.md`): the container setup, the server start and the client with a
-small model (Qwen3-1.7B); student training on 1 and 2 GPUs, and resume. The Marlowe Slurm scripts
-have not run yet; the two-node script has not been tried.
+small model (Qwen3-1.7B); student training on 1 and 2 GPUs, and resume.
+
+On Marlowe: setup (venv, image) on 2026-10-15; the smoke test (`07_teacher_smoke.slurm`, job 520344)
+passed on 2026-10-16 on one H100: no MPS error, compute nodes reach Hugging Face, 400 items with 0
+errors and 0 invalid at ~148 items/s, server ready in ~2.5 min. Preempt queue wait was about a day.
+Not yet run on Marlowe: the teacher at 8 GPUs, student training, the two-node script.

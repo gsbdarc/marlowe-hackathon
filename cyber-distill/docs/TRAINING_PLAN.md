@@ -59,5 +59,5 @@ scheduler, step), `metrics.jsonl` (validation macro F1, accuracy, per-label F1) 
 
 On Yen H200s (see `reports/run_log.md`): `scripts/10_train_student.py` on 1 GPU and on 2 GPUs (DDP),
 then resumed from `checkpoint-last`, with throwaway labels; `scripts/07_teacher.py` against the vLLM
-container with Qwen3-1.7B on 400 items. The Marlowe Slurm scripts have
-not run yet (account `marlowe-m000106`, partition `preempt`), and the multi-node script has not been tried.
+container with Qwen3-1.7B on 400 items. On Marlowe, the 1-GPU teacher smoke test passed (job 520344,
+2026-10-16); the student scripts have not run there yet, and the multi-node script has not been tried.
