@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Label with Your Model"
-nav_order: 10
+nav_order: 9
 permalink: /label/
 ---
 
@@ -22,7 +22,7 @@ sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu cp
 {: .yens }
 
 The job starts a Kev server on the GPU, sends it the same 1,000 test filings as the
-[starting point]({{ '/checkpoint-1/' | relative_url }}), and scores the answers. A run trained on Marlowe works too: copy
+[starting point]({{ '/beginner/b1/' | relative_url }}), and scores the answers. A run trained on Marlowe works too: copy
 its run directory to the Yens with Globus, or use `slurm/marlowe/serve_and_label.slurm` on Marlowe.
 
 ## Step 2: Compare with the starting point
@@ -33,8 +33,7 @@ $PY scripts/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/cp1.jsonl
 {: .yens }
 
 Did agreement on CEO changes go up? Did "leaves entirely" improve? 100 steps is about 3% of an epoch, so expect a
-change, not the whole gap closed. A longer run, using the GPU-hour estimate from
-[Checkpoint 2]({{ '/checkpoint-2/' | relative_url }}), is how you would close it.
+change, not the whole gap closed. A longer run is how you would close it.
 
 {: .note }
 > The test filings are from 2022 to 2026 and the training filings from 2004 to 2018, so a gain here is a gain on

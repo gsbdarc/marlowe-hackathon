@@ -16,8 +16,8 @@ run the same job on 1, 8 and 16 H100s on Marlowe, and measure time per step and 
 | `env/` | paths and cache settings for the Yens (`yens.sh`) and Marlowe (`marlowe.sh`) |
 | `scripts/` | setup, data preparation, labeling, scoring, step timing, and the Weights & Biases sidecar |
 | `slurm/train_args.sh` | the training job every checkpoint runs |
-| `slurm/yens/` | Checkpoints 1 and 2, data preparation, and serving a model to label filings |
-| `slurm/marlowe/` | Checkpoints 3, 4 and 5 |
+| `slurm/yens/` | Yens training, data preparation, and serving a model to label filings |
+| `slurm/marlowe/` | Marlowe training at 1, 8 and 16 GPUs |
 
 No data, results or model weights are in this repository. Jev's labeled filings are on the Yens at
 `/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev` and on Marlowe at

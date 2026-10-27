@@ -55,20 +55,17 @@ puts the same probability on each option as Jev did. It should go down as traini
 
 **Fine-tuning** continues training a model that is already trained. Kev-4B was trained on general decision tasks; we
 fine-tune it on CEO turnover. A **full fine-tune** updates all 4 billion weights. It needs more GPU memory than
-training a small add-on (an adapter) but it can be split across GPUs, which the Marlowe checkpoints do.
+training a small add-on (an adapter) but it can be split across GPUs, which the Marlowe tasks do.
 
-## Two kinds of checkpoint
+## Model checkpoints and resume points
 
-**Checkpoint** has two meanings on this site.
+A **model checkpoint** is a saved copy of a model's weights on disk, for example `$WORK/runs/a3-student/` once a
+training job has finished (`config.json`, `model-*.safetensors`, `head.pt`). You serve it, score it, or start further
+training from it. Training writes one at the end.
 
-- A **hackathon checkpoint** is a stage of the day (Checkpoints 1 to 5). You finish it by running a job and posting
-  the result.
-- A **model checkpoint** is a saved copy of a model's weights on disk, for example `$WORK/runs/cp1-1gpu/` once the job has finished (`config.json`, `model-*.safetensors`, `head.pt`).
-  You serve it, score it, or start further training from it. Training writes one at the end.
-
-A **resume point** is related: a snapshot of a training job partway through (the weights, the optimizer state, and
-the position in the data), so a job that is stopped or preempted can carry on from there instead of starting over.
-[Checkpoint 5]({{ '/checkpoint-5/' | relative_url }}) uses them.
+A **resume point** is a snapshot of a training job partway through (the weights, the optimizer state, and the position
+in the data), so a job that is stopped or preempted can carry on from there instead of starting over. Labeling jobs
+resume more simply: a rerun skips filings already answered.
 
 ## Steps, batches and epochs
 
@@ -88,7 +85,7 @@ weights and optimizer state across them. The GPUs share each step's 16 records, 
 N GPUs are less than N times faster, because the GPUs exchange results at every step. That exchange is slower across
 nodes than within one, and slower again without a direct link between the GPUs. The Yen GPUs have no such link (they
 talk over the PCIe bus), so on the Yens you train on one GPU. Marlowe's H100s are linked by NVLink, so the scaling
-happens there, in [Checkpoints 3 to 5]({{ '/checkpoint-3/' | relative_url }}).
+happens there.
 
 ## GPU-hours
 

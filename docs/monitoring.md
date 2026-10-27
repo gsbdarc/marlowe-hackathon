@@ -115,7 +115,7 @@ WANDB=1 sbatch slurm/yens/01_train_1gpu.slurm
 ```
 {: .yens }
 
-The run appears in your W&B project `marlowe-hackathon`, named after the checkpoint and job ID (for example
+The run appears in your W&B project `marlowe-hackathon`, named after the run and job ID (for example
 `cp1-1gpu-873242`). Charts update every 10 steps.
 
 {: .note }
