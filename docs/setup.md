@@ -7,8 +7,7 @@ permalink: /setup/
 
 # Before You Arrive
 
-Do these steps before November 13. Each one checks that you can log in, that your accounts work, and that the
-software is in place, so the day goes to training rather than setup.
+Do these steps before November 13, so the day goes to training rather than setup.
 
 ---
 

@@ -7,8 +7,8 @@ permalink: /monitoring/
 
 # Monitoring Training
 
-A training job runs on a GPU node, not in your terminal. There are three ways to watch it: the job's log, a GPU log the
-job writes next to it, and, if you want charts, Weights & Biases.
+A training job runs on a GPU node, not in your terminal. Watch it in the job's log, in the GPU log the job writes next
+to it, or, for charts, in Weights & Biases.
 
 ---
 
@@ -20,7 +20,7 @@ squeue --me
 {: .yens }
 
 `ST` is `PD` while the job waits for GPUs and `R` once it runs; `NODELIST(REASON)` shows the node, or why it is
-waiting. `scontrol show job <jobid>` gives the full picture.
+waiting. `scontrol show job <jobid>` shows the job's full details.
 
 ## The job's log
 

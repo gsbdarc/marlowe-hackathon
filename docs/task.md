@@ -84,7 +84,7 @@ How the Kev models agree with Jev before any training, on 1,000 filings:
 | Kev-27B | 96% | 84% | 6 (H200) |
 
 Kev-4B gets the big call right (is this filing about the CEO at all?) and misses many of the finer ones. It is
-weakest when the CEO leaves the company entirely: it agrees with Jev on only 20% of those. That gap is what fine-tuning should close.
+weakest when the CEO leaves the company entirely: it agrees with Jev on only 20% of those.
 
 {: .note }
 > Agreement with Jev measures how well the student copies the teacher. Jev is the reference here, not ground truth.

@@ -68,12 +68,13 @@ kev-4b-zeroshot.jsonl: status agreement by Jev's status
 
 - **status_agree_weighted**: how often Kev-4B picks Jev's status, weighted to stand for all 56,334 test filings.
   Most filings are not CEO changes, and those are easy, so this number is high.
-- **status_agree_on_ceo_changes**: the same, only on the 700 CEO changes. This is the number to move.
+- **status_agree_on_ceo_changes**: the same, only on the 700 CEO changes, and the number training should raise.
 - **ceo_change_f1**: how well it answers the yes-or-no question "is this a CEO change?"
 - **reason_agree_on_ceo_changes**: agreement on why the CEO left.
 
 Kev-4B nearly always knows whether a filing is about the CEO, but on CEO changes it picks the same status as Jev only
-58% of the time, and when the CEO leaves the company entirely, it agrees only one time in five. Write these numbers down: you will compare against them after training.
+58% of the time, and when the CEO leaves the company entirely, it agrees only one time in five. Write these numbers
+down: you will compare against them after training.
 
 ## Step 3: Train on one GPU
 
@@ -119,7 +120,8 @@ ep0 step 30/100 loss 0.340 kl 0.000 anchor 0.000 1.095s/rec
 ```
 {: .output }
 
-`loss` should fall. (`kl` and `anchor` are optional extra terms we do not use, so they stay at 0.) [Monitoring Training]({{ '/monitoring/' | relative_url }}) explains every field.
+`loss` should fall. `kl` and `anchor` are optional extra terms we do not use, so they stay at 0.
+[Monitoring Training]({{ '/monitoring/' | relative_url }}) explains every field.
 
 In a second terminal, check the GPU log:
 

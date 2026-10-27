@@ -9,7 +9,7 @@ permalink: /take-home/
 
 Everything in this repository is a template. The CEO-turnover task is one example of a common research pattern: a
 large model answers questions about many documents, and you want a small model you run yourself to answer them the
-same way, at scale, on your own GPU. To reuse it for your own project, change three things.
+same way, at scale, on your own GPU. To reuse it for your own project, change the documents, the questions and the labels.
 
 ## 1. Your documents
 

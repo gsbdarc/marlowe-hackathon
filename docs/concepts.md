@@ -7,7 +7,7 @@ permalink: /concepts/
 
 # Key Ideas
 
-Each term below comes up all day. This page explains what it means here.
+The terms used on the other pages, and what each means here.
 
 ---
 
@@ -38,8 +38,8 @@ you have access to. Kev comes in four sizes:
 We use **Kev-4B**. It is small enough to fine-tune quickly and starts out well short of Jev on CEO changes, so the
 effect of training is easy to see.
 
-Why bother when Jev exists? A model you run yourself has a fixed version for replication, keeps confidential documents
-on Stanford hardware, and costs only GPU time to rerun on new filings or new questions.
+A model you run yourself has a fixed version for replication, keeps confidential documents on Stanford hardware, and
+costs only GPU time to rerun on new filings or new questions. Jev offers none of those.
 
 ## Distillation
 
@@ -55,11 +55,11 @@ puts the same probability on each option as Jev did. It should go down as traini
 
 **Fine-tuning** continues training a model that is already trained. Kev-4B was trained on general decision tasks; we
 fine-tune it on CEO turnover. A **full fine-tune** updates all 4 billion weights. It needs more GPU memory than
-training a small add-on (an adapter) but scales across GPUs, which is the point of today.
+training a small add-on (an adapter) but it can be split across GPUs, which the Marlowe checkpoints do.
 
 ## Two kinds of checkpoint
 
-The word **checkpoint** means two different things today.
+**Checkpoint** has two meanings on this site.
 
 - A **hackathon checkpoint** is a stage of the day (Checkpoints 1 to 5). You finish it by running a job and posting
   the result.
@@ -85,10 +85,10 @@ finish training.
 On one GPU, the whole model and its training state must fit on that GPU and in the node's memory. With more GPUs,
 `torchrun` starts one copy of the training program per GPU and **FSDP** (fully sharded data parallel) splits the
 weights and optimizer state across them. The GPUs share each step's 16 records, so each step should take less time.
-It does not get N times faster with N GPUs, because the GPUs must exchange results at every step, and more so across
-nodes than within one, and more so without a fast link between the GPUs. The Yen GPUs have none (they talk over the
-PCIe bus), so on the Yens we train on one GPU; Marlowe's H100s are linked by NVLink, so the scaling happens there, in
-[Checkpoints 3 to 5]({{ '/checkpoint-3/' | relative_url }}).
+N GPUs are less than N times faster, because the GPUs exchange results at every step. That exchange is slower across
+nodes than within one, and slower again without a direct link between the GPUs. The Yen GPUs have no such link (they
+talk over the PCIe bus), so on the Yens you train on one GPU. Marlowe's H100s are linked by NVLink, so the scaling
+happens there, in [Checkpoints 3 to 5]({{ '/checkpoint-3/' | relative_url }}).
 
 ## GPU-hours
 

@@ -26,8 +26,8 @@ You will teach a small open model, **Kev-4B**, to give Jev's answers. This is di
 including how confident it was, become the small model's training targets. A small model you run yourself can then
 label filings at scale on a GPU you control.
 
-Kev-4B starts out matching Jev on about half of CEO changes. The day is about closing that gap and measuring what it
-costs at each scale. [The task and the data]({{ '/task/' | relative_url }}) has the details.
+Before training, Kev-4B agrees with Jev on 58% of CEO changes. During the day you train it to close that gap and
+measure what training costs at each scale. [The task and the data]({{ '/task/' | relative_url }}) has the details.
 
 ---
 

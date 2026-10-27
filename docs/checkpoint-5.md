@@ -7,8 +7,8 @@ permalink: /checkpoint-5/
 
 # Checkpoint 5: Two Nodes and Resume
 
-**Goal:** run across two Marlowe nodes (16 H100s), stop the job partway, and continue it from its last resume point.
-This is the advanced checkpoint.
+**Goal (advanced):** run across two Marlowe nodes (16 H100s), stop the job partway, and continue it from its last
+resume point.
 
 ---
 
