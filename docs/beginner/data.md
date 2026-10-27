@@ -11,8 +11,8 @@ permalink: /beginner/data/
 **Goal:** know what you will train on, where Jev's labels come from, and where the files live on the Yens, then get
 your first numbers from the test set.
 
-You need the [setup]({{ '/setup/' | relative_url }}) done: Kev installed and the training files built. Every command
-below runs from your clone of the repository on the Yens.
+You need the [setup]({{ '/setup/' | relative_url }}) done: Kev installed, Jev's data copied to your scratch and the
+training files built. Every command below runs from your clone of the repository on the Yens.
 
 ```bash
 cd /scratch/users/$USER/marlowe-hackathon
@@ -240,12 +240,18 @@ matters as much: change a word of an option and you change the task.
 
 ## Where the data lives: project space and scratch
 
-`env/yens.sh` sets two folders:
+DARC keeps the original of Jev's labeled filings in project space, at
+`/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev`, read only. In setup you copied it into your scratch,
+next to everything else you make, and `env/yens.sh` points two variables there:
 
-| Variable | Folder | Storage | What is in it |
-|---|---|---|---|
-| `$DATA` | `/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev` | project space | Jev's labeled filings: read only, one copy for everyone |
-| `$WORK` | `/scratch/users/$USER/ceo-turnover` | your scratch | the training files setup built, and later your runs and results |
+| Variable | Folder | What is in it |
+|---|---|---|
+| `$WORK` | `/scratch/users/$USER/ceo-turnover` | the training files setup built, and later your runs and results |
+| `$DATA` | `/scratch/users/$USER/ceo-turnover/data/jev` | your copy of Jev's labeled filings |
+
+With a copy of your own, every job reads only files you own, and you can change your copy, to drop some filings for
+instance, without affecting anyone else. DARC's original stays as it is, so you can always check against it or copy
+it again.
 
 ### Scratch is shared storage
 
@@ -280,20 +286,20 @@ The 40 TB is everyone's use, not yours: the space is shared. To see your own, ru
 [Yen storage on RCpedia](https://rcpedia.stanford.edu/_user_guide/storage/) has the details.
 
 {: .warning }
-> Home holds only 80 GB and Kev-4B's weights alone are about 9 GB, so `env/yens.sh` puts Kev, the weights and every cache in
-> scratch. After the hackathon, copy anything you want to keep, such as your results or a model you trained, to a
-> project space.
+> Home holds only 80 GB and Kev-4B's weights alone are about 9 GB, so `env/yens.sh` puts Kev, the weights and every
+> cache in scratch. After the hackathon, copy anything you want to keep, such as your results or a model you trained,
+> to a project space.
 
 ---
 
 ## Exercises
 
-### Find the test set
+### Find the data and the test set
 
 Use the terminal for these.
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">1</span><span class="qtext">Where is Jev's labeled data, and how big is it?</span></summary>
+<summary><span class="qnum">1</span><span class="qtext">Where is your copy of Jev's data, and how big is it?</span></summary>
 
 ```bash
 echo $DATA
@@ -302,21 +308,47 @@ ls -lh $DATA
 {: .yens }
 
 ```
+/scratch/users/<sunet>/ceo-turnover/data/jev
 total 342M
--rw-r--r--+ 1 nrapstin operator  878 Oct 24 10:57 MANIFEST.json
--rw-r--r--+ 1 nrapstin operator  65M Oct 24 10:57 index_8k_items_2004_2026.parquet
--rw-r--r--+ 1 nrapstin operator 3.3M Oct 24 10:57 item502_registrants_v1.parquet
--rw-r--r--+ 1 nrapstin operator 274M Oct 24 10:57 item502_v1.parquet
+-rw-r--r-- 1 <sunet> operator  878 Oct 27 13:49 MANIFEST.json
+-rw-r--r-- 1 <sunet> operator  65M Oct 27 13:49 index_8k_items_2004_2026.parquet
+-rw-r--r-- 1 <sunet> operator 3.3M Oct 27 13:49 item502_registrants_v1.parquet
+-rw-r--r-- 1 <sunet> operator 274M Oct 27 13:49 item502_v1.parquet
 ```
 {: .output }
 
-`item502_v1.parquet` is the one you need: 274 MB, every filing with its text and Jev's answers. It is in project
-space: you can read it but not change it.
+`item502_v1.parquet` is the one you need: 274 MB, every filing with its text and Jev's answers. The files belong to
+you, and their dates are when you copied them.
 
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">2</span><span class="qtext">Where is the test set?</span></summary>
+<summary><span class="qnum">2</span><span class="qtext">Is your copy the same as DARC's original?</span></summary>
+
+Compare its checksum with the one in `MANIFEST.json`, which came with the release:
+
+```bash
+sha256sum $DATA/item502_v1.parquet
+grep -A2 '"item502_v1.parquet"' $DATA/MANIFEST.json
+```
+{: .yens }
+
+```
+e839ffcd655f35d0ddf516d8130e1deca4c0c9bb988cc8773a31b3146ff60e89  /scratch/users/<sunet>/ceo-turnover/data/jev/item502_v1.parquet
+    "item502_v1.parquet": {
+      "bytes": 286578032,
+      "sha256": "e839ffcd655f35d0ddf516d8130e1deca4c0c9bb988cc8773a31b3146ff60e89"
+```
+{: .output }
+
+The two strings match, so the copy is complete and unchanged. A SHA-256 checksum is a fingerprint of a file's
+contents: change one byte and it changes completely. Check data this way whenever you copy it, before you spend GPU
+time on it.
+
+</details>
+
+<details class="quiz" markdown="1">
+<summary><span class="qnum">3</span><span class="qtext">Where is the test set?</span></summary>
 
 In two places. The whole test split, the 56,334 filings from 2022 to 2026, is inside `item502_v1.parquet`: the rows
 whose `split` column is `test`. Setup drew a sample of 1,000 of them into your `$WORK/data`:
@@ -328,6 +360,7 @@ ls -lh $WORK/data
 
 ```
 total 268M
+drwxr-xr-x 2 <sunet> operator 4.0K Oct 27 13:49 jev
 -rw-r--r-- 1 <sunet> operator 6.0M Oct 27 12:09 test1000.jsonl
 -rw-r--r-- 1 <sunet> operator 136K Oct 27 12:09 test1000.parquet
 -rw-r--r-- 1 <sunet> operator 252M Oct 27 12:09 train.jsonl
@@ -336,21 +369,22 @@ total 268M
 {: .output }
 
 `test1000.jsonl` is what Kev reads: one request per line, like the one DARC sent Jev. `test1000.parquet` keeps
-Jev's answers for scoring.
+Jev's answers for scoring. `jev` is your copy of the release.
 
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">3</span><span class="qtext">Is <code>$WORK</code> backed up? What happens to it in three months?</span></summary>
+<summary><span class="qnum">4</span><span class="qtext">Is <code>$WORK</code> backed up? What happens to it in three months?</span></summary>
 
 `$WORK` is in scratch, which is not backed up, and files older than 90 days are deleted at a scheduled downtime. That
-is fine for these files, because `slurm/yens/00_data.slurm` rebuilds them in a minute. A model you spent hours
-training is worth copying to a project space.
+includes your copy of Jev's data. Neither is a loss: copy the data again from DARC's folder, as in
+[setup]({{ '/setup/' | relative_url }}), and `slurm/yens/00_data.slurm` rebuilds the training files in a minute. A
+model you spent hours training is worth copying to a project space.
 
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">4</span><span class="qtext"><code>gsbquota /scratch/users/$USER</code> says 100T. Is that your space?</span></summary>
+<summary><span class="qnum">5</span><span class="qtext"><code>gsbquota /scratch/users/$USER</code> says 100T. Is that your space?</span></summary>
 
 No. Scratch is one pool shared by every Yens user, and `gsbquota` reports the whole pool. `du -sh $WORK` shows what
 you use.
@@ -391,7 +425,7 @@ the columns. These are the ones you need:
 | `edgar_url` | the filing on the SEC's website |
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">5</span><span class="qtext">Open the first record of <code>test1000.jsonl</code>. What does Kev read, and what does it learn?</span></summary>
+<summary><span class="qnum">6</span><span class="qtext">Open the first record of <code>test1000.jsonl</code>. What does Kev read, and what does it learn?</span></summary>
 
 ```python
 import json
@@ -418,7 +452,7 @@ has only the status question.
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">6</span><span class="qtext">How many filings are in the test split, and how many are CEO changes?</span></summary>
+<summary><span class="qnum">7</span><span class="qtext">How many filings are in the test split, and how many are CEO changes?</span></summary>
 
 ```python
 len(test)
@@ -440,7 +474,7 @@ Name: count, dtype: int64
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">7</span><span class="qtext">How many filings are there each year? Why does 2026 have fewer?</span></summary>
+<summary><span class="qnum">8</span><span class="qtext">How many filings are there each year? Why does 2026 have fewer?</span></summary>
 
 ```python
 test.year.value_counts().sort_index()
@@ -465,7 +499,7 @@ About 11,000 to 13,000 a year. The data ends on October 2, 2026, so 2026 is nine
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">8</span><span class="qtext">When the CEO changes, what does Jev say happens most often?</span></summary>
+<summary><span class="qnum">9</span><span class="qtext">When the CEO changes, what does Jev say happens most often?</span></summary>
 
 ```python
 ceo = test[test.ceo_change]
@@ -491,7 +525,7 @@ The CEO leaves the company entirely in 3,192 of 6,742 changes (47%). Only 85 are
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">9</span><span class="qtext">Why do CEOs leave, according to the filings?</span></summary>
+<summary><span class="qnum">10</span><span class="qtext">Why do CEOs leave, according to the filings?</span></summary>
 
 ```python
 ceo.why_name.value_counts()
@@ -518,7 +552,7 @@ companies rarely write that down. That is why status, not why, is the main task.
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">10</span><span class="qtext">How long is a filing?</span></summary>
+<summary><span class="qnum">11</span><span class="qtext">How long is a filing?</span></summary>
 
 ```python
 test.words.describe()
@@ -545,7 +579,7 @@ answered them anyway. It is worth looking at data like this before you train on 
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">11</span><span class="qtext">How sure is Jev, on CEO changes and on everything else?</span></summary>
+<summary><span class="qnum">12</span><span class="qtext">How sure is Jev, on CEO changes and on everything else?</span></summary>
 
 ```python
 test.groupby("ceo_change").status_conf.mean()
@@ -571,7 +605,7 @@ the CEO (0.81). On 1,344 CEO changes, one in five, its confidence is below 0.6: 
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">12</span><span class="qtext">Which Jev answered, and what would the test split cost at today's price?</span></summary>
+<summary><span class="qnum">13</span><span class="qtext">Which Jev answered, and what would the test split cost at today's price?</span></summary>
 
 ```python
 test.jev_model.value_counts()
@@ -594,7 +628,7 @@ about $2.86.
 </details>
 
 <details class="quiz" markdown="1">
-<summary><span class="qnum">13</span><span class="qtext">In <code>test1000</code>, 700 of the 1,000 filings are CEO changes, but in the test split only 12% are. Why?</span></summary>
+<summary><span class="qnum">14</span><span class="qtext">In <code>test1000</code>, 700 of the 1,000 filings are CEO changes, but in the test split only 12% are. Why?</span></summary>
 
 ```python
 s = pd.read_parquet(os.path.join(os.environ["WORK"], "data", "test1000.parquet"))

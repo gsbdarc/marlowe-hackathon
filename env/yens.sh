@@ -1,8 +1,8 @@
 # Settings for jobs on the Yens. Source it, don't run it:  source env/yens.sh
 # Every cache and config goes to scratch, never home. Change DATA if your copy of the data is elsewhere.
-export HACKATHON=/yen/projects/darc/marlowe_hackathon/ceo-turnover
-export DATA=${DATA:-$HACKATHON/data/jev}                     # Jev-labeled Item 5.02 release (read only)
+export HACKATHON=/yen/projects/darc/marlowe_hackathon/ceo-turnover   # DARC's copy of Jev's release in data/jev (read only)
 export WORK=${WORK:-/scratch/users/$USER/ceo-turnover}      # your training data, runs and results
+export DATA=${DATA:-$WORK/data/jev}                          # your copy of Jev-labeled Item 5.02 release (setup copies it)
 export KEV_HOME=${KEV_HOME:-/scratch/users/$USER/kev}       # Kev code and its Python environment (setup_kev.sh)
 export HF_HOME=${HF_HOME:-/scratch/users/$USER/hf}          # model weights
 export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python

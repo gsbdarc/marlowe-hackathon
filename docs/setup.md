@@ -86,16 +86,30 @@ It takes about 10 minutes and about 25 GB of scratch on each cluster, and it is 
 
 | Variable | What it is | Yens | Marlowe |
 |---|---|---|---|
-| `DATA` | Jev's labeled filings (read only) | `/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev` | `/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev` |
+| `DATA` | Jev's labeled filings | `/scratch/users/$USER/ceo-turnover/data/jev`, your copy (below) | `/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev` (shared, read only) |
 | `WORK` | your training files, runs and results | `/scratch/users/$USER/ceo-turnover` | `/scratch/m000106/gsb_hackathon/$USER/ceo-turnover` |
 | `KEV_HOME` | Kev's code and Python environment | `/scratch/users/$USER/kev` | `/scratch/m000106/gsb_hackathon/$USER/kev` |
 | `HF_HOME` | model weights | `/scratch/users/$USER/hf` | `/scratch/m000106/gsb_hackathon/hf_cache` (shared) |
 
 ---
 
+## Copy the data
+
+On the Yens, copy Jev's labeled filings from DARC's folder into your scratch (342 MB):
+
+```bash
+mkdir -p $DATA
+cp $HACKATHON/data/jev/* $DATA/
+ls -lh $DATA
+```
+{: .yens }
+
+Your jobs read this copy, not DARC's. [The Data]({{ '/beginner/data/' | relative_url }}) explains why, and how to
+check that the copy is complete.
+
 ## Build the training data
 
-On the Yens, build the training, validation and test files from Jev's labels (a CPU job, a few minutes):
+On the Yens, build the training, validation and test files from your copy of Jev's labels (a CPU job, a few minutes):
 
 ```bash
 mkdir -p logs
