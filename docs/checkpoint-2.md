@@ -72,7 +72,7 @@ cp2-batch4          1    30   49.92        21.3        45.7            45.7
 
 `BATCH=4` was 3.6 times slower per step. Filings vary in length, and every micro-batch is padded to its longest
 filing, so a batch of 4 does much more work than 4 batches of 1. Use the faster setting for your estimate, whichever
-it is on your GPU. On a 141 GB H200 you can also try `BATCH=2`.
+it is on your GPU. You can also try `BATCH=2`.
 
 ## Step 3: Estimate a full run
 

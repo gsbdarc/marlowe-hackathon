@@ -50,7 +50,7 @@ saved /scratch/users/<sunet>/ceo-turnover/runs/cp1-1gpu
 | `step 20/100` | optimizer steps done, of the steps this job runs |
 | `loss` | cross-entropy between Kev's probabilities and Jev's, averaged over the last 10 steps; should fall |
 | `kl`, `anchor` | optional extra loss terms, not used today; they stay at 0 |
-| `s/rec` | a running average of seconds per training item since the job started; do not compare it across runs (use `step_times.py`) |
+| `s/rec` | a running average since the job started, per item Kev builds from the records (a record can yield more than one), not per filing; it reads lower at `BATCH=4` even when each step is slower, so compare runs with `step_times.py` instead. W&B charts it as `seconds_per_item` |
 | `saved ...` | training finished and wrote the model checkpoint |
 
 When the job finishes, the run directory holds `training_metrics.json` with the time of every step and the peak GPU

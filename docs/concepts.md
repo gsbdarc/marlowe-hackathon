@@ -39,7 +39,7 @@ We use **Kev-4B**. It is small enough to fine-tune quickly and starts out well s
 effect of training is easy to see.
 
 A model you run yourself has a fixed version for replication, keeps confidential documents on Stanford hardware, and
-costs only GPU time to rerun on new filings or new questions. Jev offers none of those.
+costs only GPU time to rerun on new filings or new questions.
 
 ## Distillation
 
