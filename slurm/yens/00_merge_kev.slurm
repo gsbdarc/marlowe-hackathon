@@ -8,7 +8,7 @@
 
 # Once, before training: fold Kev-4B's LoRA adapter into its base so a full fine-tune can start from it.
 # Kev-4B ships as an adapter (rank 16); --full_ft trains every weight and starts from full weights.
-#   sbatch slurm/yens/00_merge_kev.slurm        # -> $WORK/kev-4b-full/checkpoint (about 9 GB)
+#   sbatch slurm/yens/00_merge_kev.slurm        # -> $WORK/kev-4b-full/checkpoint (about 8 GB)
 set -euo pipefail
 source env/yens.sh
 mkdir -p logs

@@ -86,7 +86,9 @@ On one GPU, the whole model and its training state must fit on that GPU and in t
 `torchrun` starts one copy of the training program per GPU and **FSDP** (fully sharded data parallel) splits the
 weights and optimizer state across them. The GPUs share each step's 16 records, so each step should take less time.
 It does not get N times faster with N GPUs, because the GPUs must exchange results at every step, and more so across
-nodes than within one. Measuring that is [Checkpoint 2]({{ '/checkpoint-2/' | relative_url }}).
+nodes than within one, and more so without a fast link between the GPUs. The Yen GPUs have none (they talk over the
+PCIe bus), so on the Yens we train on one GPU; Marlowe's H100s are linked by NVLink, so the scaling happens there, in
+[Checkpoints 3 to 5]({{ '/checkpoint-3/' | relative_url }}).
 
 ## GPU-hours
 

@@ -44,7 +44,6 @@ on both sides.
 |---|---|
 | `slurm/yens/serve_and_label.slurm` | serving any Kev checkpoint on one Yen GPU and labeling a file of documents |
 | `slurm/yens/01_train_1gpu.slurm` | a fine-tune on one GPU |
-| `slurm/yens/02_train_2gpu.slurm` | the same job sharded across the GPUs of one node with `torchrun` |
 | `slurm/marlowe/04_train_8gpu.slurm` | one full Marlowe node |
 | `slurm/marlowe/05_train_2node.slurm` | several nodes, with resume points for preemptible or time-limited jobs |
 
@@ -53,6 +52,6 @@ learning rate or number of steps there.
 
 ## Applying for Marlowe
 
-A Marlowe project application asks how many GPU-hours your project needs. The scaling table you build in
-[Checkpoint 2]({{ '/checkpoint-2/' | relative_url }}) is that estimate: measure time per step at two or three scales
-on a short run, multiply by the steps a full run needs, and add a margin for reruns.
+A Marlowe project application asks how many GPU-hours your project needs. The estimate from
+[Checkpoint 2]({{ '/checkpoint-2/' | relative_url }}) and the scaling table from Checkpoints 3 to 5 are that number: measure time per
+step at two or three scales on a short run, multiply by the steps a full run needs, and add a margin for reruns.

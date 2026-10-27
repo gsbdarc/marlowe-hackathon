@@ -9,9 +9,10 @@
 
 # Serve a Kev model on this GPU and label filings with it, then score against Jev.
 #   sbatch slurm/yens/serve_and_label.slurm                                  # zero-shot Kev-4B on the test sample
-#   sbatch slurm/yens/serve_and_label.slurm $WORK/runs/cp2-2gpu my-model     # your fine-tuned run
-#   sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp2-2gpu my-model $WORK/data/all.jsonl
+#   sbatch slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu my-model     # your fine-tuned run
+#   sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu my-model $DATA/item502_v1.parquet
 # Arguments: model (Hub id or run directory), a name for the results, the filings to label.
+# Labeling stops at the time limit; submit the same command again and label.py skips filings already answered.
 # The gpu partition allows at most 4,000 MB of memory per CPU; Kev-4B needs a 24 GB GPU or larger.
 set -euo pipefail
 source env/yens.sh
@@ -30,4 +31,4 @@ done
 curl -sf "http://127.0.0.1:$PORT/v1/models" > /dev/null || { echo "Kev server not ready after 30 minutes" >&2; exit 1; }
 echo "serving $RUN on $(hostname): $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader -i 0)"
 $PY scripts/label.py --url "http://127.0.0.1:$PORT" --data "$FILINGS" --out "$WORK/results/$NAME.jsonl"
-[ "$FILINGS" = "$WORK/data/test1000.jsonl" ] && $PY scripts/score.py "$WORK/results/$NAME.jsonl"
+if [ "$FILINGS" = "$WORK/data/test1000.jsonl" ]; then $PY scripts/score.py "$WORK/results/$NAME.jsonl"; fi

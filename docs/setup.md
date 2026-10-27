@@ -39,10 +39,10 @@ software is in place, so the day goes to training rather than setup.
 
 ## Clone this repository
 
-On the Yens, in your shared scratch space:
+On the Yens, in your scratch space:
 
 ```bash
-mkdir -p /scratch/shared/$USER && cd /scratch/shared/$USER
+cd /scratch/users/$USER
 git clone https://github.com/gsbdarc/marlowe-hackathon.git
 cd marlowe-hackathon
 ```
@@ -88,9 +88,9 @@ It takes about 10 minutes and about 25 GB of scratch on each cluster, and it is 
 | Variable | What it is | Yens | Marlowe |
 |---|---|---|---|
 | `DATA` | Jev's labeled filings (read only) | `/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev` | `/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev` |
-| `WORK` | your training files, runs and results | `/scratch/shared/$USER/ceo-turnover` | `/scratch/m000106/gsb_hackathon/$USER/ceo-turnover` |
-| `KEV_HOME` | Kev's code and Python environment | `/scratch/shared/$USER/kev` | `/scratch/m000106/gsb_hackathon/$USER/kev` |
-| `HF_HOME` | model weights | `/scratch/shared/$USER/hf` | `/scratch/m000106/gsb_hackathon/hf_cache` (shared) |
+| `WORK` | your training files, runs and results | `/scratch/users/$USER/ceo-turnover` | `/scratch/m000106/gsb_hackathon/$USER/ceo-turnover` |
+| `KEV_HOME` | Kev's code and Python environment | `/scratch/users/$USER/kev` | `/scratch/m000106/gsb_hackathon/$USER/kev` |
+| `HF_HOME` | model weights | `/scratch/users/$USER/hf` | `/scratch/m000106/gsb_hackathon/hf_cache` (shared) |
 
 ---
 

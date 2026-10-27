@@ -1,48 +1,24 @@
 ---
 layout: default
-title: "2. Scaling on the Yens"
+title: "2. Plan the GPU-hours"
 nav_order: 6
 permalink: /checkpoint-2/
 ---
 
-# Checkpoint 2: Scaling on the Yens
+# Checkpoint 2: Plan the GPU-hours
 
-**Goal:** run the same training on two H200s, build a scaling table, and estimate the GPU-hours a full run would need.
+**Goal:** tune the one-GPU job, then estimate the GPU-hours a full training run would need. That estimate is what a
+Marlowe application asks for.
 
 ---
 
-## Step 1: Two GPUs
+## Why one GPU on the Yens
 
-```bash
-sbatch slurm/yens/02_train_2gpu.slurm
-```
-{: .yens }
+A Yen GPU node has two or more GPUs, but they have no **NVLink**, the fast direct link between GPUs. They exchange
+data over the PCIe bus instead. When a job is split across GPUs, every step the GPUs swap the model's weights and
+gradients, so the speed of that link decides whether a second GPU helps.
 
-Compare it with the one-GPU script:
-
-```bash
-diff slurm/yens/01_train_1gpu.slurm slurm/yens/02_train_2gpu.slurm
-```
-{: .yens }
-
-Three things change: `-G 2` asks for two GPUs, `GPUS=2` halves the gradient accumulation so each step still sees
-16 records, and `torchrun --nproc_per_node 2` starts one training process per GPU. Kev notices it is running under
-`torchrun` and shards the model and optimizer state across the GPUs with FSDP. The log now shows `world=2`.
-
-{: .note }
-> Both scripts take the same 100 steps of 16 records, so they do the same training. Any difference in time per step is
-> the effect of the second GPU.
-
-## Step 2: The scaling table
-
-When both runs have finished:
-
-```bash
-$PY scripts/step_times.py $WORK/runs/cp1-1gpu $WORK/runs/cp2-2gpu
-```
-{: .yens }
-
-Here is what DARC's 30-step test runs printed on A40s (the H200s were busy that day):
+DARC tested it: the Checkpoint 1 job on one A40 and on two A40s, 30 steps each:
 
 ```
 run              GPUs steps  s/step peak GPU GB epoch hours epoch GPU-hours
@@ -51,47 +27,61 @@ cp2-2gpu            2    30   14.19        38.1        13.0            26.0
 ```
 {: .output }
 
-Yours will differ on H200s; the shape of the table is what matters.
+The second GPU made no difference to the time per step, so the same training cost twice the GPU-hours. Marlowe's
+H100s are linked by NVLink within a node, so the multi-GPU part of the day happens there, in
+[Checkpoints 3 to 5]({{ '/checkpoint-3/' | relative_url }}). On the Yens, use one GPU.
+
+---
+
+## Step 1: Larger micro-batches
+
+Each step trains on 16 records. In Checkpoint 1 the GPU took them one at a time (`BATCH=1`) and added up the results
+16 times (`ACCUM=16`). Taking 4 at a time does the same training in 4 passes instead of 16, which can keep the GPU
+busier:
+
+```bash
+BATCH=4 RUN=cp2-batch4 sbatch slurm/yens/01_train_1gpu.slurm
+```
+{: .yens }
+
+If the H200s are busy, add `-C GPU_MODEL:A40` as in Checkpoint 1, and compare with an A40 run of Checkpoint 1.
+
+`slurm/train_args.sh` sets `ACCUM` to keep 16 records per step, so this run is comparable with Checkpoint 1. It writes
+to `$WORK/runs/cp2-batch4`.
+
+## Step 2: Compare
+
+```bash
+$PY scripts/step_times.py $WORK/runs/cp1-1gpu $WORK/runs/cp2-batch4
+```
+{: .yens }
 
 - **s/step**: median seconds per optimizer step (the first three steps are left out as warm-up).
-- **epoch hours**: how long one pass over all 52,757 training records would take at this scale.
+- **peak GPU GB**: the most GPU memory the job used. Larger micro-batches use more.
+- **epoch hours**: how long one pass over all 52,757 training records would take.
 - **epoch GPU-hours**: epoch hours times the number of GPUs, which is what an allocation is charged.
 
-**Speedup** is the one-GPU time per step divided by the two-GPU time. With perfect scaling it would be 2. It is less,
-because the two GPUs exchange their results at every step.
-
-On the A40s the speedup was about 1: the second GPU made no difference to the time per step, so the 2-GPU run cost
-twice the GPU-hours for the same training. Two things changed between the runs, and both show in the table:
-
-- **Peak GPU memory doubled** (19 GB to 38 GB per GPU). On one GPU, Kev keeps the full-precision weights and the
-  optimizer's state in the node's memory; with FSDP that state moves onto the GPUs.
-- **Each GPU waited on the other.** Each step is 8 micro-batches of one record per GPU, and before every one FSDP
-  gathers the model's weights from both GPUs. The A40s talk over the PCIe bus, so that traffic takes about as long
-  as the computing it saves.
-
-More GPUs pay off when each one has more work between exchanges (larger micro-batches, longer documents, a bigger
-model) and when the GPUs have fast links between them, as Marlowe's H100s do. Checkpoints 3 and 4 test that.
+Did the larger micro-batch make each step faster? How much memory did it cost? On a 141 GB H200 there is room to try
+`BATCH=8` or `BATCH=16`.
 
 ## Step 3: Estimate a full run
 
-Suppose a real study trains for 3 epochs. From your table:
+Suppose a real study trains for 3 epochs. With your faster setting:
 
 ```
 GPU-hours = 3 epochs x epoch GPU-hours, plus about 25% for test runs and reruns
 ```
 
-Write down your estimate for one GPU and for two, and which you would ask for. This is the number a Marlowe
-application asks for.
+Write down the estimate and how long it would take on one H200. You will set it next to the Marlowe numbers in
+Checkpoints 3 to 5.
 
 {: .checkpoint }
-> **Checkpoint 2.** Post your scaling table, speedup and GPU-hour estimate in Slack, then put up a 🟩 green sticky.
-> 🟥 if you are stuck.
+> **Checkpoint 2.** Post your two rows of the table and your GPU-hour estimate in Slack, then put up a 🟩 green
+> sticky. 🟥 if you are stuck.
 
 ---
 
 ## If you have time
 
-- Look at both GPU logs (`logs/gpu-<jobid>.csv`). Is utilization higher with one GPU or two? Why might that be?
-- Give each GPU more work per exchange: `BATCH=4 ACCUM=2 sbatch slurm/yens/02_train_2gpu.slurm` still takes 16
-  records per step, in 2 micro-batches of 4. Does the time per step fall? Watch peak GPU memory.
+- Compare the GPU logs of the two runs (`logs/gpu-<jobid>.csv`). Is utilization higher with larger micro-batches?
 - With W&B (`WANDB=1`), put both runs on one chart of `seconds_per_step`.

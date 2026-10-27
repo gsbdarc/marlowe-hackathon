@@ -17,7 +17,7 @@ labels filings.
 `serve_and_label.slurm` takes the model to serve and a name for the results. Point it at any finished run:
 
 ```bash
-sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp2-2gpu cp2
+sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu cp1
 ```
 {: .yens }
 
@@ -28,7 +28,7 @@ its run directory to the Yens with Globus, or use `slurm/marlowe/serve_and_label
 ## Step 2: Compare with the starting point
 
 ```bash
-$PY scripts/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/cp2.jsonl
+$PY scripts/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/cp1.jsonl
 ```
 {: .yens }
 
@@ -46,12 +46,14 @@ The same job labels any set of filings. Give it a third argument, a file in the 
 parquet itself:
 
 ```bash
-sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp2-2gpu cp2-all $DATA/item502_v1.parquet
+sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu cp1-all $DATA/item502_v1.parquet
 ```
 {: .yens }
 
-`$WORK/results/cp2-all_summary.json` reports filings per second. At about 6 filings per second, all 296,477 filings
-take about 14 hours on one GPU; split the file and run several jobs to go faster.
+`$WORK/results/cp1-all_summary.json` reports filings per second. At about 6 filings per second, all 296,477 filings
+take about 14 hours on one GPU. The job stops at its 2-hour limit; submit the same command again and it carries on,
+because `label.py` skips filings already answered. To finish in fewer runs, ask for more time with
+`sbatch -t 1-00:00:00 ...` (the `gpu` partition allows up to a day).
 
 {: .warning }
 > Run one `serve_and_label` job at a time while you test. The server picks a free port, but every job loads the model

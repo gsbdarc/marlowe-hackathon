@@ -35,7 +35,7 @@ source env/marlowe.sh
 ## Step 2: Data and weights on Marlowe
 
 The training files and the merged Kev-4B have to be on Marlowe too. Either copy your `$WORK` from the Yens with
-Globus (from `/scratch/shared/<sunet>/ceo-turnover` on the Yens to `/scratch/m000106/gsb_hackathon/<sunet>/ceo-turnover`
+Globus (from `/scratch/users/<sunet>/ceo-turnover` on the Yens to `/scratch/m000106/gsb_hackathon/<sunet>/ceo-turnover`
 on Marlowe), or rebuild them there in one short job:
 
 ```bash

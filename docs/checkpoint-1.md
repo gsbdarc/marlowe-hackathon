@@ -14,7 +14,7 @@ You need the [setup]({{ '/setup/' | relative_url }}) done: Kev installed and the
 below runs from your clone of the repository on the Yens.
 
 ```bash
-cd /scratch/shared/$USER/marlowe-hackathon
+cd /scratch/users/$USER/marlowe-hackathon
 source env/yens.sh
 ```
 {: .yens }
@@ -34,7 +34,7 @@ sbatch slurm/yens/00_merge_kev.slurm
 It ends with the size of the merged model:
 
 ```
-7.9G	/scratch/shared/<sunet>/ceo-turnover/kev-4b-full/checkpoint
+7.9G	/scratch/users/<sunet>/ceo-turnover/kev-4b-full/checkpoint
 ```
 {: .output }
 
@@ -87,9 +87,14 @@ and runs `kev.train` with the arguments in `slurm/train_args.sh`: a full fine-tu
 optimizer steps of 16 records each.
 
 {: .note }
-> Why 64 GB of host memory for one GPU? With a single GPU, Kev keeps the full-precision copy of the weights and the
+> Why 92 GB of host memory for one GPU? With a single GPU, Kev keeps the full-precision copy of the weights and the
 > optimizer's state in the node's memory instead of on the GPU. That lets a 4B model train on one GPU, at the cost of
-> some speed. With more GPUs ([Checkpoint 2]({{ '/checkpoint-2/' | relative_url }})) that state is split across them.
+> some speed. With more GPUs (on Marlowe, [Checkpoint 4]({{ '/checkpoint-4/' | relative_url }})) that state is split across them.
+
+{: .tip }
+> The Yens have only two H200s, shared by the whole room. If your job is still pending (`PD` in `squeue --me`) after
+> a few minutes, cancel it and run on an A40 instead: `sbatch -C GPU_MODEL:A40 slurm/yens/01_train_1gpu.slurm`. An A40
+> takes about 14 seconds per step for this job, so 100 steps take about 25 minutes.
 
 Add `WANDB=1` in front of `sbatch` to also watch it in Weights & Biases; see
 [Monitoring Training]({{ '/monitoring/' | relative_url }}).

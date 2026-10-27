@@ -10,8 +10,9 @@ STEPS=${STEPS:-100}      # at least 20: the learning rate warms up over the firs
 BATCH=${BATCH:-1}
 GPUS=${GPUS:-1}
 ACCUM=${ACCUM:-$((16 / GPUS))}
-TRAIN_ARGS="--data $WORK/data/train.jsonl --base $BASE --init_from $INIT
-  --full_ft 1 --weights_dtype bf16 --dtype bf16 --checkpointing 1 --device cuda
+# One line with no newlines (each \ joins the next line), so it also survives the bash -c "..." in 05_train_2node.slurm.
+TRAIN_ARGS="--data $WORK/data/train.jsonl --base $BASE --init_from $INIT \
+  --full_ft 1 --weights_dtype bf16 --dtype bf16 --checkpointing 1 --device cuda \
   --lr 2e-5 --batch $BATCH --accum $ACCUM --max_state 2048 --max_steps $STEPS --seed 0"
 # Log GPU memory and utilization every 15 seconds, next to the job's log.
 gpu_log() { nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 15 > "$1" & }

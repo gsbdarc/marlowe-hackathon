@@ -29,4 +29,4 @@ for i in $(seq 1 360); do
 done
 curl -sf "http://127.0.0.1:$PORT/v1/models" > /dev/null || { echo "Kev server not ready after 30 minutes" >&2; exit 1; }
 $PY scripts/label.py --url "http://127.0.0.1:$PORT" --data "$FILINGS" --out "$WORK/results/$NAME.jsonl"
-[ "$FILINGS" = "$WORK/data/test1000.jsonl" ] && $PY scripts/score.py "$WORK/results/$NAME.jsonl"
+if [ "$FILINGS" = "$WORK/data/test1000.jsonl" ]; then $PY scripts/score.py "$WORK/results/$NAME.jsonl"; fi

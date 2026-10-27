@@ -29,7 +29,6 @@ docs/.jekyll-cache/
 docs/.jekyll-metadata
 docs/vendor/
 docs/.bundle/
-docs/Gemfile.lock
 
 # Python and editors
 __pycache__/

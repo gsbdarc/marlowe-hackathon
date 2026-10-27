@@ -40,7 +40,7 @@ device=cuda world=1 trainable params=4207.1M
 ep0 step 10/100 loss 0.914 kl 0.000 anchor 0.000 1.510s/rec
 ep0 step 20/100 loss 0.497 kl 0.000 anchor 0.000 1.192s/rec
 ...
-saved /scratch/shared/<sunet>/ceo-turnover/runs/cp1-1gpu
+saved /scratch/users/<sunet>/ceo-turnover/runs/cp1-1gpu
 ```
 {: .output }
 

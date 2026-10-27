@@ -60,7 +60,8 @@ def main():
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
     print(f"{len(recs):,} filings, {len(done):,} already answered, {len(todo):,} to send at concurrency {a.concurrency}", flush=True)
     start, rows = time.perf_counter(), []
-    with open(a.out, "a") as f, ThreadPoolExecutor(a.concurrency) as ex:
+    ex = ThreadPoolExecutor(a.concurrency)
+    with open(a.out, "a") as f:
         for i, row in enumerate(ex.map(lambda r: ask(a.url, a.model, r, a.timeout), todo), 1):
             f.write(json.dumps(row) + "\n")
             rows.append(row)
@@ -68,7 +69,9 @@ def main():
                 bad = sum(not x["ok"] for x in rows)
                 print(f"  {i:,}/{len(todo):,}  {i / (time.perf_counter() - start):.1f} filings/s  failed {bad}", flush=True)
             if i == 20 and all(not x["ok"] for x in rows):
+                ex.shutdown(wait=False, cancel_futures=True)   # do not wait for the requests still queued
                 raise SystemExit(f"stopping: the first 20 requests all failed ({rows[-1]['error']})")
+    ex.shutdown()
     ok = [x["seconds"] for x in rows if x["ok"]]
     wall = time.perf_counter() - start
     summary = {"filings": len(todo), "succeeded": len(ok), "wall_seconds": round(wall, 1),

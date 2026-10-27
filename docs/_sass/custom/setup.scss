@@ -47,9 +47,9 @@ $border-color: #e4e0da;
 // given in _config.yml. So recolouring a callout means redefining the colour
 // ramp it was pointed at, not the callout. Mapping, per _config.yml:
 //
-//   green  -> tip                     purple -> note
+//   green  -> tip, checkpoint         purple -> note
 //   red    -> warning                 yellow -> optional
-//   blue   -> important, exercise     grey-dk -> demo, aside
+//   blue   -> important
 //
 // Every `-300` here is a deck colour and clears 5:1 on white, which is what
 // makes them safe to set uppercase title text in.

@@ -39,7 +39,7 @@ confirm it. Checkpoints on Marlowe earn GPU-hours.
 | | Where | What counts | Award |
 |---|---|---|---|
 | [1. One GPU]({{ '/checkpoint-1/' | relative_url }}) | Yens, 1 H200 | The training job finishes; you have its time per step and GPU memory and utilization | Needed to continue |
-| [2. Scaling on the Yens]({{ '/checkpoint-2/' | relative_url }}) | Yens, 2 H200s | A scaling table and a GPU-hour estimate for a full run | Needed to continue |
+| [2. Plan the GPU-hours]({{ '/checkpoint-2/' | relative_url }}) | Yens, 1 H200 | A second run with larger micro-batches, and a GPU-hour estimate for a full run | Needed to continue |
 | [3. First Marlowe job]({{ '/checkpoint-3/' | relative_url }}) | Marlowe, 1 H100 | The job finishes on Marlowe | 10 GPU-hours |
 | [4. One full node]({{ '/checkpoint-4/' | relative_url }}) | Marlowe, 8 H100s | The job runs on all 8 GPUs of one node | 50 GPU-hours |
 | [5. Two nodes and resume]({{ '/checkpoint-5/' | relative_url }}) | Marlowe, 16 H100s | The job runs across two nodes and resumes from a saved point | 500 GPU-hours |
@@ -60,7 +60,7 @@ After training, [label filings with your model]({{ '/label/' | relative_url }}) 
 | 11:30 | Break; open a terminal on the Yens |
 | 11:40 | **Hands-on 1:** [train on one H200 on the Yens]({{ '/checkpoint-1/' | relative_url }}) |
 | 12:30 | Lunch |
-| 1:15 | **Hands-on 2:** [scale on the Yens and estimate GPU-hours]({{ '/checkpoint-2/' | relative_url }}) |
+| 1:15 | **Hands-on 2:** [tune one GPU and estimate GPU-hours]({{ '/checkpoint-2/' | relative_url }}) |
 | 2:00 | **Hands-on 3:** [first job on Marlowe]({{ '/checkpoint-3/' | relative_url }}) |
 | 2:30 | Break |
 | 2:40 | **Hands-on 4:** [8 GPUs on one node]({{ '/checkpoint-4/' | relative_url }}), then [two nodes]({{ '/checkpoint-5/' | relative_url }}) |
