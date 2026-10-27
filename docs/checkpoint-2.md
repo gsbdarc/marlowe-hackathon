@@ -36,8 +36,8 @@ H100s are linked by NVLink within a node, so the multi-GPU part of the day happe
 ## Step 1: Larger micro-batches
 
 Each step trains on 16 records. In Checkpoint 1 the GPU took them one at a time (`BATCH=1`) and added up the results
-16 times (`ACCUM=16`). Taking 4 at a time does the same training in 4 passes instead of 16, which can keep the GPU
-busier:
+16 times (`ACCUM=16`). Taking 4 at a time does the same training in 4 passes instead of 16. Whether that is faster
+depends on the GPU and the data, so measure it:
 
 ```bash
 BATCH=4 RUN=cp2-batch4 sbatch slurm/yens/01_train_1gpu.slurm
@@ -61,8 +61,18 @@ $PY scripts/step_times.py $WORK/runs/cp1-1gpu $WORK/runs/cp2-batch4
 - **epoch hours**: how long one pass over all 52,757 training records would take.
 - **epoch GPU-hours**: epoch hours times the number of GPUs, which is what an allocation is charged.
 
-Did the larger micro-batch make each step faster? How much memory did it cost? On a 141 GB H200 there is room to try
-`BATCH=8` or `BATCH=16`.
+Did the larger micro-batch make each step faster? DARC's test on an A40 says it may not:
+
+```
+run              GPUs steps  s/step peak GPU GB epoch hours epoch GPU-hours
+cp1-1gpu            1    30   14.02        19.4        12.8            12.8
+cp2-batch4          1    30   49.92        21.3        45.7            45.7
+```
+{: .output }
+
+`BATCH=4` was 3.6 times slower per step. Filings vary in length, and every micro-batch is padded to its longest
+filing, so a batch of 4 does much more work than 4 batches of 1. Use the faster setting for your estimate, whichever
+it is on your GPU. On a 141 GB H200 you can also try `BATCH=2`.
 
 ## Step 3: Estimate a full run
 
