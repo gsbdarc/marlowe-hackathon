@@ -1,0 +1,768 @@
+/* Yens Onboarding 2026 — theme overrides on top of just-the-docs.
+   Trimmed from the 4-day course's stylesheet: the quest-log, party-card, and
+   leaderboard rules are gone along with the features they styled. */
+
+/* ── Entrance page: days on the left, skills on the right, rows aligned ── */
+.day-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+@media (max-width: 650px) { .day-layout { grid-template-columns: 1fr; } }
+
+.day-skills {
+  font-size: 0.88em;
+  color: #605c56;
+  line-height: 1.7;
+}
+
+.day-card {
+  border: 1px solid #e4e0da;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  background: #f7f5f2;
+}
+.day-card h3 { margin-top: 0; font-size: 1em; }
+.day-card p { margin: 0.25rem 0 0; font-size: 0.88em; color: #55524d; }
+
+/* Wrap long plain-text code blocks (e.g. Claude Code prompt examples) so they
+   wrap instead of scrolling off-screen. Command blocks (language-bash) are
+   left to scroll, since wrapping a command mid-token hurts readability. */
+.language-plaintext.highlighter-rouge pre.highlight {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Hint / spoiler collapsibles (<details>) in lesson content default to a plain
+   browser triangle that clashes with the theme. Render them as a full-width
+   "accordion": a gray summary bar with a chevron that rotates open, and the
+   revealed content boxed beneath it. */
+.main-content details {
+  border: 1px solid #e4e0da;
+  border-radius: 8px;
+  margin: 0.9rem 0;
+  overflow: hidden;              /* clips the summary bar to the rounded box */
+}
+.main-content details > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  padding: 0.6rem 0.9rem;
+  background: #f2efe9;
+  color: #3a3733;
+  font-weight: 600;
+  list-style: none;              /* drop the default disclosure triangle... */
+}
+.main-content details > summary::-webkit-details-marker { display: none; }  /* ...incl. Safari */
+.main-content details > summary::before {
+  content: "\25b8";              /* ▸ our own chevron, rotates when open */
+  display: inline-block;
+  color: #6a7280;
+  transition: transform 0.15s ease;
+}
+.main-content details > summary:hover { background: #eae5dd; }
+.main-content details[open] > summary {
+  border-bottom: 1px solid #e4e0da;
+  margin: 0 -0.9rem;             /* pull the bar back out to the box edges... */
+}
+.main-content details[open] > summary::before { transform: rotate(90deg); }
+.main-content details[open] { padding: 0 0.9rem 0.9rem; }  /* ...so only the content is inset */
+
+/* ── Quiz ─────────────────────────────────────────────────────────────────
+   Seven questions in a row, so the accordion styling above is far too heavy:
+   it stacks seven identical grey pills with more air between them than in
+   them. Restyle <details class="quiz"> as a plain FAQ list instead — hairline
+   rules, no fill, the number in the deck's serif in Cardinal, and the chevron
+   moved to the right margin where it stops competing with the number. The
+   question reads at body weight; the rules and the chevron carry the
+   structure. */
+.main-content details.quiz {
+  border: 0;
+  border-top: 1px solid #d6cec2;
+  border-bottom: 1px solid #d6cec2;
+  border-radius: 0;
+  margin: 0;
+  overflow: visible;
+}
+.main-content details.quiz + details.quiz { border-top: 0; }  /* no doubled rules */
+
+.main-content details.quiz > summary {
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.75rem 0.15rem;
+  background: none;
+  color: inherit;
+  font-weight: 400;
+}
+.main-content details.quiz > summary:hover { background: #faf8f4; }
+
+/* The number rides in a filled Cardinal disc — a fixed-width badge, so 1
+   through 7 line up and every question starts at the same place, and the row
+   reads as an item in a numbered set rather than a sentence beginning with a
+   digit. Nudged down a hair to sit optically centred on the first line. */
+.main-content details.quiz > summary .qnum {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  background: #8c1515;
+  color: #fff;
+  font-family: "Source Serif 4", georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* The question is one flex item, not one per text node: a <code> span inside
+   an unwrapped summary would otherwise have the row's `gap` applied on both
+   sides of it, opening a hole before the question mark. */
+.main-content details.quiz > summary .qtext { flex: 1 1 auto; }
+
+/* The control moves to the right and says what it does: a bare chevron out on
+   the margin reads as decoration, and these rows otherwise look like static
+   text. Two glyphs rather than one rotated one, so the label and the arrow
+   always agree. */
+.main-content details.quiz > summary::before { display: none; }
+.main-content details.quiz > summary::after {
+  content: "Show answer \25b8";
+  flex: none;
+  margin-left: auto;
+  padding-left: 0.9rem;
+  white-space: nowrap;
+  color: #8c1515;
+  font-size: 0.82em;
+  font-weight: 600;
+}
+.main-content details.quiz[open] > summary::after {
+  content: "Hide answer \25be";
+  color: #6a7280;
+}
+.main-content details.quiz > summary:hover::after { text-decoration: underline; }
+
+/* Narrow screens: the question needs the room more than the label does. */
+@media (max-width: 34rem) {
+  .main-content details.quiz > summary::after { content: "\25b8"; font-size: 1em; }
+  .main-content details.quiz[open] > summary::after { content: "\25be"; }
+}
+
+/* Open: the answer hangs under the question, not under the number. Undo the
+   inset box the generic accordion applies when open. */
+.main-content details.quiz[open] { padding: 0; }
+.main-content details.quiz[open] > summary { border-bottom: 0; margin: 0; }
+.main-content details.quiz > *:not(summary) {
+  margin-left: calc(1.6rem + 0.85rem);   /* the disc, plus the summary's gap */
+  margin-right: 0.15rem;
+}
+.main-content details.quiz > *:last-child { margin-bottom: 0.9rem; }
+
+/* ── Aside callout ────────────────────────────────────────────────────────
+   Declared as grey-dk in _config.yml because the theme's callout SCSS needs a
+   $<color>-300 variable to exist, and grey-lt's is #e6e1e8 — invisible as a
+   title on white. That leaves it identical to the Demo box, so recolour it
+   here: an aside is tangential, and should read quieter than the page around
+   it rather than competing with the callouts that carry instructions. */
+.main-content blockquote.aside,
+.main-content p.aside {
+  border-color: #e0dbd3;
+  border-left-color: #6a7280;    /* the same muted grey as the SVG labels */
+  background: #faf8f5;
+}
+.main-content blockquote.aside::before,
+.main-content p.aside::before { color: #6a7280; }
+
+/* ══ Deck-matching theme ═══════════════════════════════════════════════════
+   Colour and type variables live in _sass/custom/setup.scss, which compiles
+   into the theme itself. What's left here is the handful of things the theme
+   has no variable for. */
+
+/* ── Headings: serif, to match the deck's slide titles ────────────────────
+   The theme sets h1 to weight 300, which is anaemic in a serif. Source Serif
+   4 is loaded at 600/700 only, so name those explicitly rather than letting
+   the browser synthesise a light weight. */
+.main-content h1,
+.main-content h2,
+.main-content h3,
+.main-content h4,
+.main-content h5,
+.main-content h6,
+.side-bar .site-title {
+  font-family: "Source Serif 4", georgia, "Times New Roman", serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* h4 is uppercased and letterspaced by the theme — a serif reads badly that
+   small and wide, so keep it in the sans and lean on the tracking instead. */
+.main-content h4 {
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #55524d;
+}
+
+/* The deck puts a short cardinal rule under every slide title. Same device
+   here, on the page title only — repeating it under every h2 would turn a
+   long lesson page into a ladder. */
+.main-content h1:first-of-type {
+  margin-bottom: 1.4rem;
+}
+/* Drawn as a pseudo-element, not a border on the h1. The deck's rule is a
+   fixed-length stub rather than a full-width line, and constraining the
+   heading box itself to get that would wrap every title of more than three
+   words. */
+.main-content h1:first-of-type::after {
+  content: "";
+  display: block;
+  width: 7rem;
+  height: 3px;
+  margin-top: 0.55rem;
+  background: #a4001d;
+}
+
+/* ── Exercise headings ────────────────────────────────────────────────────
+   Part 1 alternates reading and doing, and the doing is the part a student
+   cannot skip. Mark it with the same 3px cardinal rail the callouts and the
+   terminal tabs already use, so the heading and the .exercise callout beneath
+   it read as one block rather than two unrelated things.
+
+   Keyed off the id, not a class: any heading that starts with "Exercise" picks
+   this up, so the convention holds without an author remembering to tag it.
+   h3 is included for exercises that belong to a parent section — the
+   .gitignore one sits under Never Commit a Password. */
+.main-content h2[id^="exercise"],
+.main-content h3[id^="exercise"] {
+  padding: 0.3rem 0 0.35rem 0.9rem;
+  border-left: 6px solid #1c1e21;
+  color: #8c1515;
+}
+/* In CSS rather than the heading text, so the emoji stays out of the anchor
+   id and out of the sidebar nav. */
+.main-content h2[id^="exercise"]::before,
+.main-content h3[id^="exercise"]::before {
+  content: "\01F449";
+  margin-right: 0.45rem;
+}
+
+/* Quiz headings get the same rail in cardinal — the colour the quiz already
+   uses for its numbered discs, so the heading belongs to the questions under
+   it. Inverted against the exercise heading on purpose: exercise is a black
+   rail with cardinal type, quiz is a cardinal rail with body type, so the two
+   never read as the same thing at a glance. */
+.main-content h2[id^="quiz"],
+.main-content h3[id^="quiz"] {
+  padding: 0.3rem 0 0.35rem 0.9rem;
+  border-left: 6px solid #8c1515;
+}
+
+/* ── Sidebar section accents ──────────────────────────────────────────────
+   Day 1, Day 2 and Reference each get their spine colour from the deck's
+   Agenda. Matching on the permalink means the stripe follows the section's
+   whole subtree, so the colour tells you where you are three pages deep.
+   Falls back to no stripe (not a broken one) if :has() is unavailable.
+   The stripe is set on the link as well as the li because the *active*
+   page's link paints its own background over the parent's inset shadow,
+   which would drop the stripe from exactly the section you're reading. */
+.site-nav .nav-list-item:has(> a[href$="/prework/"]),
+.site-nav .nav-list-link[href$="/prework/"] { box-shadow: inset 3px 0 0 #8c1515; }
+.site-nav .nav-list-item:has(> a[href$="/day1/"]),
+.site-nav .nav-list-link[href$="/day1/"] { box-shadow: inset 3px 0 0 #006c80; }
+.site-nav .nav-list-item:has(> a[href$="/day2/"]),
+.site-nav .nav-list-link[href$="/day2/"] { box-shadow: inset 3px 0 0 #7f2d48; }
+.site-nav .nav-list-item:has(> a[href$="/reference/"]),
+.site-nav .nav-list-link[href$="/reference/"] { box-shadow: inset 3px 0 0 #8a5e00; }
+
+/* The active page already gets bold from the theme; add the cardinal so the
+   "you are here" marker matches the rest of the brand furniture. */
+.site-nav .nav-list-link.active { color: #8c1515; }
+
+/* ── Tables ───────────────────────────────────────────────────────────────
+   Most content tables here are two-column reference grids (agendas, section
+   lists, "what's missing"). A tinted header and horizontal-only rules make
+   them read as rows rather than as a spreadsheet. */
+.main-content table {
+  border-collapse: collapse;
+  border: 1px solid #e4e0da;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.main-content thead th {
+  background: #f2efe9;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-weight: 700;
+  color: #2c2a27;
+  border-bottom: 2px solid #d8d2c8;
+}
+.main-content tbody td { border-top: 1px solid #eeeae3; }
+.main-content tbody tr:hover { background: #faf8f5; }
+
+/* ── Code ─────────────────────────────────────────────────────────────────
+   Code blocks now sit on the warm ground set in setup.scss; give them an
+   edge so a long block has a visible boundary against the page. */
+.main-content div.highlighter-rouge,
+.main-content pre.highlight {
+  border: 1px solid #e8e3db;
+  border-radius: 6px;
+}
+/* ── Inline identifier field ───────────────────────────────────────────────
+   The in-page twin of the sidebar fields, used in a Tip callout where a page
+   first needs the value: GitHub on Git & GitHub, SUNet ID on Connecting to the
+   Yens. Both feed assets/js/personalize.js. The affix is a <label>, so
+   clicking "github.com/" or "@stanford.edu" focuses the field, and the pair
+   reads as the one identifier it is completing rather than as a stray form
+   control. */
+.main-content .personalize-field {
+  display: inline-flex;
+  align-items: stretch;
+  overflow: hidden;
+  vertical-align: middle;
+  border: 1px solid #cfc8bd;
+  border-radius: 5px;
+  background: #fff;
+}
+.main-content .personalize-field:focus-within {
+  border-color: #8c1515;
+  box-shadow: 0 0 0 2px rgba(140, 21, 21, 0.14);
+}
+.main-content .personalize-affix {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-right: 1px solid #e7e3dc;
+  background: #f4f1ec;
+  color: #8a837a;
+  font-family: "Source Code Pro", "SFMono-Regular", menlo, monospace;
+  font-size: 0.85rem;
+  cursor: text;
+}
+.main-content .personalize-field input {
+  width: 11rem;
+  padding: 0.25rem 0.55rem;
+  border: 0;
+  background: none;
+  font-family: "Source Code Pro", "SFMono-Regular", menlo, monospace;
+  font-size: 0.9rem;
+  color: #1c1e21;
+}
+.main-content .personalize-field input:focus { outline: none; }
+/* Profiling's node field is a <select> rather than a text box — only five
+   interactive Yens exist, so picking one removes the typo — but it sits in the
+   same chip as the text fields and must not look like a stray form control. */
+.main-content .personalize-field select {
+  padding: 0.25rem 0.55rem;
+  border: 0;
+  background: none;
+  font-family: "Source Code Pro", "SFMono-Regular", menlo, monospace;
+  font-size: 0.9rem;
+  color: #1c1e21;
+}
+.main-content .personalize-field select:focus { outline: none; }
+/* A trailing affix — @stanford.edu on the SUNet field — is the same chip with
+   its divider on the other side. */
+.main-content .personalize-affix-end {
+  border-right: 0;
+  border-left: 1px solid #e7e3dc;
+}
+.main-content .personalize-field-status {
+  margin-left: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a7f5a;
+  white-space: nowrap;
+}
+.main-content .personalize-field-status:empty { display: none; }
+
+/* A link waiting on a value has had its href stripped by personalize.js, so it
+   must not keep inviting a click. Reads as body text with a dotted underline,
+   which pairs with the title attribute explaining how to enable it. */
+.main-content a.personalize-pending {
+  color: inherit;
+  text-decoration: underline dotted #b9b2a6;
+  text-underline-offset: 0.18em;
+  cursor: help;
+}
+
+/* ── Sidebar personalization ───────────────────────────────────────────────
+   Two fields in the sidebar footer, so a student sets their SUNet ID and
+   GitHub name once and every command on the site fills itself in. The slot
+   this lands in (nav_footer_custom) is small-print territory, so the whole
+   block runs a step down in size and leans on the sidebar's own rules for
+   width. Rendered twice per page — desktop sidebar and mobile footer — which
+   is why nothing here keys off an id. */
+.personalize {
+  margin-bottom: 0.9rem;
+  padding: 0.7rem 0.75rem 0.55rem;
+  border: 1px solid #e4e0da;
+  border-left: 3px solid #8c1515;
+  border-radius: 5px;
+  background: #f7f5f2;
+  text-align: left;
+}
+.personalize-title {
+  margin: 0 0 0.25rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #8c1515;
+}
+.personalize-blurb {
+  margin: 0 0 0.6rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #6a6459;
+}
+.personalize-row {
+  display: block;
+  margin-bottom: 0.45rem;
+  cursor: text;
+}
+/* Flex rather than block so the label can carry its service's mark beside the
+   text. Still full-width, so the input stays stacked underneath. */
+.personalize-name {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.12rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #55524d;
+}
+/* Both marks are squared in their viewBox, so the two labels start at the same
+   x. Sized in em to track the label instead of pinning a pixel height. */
+.personalize-name svg {
+  width: 1.6em;
+  height: 1.6em;
+  flex: none;
+}
+.personalize-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #cfc8bd;
+  border-radius: 4px;
+  background: #fff;
+  font-family: "Source Code Pro", ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: #1c1e21;
+}
+.personalize-input:focus {
+  outline: none;
+  border-color: #8c1515;
+  box-shadow: 0 0 0 2px rgba(140, 21, 21, 0.15);
+}
+.personalize-status {
+  margin: 0.1rem 0 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #1a7f5a;
+}
+.personalize-status:empty { display: none; }
+.personalize-credit {
+  margin: 0;
+  font-size: 0.7rem;
+  color: #8a857c;
+}
+
+/* A placeholder personalize.js has not been able to fill yet. Marked and
+   clickable, because a student who never noticed the sidebar finds it here, in
+   the command they were about to copy. Amber rather than any of the code-block
+   tab colours: this is "you still have to do something", not a category. */
+.personalize-token-unset {
+  background: rgba(214, 138, 42, 0.16);
+  border-radius: 2px;
+  padding: 0 1px;
+  color: #8a5a12;
+  cursor: pointer;
+  text-decoration: underline dashed rgba(138, 90, 18, 0.6);
+  text-underline-offset: 0.15em;
+}
+.personalize-token-unset:hover,
+.personalize-token-unset:focus {
+  background: rgba(214, 138, 42, 0.3);
+  outline: none;
+}
+/* Inside an SVG diagram the token is a <tspan>, where background does not
+   paint — carry the signal on the fill colour instead. */
+text .personalize-token-unset,
+tspan.personalize-token-unset {
+  fill: #8a5a12;
+  font-style: italic;
+}
+/* Filled in: no call to action, just a hint that the value came from the
+   sidebar rather than being literal page text. */
+.personalize-token {
+  text-underline-offset: 0.15em;
+}
+
+/* ── Where does this go? ──────────────────────────────────────────────────
+   Half the commands in Part 1 run on the Yens and half on the student's own
+   laptop, and running one in the wrong place is the commonest way to get
+   stuck — `scp` from inside an SSH session, `ssh` from the cluster. A third
+   kind of block isn't a command at all: it's a prompt you type *to Claude*,
+   which people paste at a shell prompt if nothing tells them otherwise. Tag a
+   fenced block with `{: .yens }`, `{: .laptop }`, `{: .claude }`,
+   `{: .file }`, `{: .notebook }`, `{: .jupyter-terminal }` or
+   `{: .python-repl }` (kramdown
+   puts the class on the highlighter-rouge container) to label it.
+
+   The label is a folder tab reading YEN TERMINAL or LOCAL TERMINAL: same fill
+   and same 1px dark edge as the code box the theme draws on div.highlight,
+   bottom border dropped, and pulled down a pixel so its base merges into the
+   box's top edge. The machine colour is a 3px edge carried by *both* the tab
+   and the box, so it runs as one unbroken line from the top of the tab to the
+   bottom of the block. Widening that edge from 1px to 3px costs nothing in
+   alignment: a tagged container drops the 1px border and radius it would
+   otherwise carry, so the code still starts at the same x as every untagged
+   block on the page — measured, not assumed. */
+.main-content div.highlighter-rouge.yens,
+.main-content div.highlighter-rouge.laptop,
+.main-content div.highlighter-rouge.claude,
+.main-content div.highlighter-rouge.notebook,
+.main-content div.highlighter-rouge.jupyter-terminal,
+.main-content div.highlighter-rouge.python-repl,
+.main-content div.highlighter-rouge.file,
+.main-content div.highlighter-rouge.output {
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.main-content div.highlighter-rouge.yens::before,
+.main-content div.highlighter-rouge.laptop::before,
+.main-content div.highlighter-rouge.claude::before,
+.main-content div.highlighter-rouge.notebook::before,
+.main-content div.highlighter-rouge.jupyter-terminal::before,
+.main-content div.highlighter-rouge.python-repl::before,
+.main-content div.highlighter-rouge.file::before,
+.main-content div.highlighter-rouge.output::before {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  margin-bottom: -1px;           /* merge the tab's base into the box edge */
+  padding: 0.2rem 0.7rem 0.26rem 0.6rem;
+  border: 1px solid #1c1e21;     /* the theme's own code-box edge */
+  border-bottom: 0;
+  border-left-width: 3px;
+  border-radius: 4px 4px 0 0;
+  background: #f7f5f2;           /* the theme's own code-box fill */
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+}
+.main-content div.highlighter-rouge.yens > div.highlight,
+.main-content div.highlighter-rouge.laptop > div.highlight,
+.main-content div.highlighter-rouge.claude > div.highlight,
+.main-content div.highlighter-rouge.notebook > div.highlight,
+.main-content div.highlighter-rouge.jupyter-terminal > div.highlight,
+.main-content div.highlighter-rouge.python-repl > div.highlight,
+.main-content div.highlighter-rouge.file > div.highlight,
+.main-content div.highlighter-rouge.output > div.highlight {
+  border-top-left-radius: 0;     /* the tab sits on this corner */
+  border-left-width: 3px;
+}
+.main-content div.highlighter-rouge.yens::before {
+  content: "\276F_  Yen Terminal";
+  color: #8c1515;
+  border-left-color: #8c1515;
+}
+.main-content div.highlighter-rouge.yens > div.highlight {
+  border-left-color: #8c1515;
+}
+.main-content div.highlighter-rouge.laptop::before {
+  content: "💻  Local Terminal";
+  color: #1f4e79;
+  border-left-color: #1f4e79;
+}
+.main-content div.highlighter-rouge.laptop > div.highlight {
+  border-left-color: #1f4e79;
+}
+
+/* Not a terminal — a prompt you type to Claude. Burnt orange rather than a
+   second red: cardinal and a clay tone are hard to tell apart in 0.68rem
+   uppercase, and these blocks sit a few lines from a `.yens` one. */
+.main-content div.highlighter-rouge.claude::before {
+  content: "\01F916  Claude Code";
+  color: #c2410c;
+  border-left-color: #c2410c;
+}
+.main-content div.highlighter-rouge.claude > div.highlight {
+  border-left-color: #c2410c;
+}
+
+/* Not a terminal at all -- lines that belong *inside* a file. Green rather
+   than a fourth warm tone: at 0.68rem uppercase a reader picks the hue before
+   the words, and cardinal, navy and rust are already spoken for. #166534 is
+   6.55:1 on the tab fill, so it clears AA for small text. */
+.main-content div.highlighter-rouge.file::before {
+  content: "\01F4C4  Text File";
+  color: #166534;
+  border-left-color: #166534;
+}
+.main-content div.highlighter-rouge.file > div.highlight {
+  border-left-color: #166534;
+}
+
+/* Python entered in a notebook cell. Purple distinguishes it from the
+   terminal and file tabs while keeping the same shape and spacing. */
+.main-content div.highlighter-rouge.notebook::before {
+  content: "In [ ]:  Jupyter Notebook Cell";
+  color: #6b21a8;
+  border-left-color: #6b21a8;
+}
+.main-content div.highlighter-rouge.notebook > div.highlight {
+  border-left-color: #6b21a8;
+}
+
+/* Distinguish the browser's shell from Python running inside that shell. */
+.main-content div.highlighter-rouge.jupyter-terminal::before {
+  content: "\276F_  JupyterHub Terminal";
+  color: #0f5964;
+  border-left-color: #0f5964;
+}
+.main-content div.highlighter-rouge.jupyter-terminal > div.highlight {
+  border-left-color: #0f5964;
+}
+.main-content div.highlighter-rouge.python-repl::before {
+  content: "Python Prompt (>>>)";
+  color: #444444;
+  border-left-color: #444444;
+}
+.main-content div.highlighter-rouge.python-repl > div.highlight {
+  border-left-color: #444444;
+}
+
+/* What the terminal printed back, rather than something to type. Deliberately
+   the quiet one: the other five tabs are saturated because each answers "where
+   do I run this?", and output answers a different question. Grey keeps it
+   legible as a label without competing with the block a student is meant to
+   act on. */
+.main-content div.highlighter-rouge.output::before {
+  content: "\21B3  Output";
+  color: #6a7280;
+  border-left-color: #6a7280;
+}
+/* The tab butts against the box's top-left corner, so that corner has to be
+   square. It is squared on `div.highlight` above, which does work — measured:
+   that element carries both the 3px coloured rail and a 0px radius on every
+   tagged block.
+
+   What it does not fix is `pre.highlight` *inside* it, which keeps the 6px
+   radius from the box-edge rule near the top of this file. That is the notch
+   that shows beside the tab. Squaring it here, on all eight tabs.
+
+   Only the radius. An earlier pass also gave `pre.highlight` a
+   `border-left: 3px`, which drew a second coloured rail 15px inside the
+   first — two nested boxes, most visible on `.file` where the rail is a
+   strong green. `div.highlight` already draws the rail; `pre.highlight` only
+   needs its corner squared. */
+.main-content div.highlighter-rouge.yens > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.laptop > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.claude > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.notebook > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.jupyter-terminal > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.python-repl > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.file > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.output > div.highlight > pre.highlight {
+  border-top-left-radius: 0;
+}
+
+/* ── Keys look like keys ──────────────────────────────────────────────────
+   A key set as inline code (`Shift+Tab`) reads as something you'd type at a
+   prompt, which is exactly wrong for something you press. Written as
+   <kbd>Shift</kbd>+<kbd>Tab</kbd> it comes out as a small keycap instead: a
+   sans face, because a key is not code; a heavier bottom edge for the sense of
+   a physical key; and nowrap so a combination never breaks across two lines.
+   min-width keeps a single letter (<kbd>c</kbd>) from collapsing to a sliver. */
+.main-content kbd {
+  display: inline-block;
+  min-width: 1.35em;
+  margin: 0 0.06em;
+  padding: 0.08em 0.4em 0.12em;
+  border: 1px solid #cfc8bd;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #fffefc;
+  box-shadow: inset 0 -1px 0 #f4efe8;
+  color: #2e2d29;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.78em;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: 0.08em;
+}
+
+/* Inline code shouldn't look like a miniature block — no border, just tint.
+   Mirrors the theme's own `:not(pre, figure) > code` selector rather than
+   listing parent elements: inline code turns up inside <strong>, <em> and
+   links as often as directly inside a <p>, and enumerating parents misses one
+   every time — **`/compact`** kept the theme's bordered default while the
+   plain `/compact` beside it in the same sentence did not. */
+.main-content :not(pre, figure) > code {
+  border: 0;
+  padding: 0.12em 0.32em;
+  border-radius: 3px;
+  color: #7f2d48;
+}
+
+/* ── Links ────────────────────────────────────────────────────────────────
+   Cardinal on white is 8.9:1, so it carries link duty without underlines in
+   body text — but keep the underline on hover as the affordance. */
+.main-content a { text-decoration: none; }
+.main-content a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── Collapsed Bonus sections ─────────────────────────────────────────────
+   Built by assets/js/bonus-collapse.js, and styled as the same accordion as
+   the hand-written <details> above. Slightly more inset from the heading it
+   follows, so it reads as that section's content rather than a sibling. */
+.main-content details.bonus {
+  margin-top: 0.6rem;
+}
+.main-content details.bonus > summary {
+  color: #55524d;
+  font-size: 0.95em;
+}
+
+/* Marlowe hackathon: a third machine. Same tab and edge as .yens, in a dark teal so the two clusters'
+   blocks are easy to tell apart when a page switches between them. */
+.main-content div.highlighter-rouge.marlowe {
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.main-content div.highlighter-rouge.marlowe::before {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  margin-bottom: -1px;
+  padding: 0.2rem 0.7rem 0.26rem 0.6rem;
+  border: 1px solid #1c1e21;
+  border-bottom: 0;
+  border-left-width: 3px;
+  border-radius: 4px 4px 0 0;
+  background: #f7f5f2;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+  content: "\276F_  Marlowe Terminal";
+  color: #0f5e5a;
+  border-left-color: #0f5e5a;
+}
+.main-content div.highlighter-rouge.marlowe > div.highlight {
+  border-top-left-radius: 0;
+  border-left-width: 3px;
+  border-left-color: #0f5e5a;
+}

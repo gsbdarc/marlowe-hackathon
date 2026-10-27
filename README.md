@@ -1,22 +1,40 @@
-# Marlowe hackathon examples on the Yens
+# Marlowe Hackathon 2026
 
-Each example lives in its own directory with its own README, requirements, and
-Slurm script. Submit jobs from inside the example's directory.
+Materials for the DARC and Marlowe GPU hackathon at Stanford GSB, November 13, 2026.
 
-| Directory | What it does |
+**Website: <https://gsbdarc.github.io/marlowe-hackathon/>**
+
+Participants fine-tune **Kev-4B**, a small open model, to answer three questions about CEO turnover in SEC 8-K Item 5.02
+filings the way **Jev**, a large hosted model, answered them. They train on one GPU on the Yens, scale to two, then
+run the same job on 1, 8 and 16 H100s on Marlowe, and measure time per step and GPU-hours at each scale.
+
+## What is here
+
+| Path | What |
 |---|---|
-| `financial_sentiment/` | LoRA fine-tune of Qwen3-4B to label financial news sentences as negative, neutral, or positive (Financial PhraseBank). |
-| `cyber-distill/` | Cybersecurity disclosure in 10-K filings, fiscal 1996-2025: a large teacher model on Marlowe labels paragraphs, a small student model learns from them. Runbook and status in its README. |
+| `docs/` | the website (Jekyll, just-the-docs), deployed by `.github/workflows/pages.yml` on every push to `main` |
+| `env/` | paths and cache settings for the Yens (`yens.sh`) and Marlowe (`marlowe.sh`) |
+| `scripts/` | setup, data preparation, labeling, scoring, step timing, and the Weights & Biases sidecar |
+| `slurm/train_args.sh` | the training job every checkpoint runs |
+| `slurm/yens/` | Checkpoints 1 and 2, data preparation, and serving a model to label filings |
+| `slurm/marlowe/` | Checkpoints 3, 4 and 5 |
 
-## Shared setup
+No data, results or model weights are in this repository. Jev's labeled filings are on the Yens at
+`/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev` and on Marlowe at
+`/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev`. `.gitignore` is a whitelist: only the paths above are
+tracked, and data files are ignored everywhere in the tree.
 
-- `.venv/`: one shared Python environment (Python 3.11, torch with CUDA). Add a
-  new example's packages with `../.venv/bin/pip install -r requirements.txt`.
-- Caches go to scratch, not here: `HF_HOME=/scratch/users/$USER/hf_cache`,
-  `PIP_CACHE_DIR=/scratch/users/$USER/pip_cache`, `WANDB_DIR=/scratch/users/$USER/wandb`.
+## Build the site locally
 
-## Git
+```bash
+cd docs
+bundle install
+bundle exec jekyll serve
+```
 
-This folder is the repository `gsbdarc/marlowe-hackathon` (private). `.gitignore` is a whitelist:
-only listed example directories are tracked. To add an example, check it holds no `.env`,
-licensed data (for example CUSIPs) or large files, then add a `!/<dir>/` line to `.gitignore`.
+Then open <http://localhost:4000/marlowe-hackathon/>.
+
+## Earlier work
+
+The cybersecurity-disclosure pilot that preceded this project is in the git history and on the `kev-finetune`
+branch.
