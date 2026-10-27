@@ -1,15 +1,39 @@
-# Whitelist: only listed paths are tracked. Each example opts in by adding a "!/<dir>/" line
-# after checking it holds no secrets (.env), licensed data (CUSIPs) or large data files.
+# Whitelist: only these paths are tracked. Data, results, model weights and secrets never go in this
+# repository; the Jev-labeled data lives on the Yens and Marlowe.
 /*
 !/.gitignore
 !/README.md
-!/cyber-distill/
+!/.github/
+!/docs/
+!/env/
+!/scripts/
+!/slurm/
 
 # Never commit these anywhere in the tree
 .env
-**/data/
-**/logs/
-**/.venv/
-**/venv/
-**/__pycache__/
-**/.ipynb_checkpoints/
+data/
+results/
+runs/
+logs/
+wandb/
+*.parquet
+*.jsonl
+*.csv
+*.log
+*.safetensors
+*.pt
+
+# Jekyll build output
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/vendor/
+docs/.bundle/
+
+# Python and editors
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store

@@ -1,0 +1,62 @@
+# Site settings for the Marlowe Hackathon 2026 website.
+# Not reloaded by `jekyll serve`: restart the server after changing anything here.
+
+title: "Marlowe Hackathon 2026"
+tagline: "Stanford GSB · From one GPU on the Yens to many on Marlowe"
+author: GSB DARC Team
+description: >-
+  A one-day hands-on hackathon for Stanford GSB researchers: distill a large model's labels on SEC 8-K CEO-turnover
+  filings into a small open model, from one GPU on the Yens to multiple nodes on Marlowe.
+
+baseurl: '/marlowe-hackathon'
+url: 'https://gsbdarc.github.io'
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .bundle
+
+theme: just-the-docs
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+highlighter: rouge
+permalink: pretty
+
+plugins:
+  - jekyll-last-modified-at
+
+last_edit_timestamp: true
+last_edit_time_format: "%b %-d, %Y"
+
+aux_links:
+  GitHub repository:
+    - 'https://github.com/gsbdarc/marlowe-hackathon'
+  GSB RCpedia:
+    - 'https://rcpedia.stanford.edu'
+
+callouts:
+  tip:
+    title: Tip
+    color: green
+  warning:
+    title: Warning
+    color: red
+  important:
+    title: Important
+    color: blue
+  note:
+    title: Note
+    color: purple
+  checkpoint:
+    title: Checkpoint
+    color: green
+  optional:
+    title: Optional
+    color: yellow
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false

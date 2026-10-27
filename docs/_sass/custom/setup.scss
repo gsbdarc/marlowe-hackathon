@@ -1,0 +1,65 @@
+// Marlowe Hackathon 2026 — theme variables.
+//
+// just-the-docs imports this file *after* its own `support/_variables.scss`
+// (which declares everything `!default`) and *before* `color_schemes/light`
+// and `modules`. So plain assignments here win over both the defaults and the
+// light scheme, and every rule the theme compiles picks them up — including
+// the ones we'd never think to override by hand (search results, breadcrumbs,
+// buttons, nav hover). Do colour and type here; do layout in course.css.
+//
+// The palette is the lecture deck's, so the site and the slides students see
+// in the room read as one course. Source of truth for these values is
+// `theme.py` in the phd_class_2026 deck repo.
+
+// ── Type ─────────────────────────────────────────────────────────────────
+// Source Sans 3 / Serif 4 / Code Pro are the *current* family names. The
+// legacy "Source Sans Pro" / "Source Serif Pro" names no longer resolve —
+// same trap the deck hit, where they silently fell back to Arial.
+$body-font-family: "Source Sans 3", system-ui, -apple-system, blinkmacsystemfont,
+  "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif, "Segoe UI Emoji";
+$mono-font-family: "Source Code Pro", "SFMono-Regular", menlo, consolas, monospace;
+
+$body-line-height: 1.5;
+$content-line-height: 1.65;
+
+// ── Brand ────────────────────────────────────────────────────────────────
+$cardinal: #8c1515; // Stanford Cardinal — links, accents, brand furniture
+$cardinal-rule: #a4001d; // the deck's rule under every slide title
+$warm-000: #f7f5f2; // sidebar / code / table-header ground
+$warm-100: #ede9e3; // hairlines on the warm ground
+
+$link-color: $cardinal;
+$btn-primary-color: $cardinal;
+$body-background-color: #fff;
+$body-heading-color: #000;
+$body-text-color: #1c1e21;
+$sidebar-color: $warm-000;
+$code-background-color: $warm-000;
+$table-background-color: #fff;
+$search-background-color: #fff;
+$search-result-preview-color: #55524d;
+$nav-child-link-color: #55524d;
+$border-color: #e4e0da;
+
+// ── Callout palette ──────────────────────────────────────────────────────
+// The theme builds each callout from `$<colour>-000` (thin border) and
+// `$<colour>-300` (left bar + uppercase title), where `<colour>` is the name
+// given in _config.yml. So recolouring a callout means redefining the colour
+// ramp it was pointed at, not the callout. Mapping, per _config.yml:
+//
+//   green  -> tip, checkpoint         purple -> note
+//   red    -> warning                 yellow -> optional
+//   blue   -> important
+//
+// Every `-300` here is a deck colour and clears 5:1 on white, which is what
+// makes them safe to set uppercase title text in.
+$green-300: #175e54; // Palo Alto
+$green-000: #a8cdc6;
+$red-300: #b1040e; // alert red — held back for warnings only
+$red-000: #f0b3b6;
+$blue-300: #006c80; // teal — the deck's "What are the Yen Servers?" section
+$blue-000: #a3ccd4;
+$purple-300: #7f2d48; // plum — the deck's "Git & GitHub" section
+$purple-000: #d9b6c1;
+$yellow-300: #8a5e00; // the Agenda's gold, darkened to 5.7:1 for text
+$yellow-000: #e8d49a;
