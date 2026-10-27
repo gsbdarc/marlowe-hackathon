@@ -53,7 +53,7 @@ def main():
         if m := STEP.search(line):
             ep, step, steps, loss, _, _, sec_rec = m.groups()   # kl and anchor are unused terms (always 0 here)
             now, step = time.time(), int(step)
-            row = {"loss": float(loss), "seconds_per_record": float(sec_rec), "epoch": int(ep),
+            row = {"loss": float(loss), "seconds_per_item": float(sec_rec), "epoch": int(ep),
                    "progress": step / int(steps)}
             if last:   # seconds per optimizer step over the last 10 steps, by this script's clock
                 row["seconds_per_step"] = (now - last[0]) / (step - last[1])

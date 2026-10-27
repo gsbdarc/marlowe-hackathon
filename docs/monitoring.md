@@ -7,8 +7,8 @@ permalink: /monitoring/
 
 # Monitoring Training
 
-A training job runs on a GPU node, not in your terminal. There are three ways to watch it: the job's log, a GPU log the
-job writes next to it, and, if you want charts, Weights & Biases.
+A training job runs on a GPU node, not in your terminal. Watch it in the job's log, in the GPU log the job writes next
+to it, or, for charts, in Weights & Biases.
 
 ---
 
@@ -20,7 +20,7 @@ squeue --me
 {: .yens }
 
 `ST` is `PD` while the job waits for GPUs and `R` once it runs; `NODELIST(REASON)` shows the node, or why it is
-waiting. `scontrol show job <jobid>` gives the full picture.
+waiting. `scontrol show job <jobid>` shows the job's full details.
 
 ## The job's log
 
@@ -50,7 +50,7 @@ saved /scratch/users/<sunet>/ceo-turnover/runs/cp1-1gpu
 | `step 20/100` | optimizer steps done, of the steps this job runs |
 | `loss` | cross-entropy between Kev's probabilities and Jev's, averaged over the last 10 steps; should fall |
 | `kl`, `anchor` | optional extra loss terms, not used today; they stay at 0 |
-| `s/rec` | seconds per record on one GPU since the job started, loading included; it falls as the run settles |
+| `s/rec` | a running average since the job started, per item Kev builds from the records (a record can yield more than one), not per filing; it reads lower at `BATCH=4` even when each step is slower, so compare runs with `step_times.py` instead. W&B charts it as `seconds_per_item` |
 | `saved ...` | training finished and wrote the model checkpoint |
 
 When the job finishes, the run directory holds `training_metrics.json` with the time of every step and the peak GPU

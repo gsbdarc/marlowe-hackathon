@@ -19,8 +19,8 @@ sbatch slurm/marlowe/04_train_8gpu.slurm
 {: .marlowe }
 
 Compared with Checkpoint 3: `--gpus-per-node=8` and `--exclusive` take the whole node, whose 8 H100s are linked by
-NVLink, `GPUS=8` makes each step
-2 records per GPU (still 16 in all), and `torchrun --nproc_per_node 8` starts eight training processes. Look for
+NVLink; `GPUS=8` makes each step 2 records per GPU (still 16 in all); and `torchrun --nproc_per_node 8` starts eight
+training processes. Look for
 `world=8` in the log:
 
 ```bash
@@ -45,8 +45,8 @@ $PY scripts/step_times.py $WORK/runs/cp3-1gpu $WORK/runs/cp4-8gpu
 Add your Yens H200 rows from [Checkpoints 1 and 2]({{ '/checkpoint-2/' | relative_url }}) and answer:
 
 1. What is the speedup from 1 to 8 H100s? How close is it to 8?
-2. Which scale has the lowest **epoch GPU-hours**? That is the cheapest way to train; the fastest scale is usually not
-   it.
+2. Which scale has the lowest **epoch GPU-hours**? That is the cheapest way to train, and it is usually not the
+   fastest.
 3. With your 3-epoch estimate, how long would the full run take on one node, and would it fit in `preempt`'s 4-hour
    limit?
 
