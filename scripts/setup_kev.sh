@@ -15,7 +15,8 @@ fi
 [ -d "$KEV_HOME/kev/.git" ] || git clone -q https://github.com/jaredpalmer/kev.git "$KEV_HOME/kev"
 cd "$KEV_HOME/kev" && git checkout -q "$KEV_COMMIT"
 "$UV" sync --extra serve
-"$UV" pip install --python .venv/bin/python -q flash-linear-attention==0.5.2 wandb
+# fla refuses to train on Hopper GPUs (H100, H200) with torch's Triton 3.4.0: it gives wrong gradients below 3.7.1
+"$UV" pip install --python .venv/bin/python -q flash-linear-attention==0.5.2 triton==3.8.0 wandb
 # Weights, fetched here so no GPU time is spent downloading
 .venv/bin/hf download jaredpalmer/kev-4b --revision v1.0 > /dev/null
 .venv/bin/hf download Qwen/Qwen3.5-4B-Base > /dev/null
