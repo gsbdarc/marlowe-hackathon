@@ -5,7 +5,8 @@ estimates agreement over the whole 2022-2026 test split rather than over the ove
 
     $PY scripts/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/kev-4b-step500.jsonl
 
-Prints one row per run and writes <run>_scores.json next to each run.
+Prints one row per run and writes <run>_scores.json next to each run. With --wandb, the scores also go to the W&B run
+that label.py --wandb started for each one.
 """
 import argparse
 import json
@@ -60,6 +61,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("runs", nargs="+")
     ap.add_argument("--sample", default=os.path.join(os.environ.get("WORK", "."), "data", "test1000.parquet"))
+    ap.add_argument("--wandb", action="store_true", help="add the scores to each run's W&B run (from label.py --wandb)")
     a = ap.parse_args()
     sample = pd.read_parquet(a.sample)
     sample["status"], sample["why"] = sample.status.astype(int), sample.why.astype(int)
@@ -71,6 +73,14 @@ def main():
         print(f"\n{r['run']}: status agreement by Jev's status")
         for k, v in r["status_agree_by_jev_status"].items():
             print(f"  {k:<24} {v:.1%}")
+    if a.wandb:
+        import wandb
+        for p, r in zip(a.runs, res):
+            run_id = json.load(open(p.replace(".jsonl", "_summary.json"))).get("wandb_run_id")
+            if run_id:
+                run = wandb.init(id=run_id, resume="must")
+                run.summary.update({k: v for k, v in r.items() if k != "run"})
+                run.finish()
 
 
 if __name__ == "__main__":

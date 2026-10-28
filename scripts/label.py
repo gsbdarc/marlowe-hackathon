@@ -10,11 +10,16 @@ three questions. Labels in the input file are never sent.
 
 Writes one line per filing: {"id", "ok", "seconds", "answers"} (or "error"), then <out>_summary.json with the
 throughput. A rerun skips filings already answered.
+
+With --wandb NAME (slurm/yens/score_kev.slurm), the run also goes to Weights & Biases: the server's settings, the speed
+and GPU memory every 100 filings, and at the end the peak memory and the mean batch the server ran. Run it on the GPU
+node, as the job does: it reads the GPU with nvidia-smi, and W&B's System tab charts that GPU.
 """
 import argparse
 import json
 import os
 import statistics
+import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -34,6 +39,14 @@ def ask(url, model, rec, timeout):
         return {"id": rec["_meta"]["id"], "ok": False, "seconds": time.perf_counter() - t, "error": f"{type(e).__name__}: {e}"}
 
 
+def gpu():
+    """(name, GB in use, GB in all) of the job's GPU, from nvidia-smi."""
+    out = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.used,memory.total", "--format=csv,noheader,nounits", "-i", "0"],
+                         capture_output=True, text=True, check=True).stdout
+    name, used, total = (x.strip() for x in out.split(","))
+    return name, int(used) / 1024, int(total) / 1024
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--url", required=True)
@@ -43,6 +56,7 @@ def main():
     ap.add_argument("--concurrency", type=int, default=16)
     ap.add_argument("--timeout", type=float, default=300)
     ap.add_argument("--limit", type=int, default=0, help="label only the first N filings")
+    ap.add_argument("--wandb", metavar="NAME", help="also log the run to Weights & Biases under this name")
     a = ap.parse_args()
     if a.data.endswith(".parquet"):
         import pandas as pd
@@ -59,6 +73,15 @@ def main():
     todo = [r for r in recs if r["_meta"]["id"] not in done]
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
     print(f"{len(recs):,} filings, {len(done):,} already answered, {len(todo):,} to send at concurrency {a.concurrency}", flush=True)
+    run, peak = None, 0.0
+    if a.wandb:
+        import wandb
+        card = requests.get(f"{a.url}/v1/models", timeout=30).json()["models"][0]
+        name, _, total = gpu()
+        run = wandb.init(name=a.wandb, config={
+            "user": os.environ.get("USER"), "job": os.environ.get("SLURM_JOB_ID"), "gpu": name,
+            "gpu_memory_gb": round(total, 1), "model": card["run"], "dtype": card["dtype"],
+            "fused": os.environ.get("KEV_FUSED") != "0", "concurrency": a.concurrency, "filings": len(todo)})
     start, rows = time.perf_counter(), []
     ex = ThreadPoolExecutor(a.concurrency)
     with open(a.out, "a") as f:
@@ -67,7 +90,12 @@ def main():
             rows.append(row)
             if i % 100 == 0 or i == len(todo):
                 bad = sum(not x["ok"] for x in rows)
-                print(f"  {i:,}/{len(todo):,}  {i / (time.perf_counter() - start):.1f} filings/s  failed {bad}", flush=True)
+                rate = i / (time.perf_counter() - start)
+                print(f"  {i:,}/{len(todo):,}  {rate:.1f} filings/s  failed {bad}", flush=True)
+                if run:
+                    used = gpu()[1]
+                    peak = max(peak, used)
+                    run.log({"filings_per_second": rate, "failed": bad, "gpu_memory_used_gb": used}, step=i)
             if i == 20 and all(not x["ok"] for x in rows):
                 ex.shutdown(wait=False, cancel_futures=True)   # do not wait for the requests still queued
                 raise SystemExit(f"stopping: the first 20 requests all failed ({rows[-1]['error']})")
@@ -79,6 +107,12 @@ def main():
                "latency_p50": round(statistics.median(ok), 3) if ok else None,
                "latency_p95": round(sorted(ok)[int(0.95 * (len(ok) - 1))], 3) if ok else None,
                "concurrency": a.concurrency}
+    if run:
+        b = requests.get(f"{a.url}/v1/models", timeout=30).json()["models"][0]["batches"]
+        summary.update(gpu_memory_peak_gb=round(peak, 1), mean_batch=round(b["requests"] / b["count"], 1) if b["count"] else None)
+        run.summary.update(summary)
+        summary["wandb_run_id"] = run.id
+        run.finish()
     json.dump(summary, open(a.out.replace(".jsonl", "_summary.json"), "w"), indent=2)
     print(json.dumps(summary, indent=2))
 
