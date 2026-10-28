@@ -272,11 +272,12 @@ To score it yourself: `RUN=jaredpalmer/kev-4b@v1.0 sbatch slurm/yens/finetune_ke
 
 ## The room's dashboard
 
-Every job logs to the W&B project
-[darc/marlowe-hackathon-finetune](https://forge.coreweave.com/wandb/darc/marlowe-hackathon-finetune), under a name
-made of your SUNet ID, the GPU and the settings, for example `<sunet>-a40-kev-lr2e-5-rps8-fp32-<jobid>`. Each run holds
-the loss every 10 steps, its settings, and its validation scores. The System tab shows the GPU's memory and use.
-Test runs carry `test` in their name and job type, so they stay apart from the tuning runs.
+Every job logs to the hackathon's W&B project,
+[darc/Marlowe-Hackathon](https://forge.coreweave.com/wandb/darc/Marlowe-Hackathon), with the tag `exercise-2`, under a
+name made of your SUNet ID, the GPU and the settings, for example `<sunet>-a40-kev-lr2e-5-rps8-fp32-<jobid>`. Each run
+holds the loss every 10 steps, its settings, and its validation scores. The System tab shows the GPU's memory and use.
+Filter the runs table by the tag to see only this exercise. Test runs carry `test` in their name and job type, so they
+stay apart from the tuning runs.
 
 ---
 

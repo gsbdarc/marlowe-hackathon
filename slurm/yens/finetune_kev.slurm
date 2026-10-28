@@ -35,7 +35,7 @@ mkdir -p logs "$WORK/runs/b2" "$WORK/results/b2"
 nvidia-smi --query-gpu=timestamp,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > "logs/gpu-$SLURM_JOB_ID.csv" &
 
 # The room's W&B project. The shared key is a line WANDB_API_KEY=... in .env at the top of the repo, which git ignores.
-export WANDB_PROJECT=${WANDB_PROJECT:-marlowe-hackathon-finetune} WANDB_ENTITY=${WANDB_ENTITY:-darc}
+export WANDB_PROJECT=${WANDB_PROJECT:-Marlowe-Hackathon} WANDB_ENTITY=${WANDB_ENTITY:-darc} WANDB_TAGS=exercise-2
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 if [ -r .env ]; then set -a; source ./.env; set +a; fi
 WB=
