@@ -76,7 +76,7 @@ def main():
     if a.wandb:
         import wandb
         for p, r in zip(a.runs, res):
-            run_id = json.load(open(p.replace(".jsonl", "_summary.json"))).get("wandb_run_id")
+            run_id = json.load(open(p.replace(".jsonl", "_summary.json"))).get("wandb_run_id") or os.environ.get("WANDB_RUN_ID")
             if run_id:
                 run = wandb.init(id=run_id, resume="must")
                 run.summary.update({k: v for k, v in r.items() if k != "run"})

@@ -14,6 +14,7 @@ It needs `wandb login` once (your API key goes to ~/.netrc, never into this repo
 the internet, set WANDB_MODE=offline and run `wandb sync` on the run directory afterward from a login node.
 """
 import argparse
+import json
 import os
 import re
 import signal
@@ -44,12 +45,18 @@ def main():
     ap.add_argument("--name", required=True, help="the run's name in W&B, e.g. cp1-1gpu")
     ap.add_argument("--gpus", type=int, default=1)
     ap.add_argument("--project", default=os.environ.get("WANDB_PROJECT", "marlowe-hackathon"))
+    ap.add_argument("--run-dir", help="the run's --out directory: its training_config.json settings go into the W&B config")
     a = ap.parse_args()
     run = wandb.init(project=a.project, name=f"{a.name}-{os.environ.get('SLURM_JOB_ID', 'local')}",
                      config={"gpus": a.gpus, "job": os.environ.get("SLURM_JOB_ID"), "node": os.uname().nodename})
     signal.signal(signal.SIGTERM, lambda *_: (run.finish(exit_code=1), sys.exit(0)))   # the job ended first
-    last = None
+    last, cfg = None, a.run_dir and os.path.join(a.run_dir, "training_config.json")
     for line in follow(a.log):
+        if cfg and os.path.exists(cfg):   # kev.train writes it before the first step
+            c = json.load(open(cfg)).get("args", {})
+            run.config.update({k: c.get(k) for k in ("init_from", "lr", "batch", "accum", "lora", "weights_dtype",
+                                                     "max_steps", "max_state", "seed")})
+            cfg = None
         if m := STEP.search(line):
             ep, step, steps, loss, _, _, sec_rec = m.groups()   # kl and anchor are unused terms (always 0 here)
             now, step = time.time(), int(step)

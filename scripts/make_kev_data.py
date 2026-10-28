@@ -5,7 +5,7 @@ Jev's answer and the target is Jev's full probability distribution, so the stude
 Filings Jev calls "not a CEO change" get only the status question: Jev answers why and future for every filing, but
 they mean nothing when the CEO is not leaving.
 
-    $PY scripts/make_kev_data.py                    # train.jsonl, valid.jsonl, test1000.jsonl in $WORK/data
+    $PY scripts/make_kev_data.py                    # train.jsonl, valid.jsonl, test1000.jsonl (+ .parquet) in $WORK/data
     $PY scripts/make_kev_data.py --neg-ratio 1 --max-train 20000
 
 Splits are Jev's, by filing year: train 2004-2018, valid 2019-2021, test 2022-2026.
@@ -14,6 +14,8 @@ Splits are Jev's, by filing year: train 2004-2018, valid 2019-2021, test 2022-20
 The test sample is 1,000 test-split filings stratified by Jev's status (300 not a CEO change, 700 across the others,
 proportional to the square root of each status's size, at least 40 each), with weights back to the whole test split,
 the same design as Alex Storer's eval1000. Its parquet keeps Jev's answers for scoring.
+The validation sample is 2,000 validation-split filings, half CEO changes, for comparing training settings; its parquet
+weights each half back to the whole validation split, so scoring treats it like the test sample.
 """
 import argparse
 import json
@@ -79,8 +81,10 @@ def main():
         tr = tr.head(a.max_train)
     write(tr, os.path.join(a.out, "train.jsonl"))
 
-    va = d[d.split == "valid"]
-    va = pd.concat([va[va.ceo_change], va[~va.ceo_change].sample(int(va.ceo_change.sum()), random_state=SEED)]).sample(n=2000, random_state=SEED)
+    split = d[d.split == "valid"]
+    va = pd.concat([split[split.ceo_change], split[~split.ceo_change].sample(int(split.ceo_change.sum()), random_state=SEED)]).sample(n=2000, random_state=SEED)
+    va["weight"] = va.ceo_change.map(split.ceo_change.value_counts() / va.ceo_change.value_counts())
+    va.drop(columns=["text_502"]).to_parquet(os.path.join(a.out, "valid.parquet"), index=False)
     write(va, os.path.join(a.out, "valid.jsonl"))
 
     te = stratified_test(d[d.split == "test"])
