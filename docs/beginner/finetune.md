@@ -8,8 +8,9 @@ permalink: /beginner/finetune/
 
 # Fine-Tune Kev-4B
 
-**Goal:** know what Kev-4B is made of and what LoRA is, fine-tune Kev-4B's adapter for about 10 minutes on one GPU,
-and find out which settings make it agree with Jev most often on filings it has never seen.
+**Goal:** know what Kev-4B is made of and what LoRA is, fine-tune Kev-4B's adapter for about 10 minutes on one GPU
+(enough for 1% of the training data), and find out which settings make it agree with Jev most often on filings it has
+never seen.
 
 You need exercise 1 done: you have scored Kev-4B as released, and you know how fast it labels filings on an A40.
 Every command below runs from your clone of the repository on the Yens.
@@ -157,9 +158,10 @@ sbatch slurm/yens/finetune_kev.slurm
 ```
 {: .yens }
 
-The job takes about 17 minutes on an A40. It loads the model and the filings (2 to 3 minutes), trains on 512 filings
-in 64 steps of 8 (9 minutes), then serves the new adapter, labels the 2,000 validation filings with it and scores the
-answers against Jev's (5 minutes). Its log is `logs/ceo-finetune-<jobid>.out`. The parts to read:
+The job takes about 17 minutes on an A40. It loads the model and the filings (2 to 3 minutes), trains on 512 filings,
+1% of `train.jsonl`, in 64 steps of 8 (9 minutes; see [What 10 minutes covers](#what-10-minutes-covers)), then
+serves the new adapter, labels the 2,000 validation filings with it and scores the answers against Jev's (5 minutes).
+Its log is `logs/ceo-finetune-<jobid>.out`. The parts to read:
 
 ```
 device=cuda world=1 trainable params=33.8M
@@ -283,9 +285,22 @@ stay apart from the tuning runs.
 
 ## What 10 minutes covers
 
-512 filings is 1% of the 52,757 in one pass through `train.jsonl`. At the default run's speed, one full pass would
-take 15.0 hours on one A40, or 13.7 with the bf16 backbone: the `epoch hours` in your log. On Marlowe, with many more
-GPUs, a full pass becomes practical.
+Each run gets about 10 minutes of training, so it can only use a small slice of the training data: 512 filings, 1%
+of the 52,757 in `train.jsonl`.
+
+| On one A40 | Filings | Share of `train.jsonl` | Training time |
+|---|---|---|---|
+| One run of this exercise | 512 | 1% | 9.2 minutes |
+| One full pass | 52,757 | 100% | 15.0 hours (13.7 with the bf16 backbone) |
+
+The job stops after a set number of filings, not after a set time. The learning rate's schedule needs the number of
+steps before training starts, so `FILINGS` is fixed at what fits in about 10 minutes: 512 filings at about 1.08
+seconds each. The job's 45-minute limit allows up to about 1,800. Every run sees the same 512 filings, chosen by
+`--seed 0`, and never sees the other 99%. The full-pass time is the `epoch hours` in your log.
+
+So the scores in this exercise show what 1% of the data can do: on validation, weighted agreement went from 0.882 to
+0.961. They can't show how much a full pass would add. On Marlowe, with many more GPUs, a full pass becomes
+practical.
 
 ---
 
