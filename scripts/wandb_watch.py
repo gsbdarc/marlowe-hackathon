@@ -11,7 +11,7 @@ it when WANDB=1:
     WANDB=1 sbatch slurm/yens/01_train_1gpu.slurm
 
 It needs `wandb login` once (your API key goes to ~/.netrc, never into this repo). Where compute nodes cannot reach
-the internet, set WANDB_MODE=offline and run `wandb sync` on the run directory afterward from a login node.
+the internet, set WANDB_MODE=offline and run `wandb sync` on the run directory afterward from an interactive Yen node or the Marlowe login node.
 """
 import argparse
 import os

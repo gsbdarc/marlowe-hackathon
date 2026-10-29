@@ -1,5 +1,5 @@
 #!/bin/bash
-# One-time setup on a login node: Kev's code and Python environment, plus the Kev-4B weights.
+# One-time setup, run where you log in (an interactive Yen node, or the Marlowe login node), not in a job: Kev's code and Python environment, plus the Kev-4B weights.
 #   source env/yens.sh      (or env/marlowe.sh)
 #   bash scripts/setup_kev.sh
 # Takes about 10 minutes and about 25 GB of scratch. Safe to rerun: finished steps are skipped.

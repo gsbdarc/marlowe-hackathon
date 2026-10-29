@@ -65,8 +65,9 @@ Instead of cloning on Marlowe, you can copy your Yens clone over with Globus. Cl
 
 Kev is an open family of small models that answer the same kind of questions Jev does, through the same API. Its
 code includes the trainer and the server you will use all day. `scripts/setup_kev.sh` installs Kev at the version
-DARC tested, builds its Python environment and downloads the Kev-4B weights. Run it on a **login node** of each
-cluster, so no GPU time is spent downloading.
+DARC tested, builds its Python environment and downloads the Kev-4B weights. Run it directly where you log in,
+not in a job, so no GPU time is spent downloading. On the Yens that is an interactive node (`yen1` to `yen5`, where
+`ssh yen.stanford.edu` puts you), which is a full-size server meant for real work; on Marlowe it is the login node.
 
 ```bash
 source env/yens.sh
