@@ -65,9 +65,12 @@ Instead of cloning on Marlowe, you can copy your Yens clone over with Globus. Cl
 
 Kev is an open family of small models that answer the same kind of questions Jev does, through the same API. Its
 code includes the trainer and the server you will use all day. `scripts/setup_kev.sh` installs Kev at the version
-DARC tested, builds its Python environment and downloads the Kev-4B weights. Run it directly where you log in,
-not in a job, so no GPU time is spent downloading. On the Yens that is an interactive node (`yen1` to `yen5`, where
-`ssh yen.stanford.edu` puts you), which is a full-size server meant for real work; on Marlowe it is the login node.
+DARC tested, builds its Python environment, and checks that the models you need are in place. Run it directly where
+you log in, not in a job. On the Yens that is an interactive node (`yen1` to `yen5`, where `ssh yen.stanford.edu` puts
+you), which is a full-size server meant for real work; on Marlowe it is the login node.
+
+You do not download any models. DARC has put them in a shared, read-only cache on each cluster: Kev-4B, its base
+Qwen3.5-4B-Base, and Kev-27B.
 
 ```bash
 source env/yens.sh
@@ -81,7 +84,8 @@ bash scripts/setup_kev.sh
 ```
 {: .marlowe }
 
-It takes about 10 minutes and about 25 GB of scratch on each cluster, and it is safe to rerun.
+It takes about 3 minutes and about 8 GB of scratch on each cluster, and it is safe to rerun. It ends with one
+`model ok` line per model and `Kev ready`.
 
 `env/yens.sh` and `env/marlowe.sh` set every path the scripts use. Every job sources one of them:
 
@@ -90,7 +94,7 @@ It takes about 10 minutes and about 25 GB of scratch on each cluster, and it is 
 | `DATA` | Jev's labeled filings (read only) | `/scratch/shared/marlowe_hackathon/data/jev` | `/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev` |
 | `WORK` | your training files, runs and results | `/scratch/users/$USER/ceo-turnover` | `/scratch/m000106/gsb_hackathon/$USER/ceo-turnover` |
 | `KEV_HOME` | Kev's code and Python environment | `/scratch/users/$USER/kev` | `/scratch/m000106/gsb_hackathon/$USER/kev` |
-| `HF_HOME` | model weights | `/scratch/users/$USER/hf` | `/scratch/m000106/gsb_hackathon/hf_cache` (shared) |
+| `HF_HUB_CACHE` | model weights (shared, read only on the Yens) | `/scratch/shared/marlowe_hackathon/hf/hub` | `/scratch/m000106/gsb_hackathon/hf_cache/hub` |
 
 ---
 
