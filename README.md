@@ -20,7 +20,7 @@ run the same job on 1, 8 and 16 H100s on Marlowe, and measure time per step and 
 | `slurm/marlowe/` | Marlowe training at 1, 8 and 16 GPUs |
 
 No data, results or model weights are in this repository. Jev's labeled filings are on the Yens at
-`/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev` and on Marlowe at
+`/scratch/shared/marlowe_hackathon/data/jev` and on Marlowe at
 `/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev`. `.gitignore` is a whitelist: only the paths above are
 tracked, and data files are ignored everywhere in the tree.
 
