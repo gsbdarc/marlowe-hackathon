@@ -1,8 +1,9 @@
 #!/bin/bash
-# One-time setup on a login node: Kev's code and Python environment, plus the Kev-4B weights.
+# One-time setup, run where you log in (an interactive Yen node, or the Marlowe login node), not in a job: Kev's code
+# and Python environment, and a check that the models are in the shared cache.
 #   source env/yens.sh      (or env/marlowe.sh)
 #   bash scripts/setup_kev.sh
-# Takes about 10 minutes and about 25 GB of scratch. Safe to rerun: finished steps are skipped.
+# Takes about 3 minutes and about 8 GB of scratch. Safe to rerun: finished steps are skipped.
 set -euo pipefail
 : "${KEV_HOME:?source env/yens.sh or env/marlowe.sh first}"
 KEV_COMMIT=53cb0b5                       # the Kev commit DARC tested
@@ -16,7 +17,10 @@ fi
 cd "$KEV_HOME/kev" && git checkout -q "$KEV_COMMIT"
 "$UV" sync --extra serve
 "$UV" pip install --python .venv/bin/python -q flash-linear-attention==0.5.2 wandb
-# Weights, fetched here so no GPU time is spent downloading
-.venv/bin/hf download jaredpalmer/kev-4b --revision v1.0 > /dev/null
-.venv/bin/hf download Qwen/Qwen3.5-4B-Base > /dev/null
+# Models. DARC downloads them into the shared cache before the day; with HF_HUB_OFFLINE=1 (the Yens), these lines
+# only check they are there, and fail if one is missing.
+for m in jaredpalmer/kev-4b@v1.0 Qwen/Qwen3.5-4B-Base@main jaredpalmer/kev-27b@af0e6d551bdc2cc724f3e9d7a8bee1cd4fb8f7bf; do
+  .venv/bin/hf download "${m%@*}" --revision "${m#*@}" > /dev/null 2>&1 || { echo "model missing from ${HF_HUB_CACHE:-$HF_HOME/hub}: $m" >&2; exit 1; }
+  echo "model ok: $m"
+done
 echo "Kev ready: $KEV_HOME/kev at $(git rev-parse --short HEAD), $(.venv/bin/python --version)"

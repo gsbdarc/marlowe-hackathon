@@ -22,31 +22,27 @@ When a public company's CEO leaves, the company files an 8-K under **Item 5.02**
 read every Item 5.02 filing since 2004, about 300,000 of them, and answered three questions about each: what happens
 to the CEO, why, and whether the change was announced in advance.
 
-You will teach a small open model, **Kev-4B**, to give Jev's answers. This is distillation: the large model's labels,
-including how confident it was, become the small model's training targets. A small model you run yourself can then
-label filings at scale on a GPU you control.
+You will work with open models from the **Kev** family that answer the same questions. Training a Kev model on Jev's
+labels, including how confident Jev was, is distillation: a model you run yourself can then label filings at scale on
+a GPU you control.
 
-Before training, Kev-4B agrees with Jev on 58% of CEO changes. During the day you start closing that gap and
-measure what training costs at each scale. [The task and the data]({{ '/task/' | relative_url }}) has the details.
+Before training, Kev-4B agrees with Jev on 58% of CEO changes. During the day you train, label filings at scale, and
+measure what each costs on the Yens and on Marlowe. [The task and the data]({{ '/task/' | relative_url }}) has the details.
 
 ---
 
-## Checkpoints
+## Tracks
 
-Each stage ends in a checkpoint. Post your job ID and a screenshot of the log in the Slack channel and a helper will
-confirm it. Checkpoints on Marlowe earn GPU-hours.
+Pick one track. Each task ends in a check-in: post your result in the Slack channel and put
+up a 🟩 green sticky, or a 🟥 red one if you are stuck.
 
-| | Where | What counts | Award |
+| Task | [Beginner]({{ '/beginner/' | relative_url }}) | [Intermediate]({{ '/intermediate/' | relative_url }}) | [Advanced]({{ '/advanced/' | relative_url }}) |
 |---|---|---|---|
-| [1. One GPU]({{ '/checkpoint-1/' | relative_url }}) | Yens, 1 H200 | The training job finishes; you have its time per step and GPU memory and utilization | Needed to continue |
-| [2. Plan the GPU-hours]({{ '/checkpoint-2/' | relative_url }}) | Yens, 1 H200 | A second run with larger micro-batches, and a GPU-hour estimate for a full run | Needed to continue |
-| [3. First Marlowe job]({{ '/checkpoint-3/' | relative_url }}) | Marlowe, 1 H100 | The job finishes on Marlowe | 10 GPU-hours |
-| [4. One full node]({{ '/checkpoint-4/' | relative_url }}) | Marlowe, 8 H100s | The job runs on all 8 GPUs of one node | 50 GPU-hours |
-| [5. Two nodes and resume]({{ '/checkpoint-5/' | relative_url }}) | Marlowe, 16 H100s | The job runs across two nodes and resumes from a saved point | 500 GPU-hours |
-
-Award amounts are proposed and still to be confirmed with the Marlowe team.
-
-After training, [label filings with your model]({{ '/label/' | relative_url }}) on a Yen H200 and score it against Jev.
+| 1 | [Score Kev-4B before training]({{ '/beginner/b1/' | relative_url }}) (Yens, 1 GPU) | [Fine-tune and profile Kev-4B]({{ '/intermediate/i1/' | relative_url }}) (Yens, 1 GPU) | [Score Kev-27B before training]({{ '/advanced/a1/' | relative_url }}) (Yens, 1 H200) |
+| 2 | [Fine-tune Kev-4B]({{ '/beginner/b2/' | relative_url }}) (Yens, 1 GPU) | [Move your data with Globus]({{ '/intermediate/i2/' | relative_url }}) (Yens to Marlowe) | [Fine-tune Qwen 27B]({{ '/advanced/a2/' | relative_url }}) (Marlowe, 1 H100, then 8 H100s) |
+| 3 | [Label filings on one Marlowe GPU]({{ '/beginner/b3/' | relative_url }}) (Marlowe, 1 H100) | [Label the test split on a node]({{ '/intermediate/i3/' | relative_url }}) (Marlowe, 1 node) | [Fine-tune on two nodes]({{ '/advanced/a3/' | relative_url }}) (Marlowe, 16 H100s) |
+| 4 | [Label on a full node]({{ '/beginner/b4/' | relative_url }}) (Marlowe, 1 node) | [Label the corpus on two nodes]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 2 nodes) | [Inference at scale with Qwen 235B]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
+| 5 | | | [Distill a student]({{ '/advanced/a5/' | relative_url }}) (Marlowe, 1 H100) |
 
 ---
 
@@ -54,16 +50,16 @@ After training, [label filings with your model]({{ '/label/' | relative_url }}) 
 
 | Time | Session |
 |---|---|
-| 10:00 | Welcome: goals, checkpoints, the Slack channel, a quick login check on the Yens and Marlowe |
+| 10:00 | Welcome: goals, the three tracks, the Slack channel, a quick login check on the Yens and Marlowe |
 | 10:15 | Talk: an introduction to Marlowe (Marlowe team) |
 | 10:50 | Talk: a social science researcher's Marlowe story |
 | 11:30 | Break; open a terminal on the Yens |
-| 11:40 | **Hands-on 1:** [train on one H200 on the Yens]({{ '/checkpoint-1/' | relative_url }}) |
+| 11:40 | **Hands-on 1:** task 1 of your track |
 | 12:30 | Lunch |
-| 1:15 | **Hands-on 2:** [tune one GPU and estimate GPU-hours]({{ '/checkpoint-2/' | relative_url }}) |
-| 2:00 | **Hands-on 3:** [first job on Marlowe]({{ '/checkpoint-3/' | relative_url }}) |
+| 1:15 | **Hands-on 2:** task 2 |
+| 2:00 | **Hands-on 3:** task 3 |
 | 2:30 | Break |
-| 2:40 | **Hands-on 4:** [8 GPUs on one node]({{ '/checkpoint-4/' | relative_url }}), then [two nodes]({{ '/checkpoint-5/' | relative_url }}) |
+| 2:40 | **Hands-on 4:** task 4 |
 | 4:00 | Awards, templates, next steps for applying |
 
 ---
