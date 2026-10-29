@@ -113,5 +113,13 @@ When it finishes, `logs/ceo-data-<jobid>.out` ends with:
 ```
 {: .output }
 
+The same files, built by DARC, are in the shared read-only data folder on the Yens. Copying them skips the job:
+
+```bash
+mkdir -p $WORK/data
+cp /scratch/shared/marlowe_hackathon/data/{train,valid,test1000}.* $WORK/data/
+```
+{: .yens }
+
 Copy `$WORK/data/` to the same place on Marlowe with Globus, or run the same script there with `source env/marlowe.sh`.
 [The task and the data]({{ '/task/' | relative_url }}) explains what is in each file.
