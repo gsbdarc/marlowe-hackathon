@@ -1,0 +1,19 @@
+<!-- The participant's SUNet ID, filled into every command on the site by assets/js/personalize.js. Adapted from the
+     Yens Onboarding site. This include renders twice per page (desktop sidebar and mobile footer), so the input is
+     marked with data-personalize rather than an id. The Stanford block "S" is used unaltered. -->
+<div class="personalize">
+  <p class="personalize-title">Your details</p>
+  <p class="personalize-blurb">Set your SUNet ID once and the commands on every page fill it in. Stored in this
+    browser only.</p>
+  <label class="personalize-row">
+    <span class="personalize-name">
+      <svg viewBox="-16.5175 0 98.113 98.113" aria-hidden="true" focusable="false"><g><polygon points="0.84 14.582 0.84 49.735 12.79 61.688 41.354 61.686 41.354 73.893 26.669 73.893 26.669 65.932 0.866 65.932 0.866 85.15 12.866 97.245 52.227 97.245 64.177 85.304 64.177 49.745 52.001 37.978 25.785 37.978 25.786 24.888 40.293 24.887 40.293 33.909 64.176 33.909 64.177 14.596 50.804 0.915 14.596 0.915" fill="#8C1515"/><g><path fill="#fff" d="m2.413 15.294v33.82l11.017 11.019s26.638 0 29.497-0.001c0 2.412 0 12.98-0.001 15.391-2.497 0-15.368 0-17.868 0.002 0.001-2.037 0.001-7.961 0.001-7.961l-22.62-0.001v16.952l11.051 11.178h38.067l11.009-11.017v-34.253l-11.263-10.814h-27.13c0.001-2.445 0.001-13.831 0-16.275h17.693v9.02h20.7v-17.052l-12.437-12.755h-34.911l-12.805 12.747z"/><polygon points="15.868 4.253 4.015 16.083 4.015 48.571 14.098 58.656 44.527 58.656 44.526 77.233 23.475 77.233 23.475 69.271 4.038 69.272 4.038 83.956 14.142 94.215 50.913 94.215 60.981 84.123 60.983 51.181 50.634 41.316 22.589 41.315 22.588 21.856 43.467 21.856 43.467 30.878 60.981 30.878 60.983 16.083 49.482 4.253" fill="#8C1515"/></g></g></svg>
+      SUNet ID
+    </span>
+    <input class="personalize-input" data-personalize="sunet" type="text" placeholder="e.g. jdoe"
+           spellcheck="false" autocapitalize="none" autocorrect="off" autocomplete="off">
+  </label>
+  <p class="personalize-status" data-personalize-status></p>
+</div>
+<p class="personalize-credit">Built with
+  <a href="https://github.com/just-the-docs/just-the-docs" target="_blank" rel="noopener noreferrer">Just the Docs</a>.</p>
