@@ -10,8 +10,9 @@ KEV_COMMIT=53cb0b5                       # the Kev commit DARC tested
 UV=$KEV_HOME/bin/uv
 mkdir -p "$KEV_HOME"
 if [ ! -x "$UV" ]; then                  # uv is not installed on the clusters; install it into KEV_HOME
-  python3 -m venv "$KEV_HOME/uv-venv" && "$KEV_HOME/uv-venv/bin/pip" install -q "uv==0.13.1"
-  mkdir -p "$KEV_HOME/bin" && ln -sf "$KEV_HOME/uv-venv/bin/uv" "$UV"
+  # pip --target, not a venv: Marlowe's system Python has no ensurepip, so python3 -m venv fails there
+  python3 -m pip install -q --target "$KEV_HOME/uv-pkg" "uv==0.13.1"
+  mkdir -p "$KEV_HOME/bin" && ln -sf "$KEV_HOME/uv-pkg/bin/uv" "$UV"
 fi
 [ -d "$KEV_HOME/kev/.git" ] || git clone -q https://github.com/jaredpalmer/kev.git "$KEV_HOME/kev"
 cd "$KEV_HOME/kev" && git checkout -q "$KEV_COMMIT"
