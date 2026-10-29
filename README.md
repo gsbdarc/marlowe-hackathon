@@ -34,8 +34,3 @@ bundle exec jekyll serve
 ```
 
 Then open <http://localhost:4000/marlowe-hackathon/>.
-
-## Earlier work
-
-The cybersecurity-disclosure pilot that preceded this project is in the git history and on the `kev-finetune`
-branch.
