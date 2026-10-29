@@ -766,3 +766,15 @@ tspan.personalize-token-unset {
   border-left-width: 3px;
   border-left-color: #0f5e5a;
 }
+
+/* Site title: "Marlowe Hackathon 2026" wrapped onto two lines in the sidebar header at the theme's 1.5rem and filled
+   the 60px header edge to edge. One line, a step smaller, with less side padding, sits centred with room above it. */
+@media (min-width: 50rem) {
+  .side-bar .site-title {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 1.15rem !important;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+}
