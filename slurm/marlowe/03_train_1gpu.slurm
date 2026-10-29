@@ -10,7 +10,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 
-# Checkpoint 3: the checkpoint 1 job on one H100 on Marlowe. Compare its time per step with the Yens.
+# The Yens training job on one H100 on Marlowe. Compare its time per step with the Yens.
 #   sbatch slurm/marlowe/03_train_1gpu.slurm
 # Basic access: account marlowe-m000106 on the preempt partition (4-hour limit; a preempted job restarts).
 set -euo pipefail

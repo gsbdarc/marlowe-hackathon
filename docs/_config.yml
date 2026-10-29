@@ -35,6 +35,8 @@ aux_links:
     - 'https://github.com/gsbdarc/marlowe-hackathon'
   GSB RCpedia:
     - 'https://rcpedia.stanford.edu'
+  HAI Marlowe Docs:
+    - 'https://marlowe-research.stanford.edu/documentation/'
 
 callouts:
   tip:
