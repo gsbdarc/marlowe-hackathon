@@ -22,7 +22,7 @@ CEO, why, and whether the change was announced in advance. Labeling them all too
 $19. Those answers are this hackathon's labels. Jev is the reference we measure against, not ground truth: a filing
 Jev gets wrong stays wrong in the labels.
 
-## Kev: the student
+## Kev: open models you run yourself
 
 **Kev** is an open family of models built to answer the same kind of questions as Jev, through the same request
 format. The code (a trainer and a server) and the weights are public under Apache 2.0, so a Kev model runs on any GPU
@@ -33,10 +33,10 @@ you have access to. Kev comes in four sizes:
 | Kev-0.8B | Qwen3.5-0.8B | 1.8 GB |
 | **Kev-4B** | Qwen3.5-4B | 9.5 GB |
 | Kev-9B | Qwen3.5-9B | 19.5 GB |
-| Kev-27B | Qwen3.5-27B | 51 GB |
+| Kev-27B | Qwen3.8-27B | 51 GB |
 
-We use **Kev-4B**. It is small enough to fine-tune quickly and starts out well short of Jev on CEO changes, so the
-effect of training is easy to see.
+The tracks use Kev models as reference points: their scores before any training are the bar to beat. Each track's
+pages say which model it scores and which it fine-tunes.
 
 A model you run yourself has a fixed version for replication, keeps confidential documents on Stanford hardware, and
 costs only GPU time to rerun on new filings or new questions.
@@ -45,21 +45,21 @@ costs only GPU time to rerun on new filings or new questions.
 
 **Distillation** trains a small model to give a large model's answers. Here the training target for each filing is
 Jev's whole probability distribution, not just its top answer. When Jev put 60% on "becomes executive chair" and 40% on
-"stays as a director only", Kev learns that the filing is ambiguous, which carries more information than a single
+"stays as a director only", the student learns that the filing is ambiguous, which carries more information than a single
 label.
 
-The **loss** in the training log is the cross-entropy between Kev's probabilities and Jev's: it is lowest when Kev
-puts the same probability on each option as Jev did. It should go down as training goes on.
+The **loss** in the training log is the cross-entropy between the student's probabilities and Jev's: it is lowest when
+the student puts the same probability on each option as Jev did. It should go down as training goes on.
 
 ## Fine-tuning, and what "full" means
 
-**Fine-tuning** continues training a model that is already trained. Kev-4B was trained on general decision tasks; we
-fine-tune it on CEO turnover. A **full fine-tune** updates all 4 billion weights. It needs more GPU memory than
+**Fine-tuning** continues training a model that is already trained, here on CEO turnover. A **full fine-tune** updates
+all of the model's weights, 4 billion for a 4B model. It needs more GPU memory than
 training a small add-on (an adapter) but it can be split across GPUs, which the Marlowe tasks do.
 
 ## Model checkpoints and resume points
 
-A **model checkpoint** is a saved copy of a model's weights on disk, for example `$WORK/runs/a3-student/` once a
+A **model checkpoint** is a saved copy of a model's weights on disk, for example `$WORK/runs/<run>/` once a
 training job has finished (`config.json`, `model-*.safetensors`, `head.pt`). You serve it, score it, or start further
 training from it. Training writes one at the end.
 

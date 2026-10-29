@@ -22,7 +22,7 @@ sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu cp
 {: .yens }
 
 The job starts a Kev server on the GPU, sends it the same 1,000 test filings as the
-[starting point]({{ '/beginner/b1/' | relative_url }}), and scores the answers. A run trained on Marlowe works too: copy
+[zero-shot comparison]({{ '/task/' | relative_url }}), and scores the answers. A run trained on Marlowe works too: copy
 its run directory to the Yens with Globus, or use `slurm/marlowe/serve_and_label.slurm` on Marlowe.
 
 ## Step 2: Compare with the starting point

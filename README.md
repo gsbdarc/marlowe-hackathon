@@ -4,9 +4,10 @@ Materials for the DARC and Marlowe GPU hackathon at Stanford GSB, November 13, 2
 
 **Website: <https://gsbdarc.github.io/marlowe-hackathon/>**
 
-Participants fine-tune **Kev-4B**, a small open model, to answer three questions about CEO turnover in SEC 8-K Item 5.02
-filings the way **Jev**, a large hosted model, answered them. They train on one GPU on the Yens, scale to two, then
-run the same job on 1, 8 and 16 H100s on Marlowe, and measure time per step and GPU-hours at each scale.
+Participants fine-tune open models to answer three questions about CEO turnover in SEC 8-K Item 5.02 filings the way
+**Jev**, a large hosted model, answered them. They pick one of three tracks (Beginner, Intermediate, Advanced), start
+on the Yens, then scale the training to 1, 8 and 16 H100s on Marlowe, and measure time per step and GPU-hours at each
+scale.
 
 ## What is here
 
@@ -33,8 +34,3 @@ bundle exec jekyll serve
 ```
 
 Then open <http://localhost:4000/marlowe-hackathon/>.
-
-## Earlier work
-
-The cybersecurity-disclosure pilot that preceded this project is in the git history and on the `kev-finetune`
-branch.

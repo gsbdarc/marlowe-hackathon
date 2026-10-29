@@ -7,8 +7,8 @@ permalink: /
 
 # Marlowe Hackathon 2026
 
-A one-day, hands-on hackathon for Stanford GSB researchers, run by DARC and the HAI Marlowe team. You will fine-tune
-an open-weight model on one GPU on the Yens, then scale the same job across GPUs and nodes on Marlowe, Stanford's
+A one-day, hands-on hackathon for Stanford GSB researchers, run by DARC and the HAI Marlowe team. You pick one of three
+tracks: each starts on the Yens and then fine-tunes an open-weight model across GPUs and nodes on Marlowe, Stanford's
 H100 cluster. You leave with a working Marlowe job, Slurm templates for your own research, and the measurements a
 Marlowe project application asks for.
 

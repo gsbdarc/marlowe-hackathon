@@ -9,7 +9,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 
-# Checkpoint 4: the same job on all 8 H100s of one Marlowe node, sharded with FSDP2.
+# The same job on all 8 H100s of one Marlowe node, sharded with FSDP2.
 #   sbatch slurm/marlowe/04_train_8gpu.slurm
 set -euo pipefail
 module load slurm mps

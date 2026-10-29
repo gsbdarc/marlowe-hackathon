@@ -9,7 +9,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 
-# Checkpoint 5 (advanced): two Marlowe nodes, 16 H100s, one torchrun per node, with resume points.
+# Two Marlowe nodes, 16 H100s, one torchrun per node, with resume points.
 #   STOP_AFTER=100 sbatch slurm/marlowe/05_train_2node.slurm   # stops after step 100, as a preemption would
 #   sbatch slurm/marlowe/05_train_2node.slurm                  # continues from $OUT/resume to step $STEPS
 # Kev writes a resume point every SAVE_STEPS optimizer steps; --resume 1 continues from the last one. A resumed
