@@ -9,5 +9,6 @@ export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=/scratch/users/$USER/.cache PIP_CACHE_DIR=/scratch/users/$USER/.cache/pip
 export TRITON_CACHE_DIR=/scratch/users/$USER/.cache/triton TORCHINDUCTOR_CACHE_DIR=/scratch/users/$USER/.cache/inductor
 export KEV_PREFIX_CACHE=0                                    # time every filing on its own
+export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
 mkdir -p "$WORK" "$HF_HOME" "$XDG_CACHE_HOME"

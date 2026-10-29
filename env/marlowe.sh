@@ -9,6 +9,7 @@ export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=$SHARE/$USER/.cache PIP_CACHE_DIR=$SHARE/$USER/.cache/pip
 export TRITON_CACHE_DIR=$SHARE/$USER/.cache/triton TORCHINDUCTOR_CACHE_DIR=$SHARE/$USER/.cache/inductor
 export KEV_PREFIX_CACHE=0
+export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
 export MARLOWE_ACCOUNT=${MARLOWE_ACCOUNT:-marlowe-m000106}
 mkdir -p "$WORK" "$HF_HOME" "$XDG_CACHE_HOME"
