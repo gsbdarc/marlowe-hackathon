@@ -111,5 +111,4 @@ wc -l /scratch/m000106/gsb_hackathon/$USER/ceo-turnover/data/*.jsonl
 {: .output }
 
 {: .tip }
-> The same steps copy results back: the Advanced track's [A3]({{ '/advanced/a3/' | relative_url }}) moves a trained
-> model from Marlowe to the Yens.
+> The same steps copy results back, for example a model you trained on Marlowe, to run it on the Yens.
