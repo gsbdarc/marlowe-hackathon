@@ -30,6 +30,7 @@ and set `HF_HUB_OFFLINE=1`, so setup and jobs read from the cache and never down
 | [Qwen3.5-4B-Base](https://huggingface.co/Qwen/Qwen3.5-4B-Base) | 9.3 GB (full weights) | [Beginner]({{ '/beginner/' | relative_url }})<br>[Intermediate]({{ '/intermediate/' | relative_url }})<br>[Advanced]({{ '/advanced/' | relative_url }}) |
 | [Kev-27B](https://huggingface.co/jaredpalmer/kev-27b) | 51 GB (full weights) | [Advanced]({{ '/advanced/' | relative_url }}) |
 | [Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B) | Yens: 23 MB (tokenizer only)<br>Marlowe: 56 GB (full weights) | [Advanced]({{ '/advanced/' | relative_url }}) |
+| [Qwen3-235B-A22B-Instruct-2507-FP8](https://huggingface.co/Qwen/Qwen3-235B-A22B-Instruct-2507-FP8) | Marlowe only: 237 GB (full weights, FP8) | [Advanced]({{ '/advanced/' | relative_url }}) |
 
 An adapter is a small set of changes that runs on top of a base model: Kev-4B runs on Qwen3.5-4B-Base. Kev-27B
 reads its tokenizer from Qwen3.8-27B, which is all the Yens need of that model. Each model is pinned to one
@@ -60,6 +61,7 @@ It works out the cluster from the node's name, then:
 | `pip install --target ... huggingface_hub==1.32.0` | gets the `hf` command, at the version Kev uses, in a temporary folder deleted at the end. It does not install Kev |
 | `hf download ...` | downloads each model at its pinned revision; a model already in the cache is checked and skipped |
 | Qwen3.8-27B | tokenizer and config only on the Yens (`--exclude "*.safetensors"`), full weights on Marlowe |
+| Qwen3-235B, vLLM container | Marlowe only: the 235B for A4, and the vLLM 0.31.0 container in `/scratch/m000106/gsb_hackathon/containers/` (`apptainer pull`, if it is missing) |
 | `chmod -R g-w` | Yens only: makes the cache read only for everyone but its owner. Marlowe's cache stays writable by the project group (`marlowe-m000106`) |
 | check | looks for every model again with downloads off (`HF_HUB_OFFLINE=1`) |
 

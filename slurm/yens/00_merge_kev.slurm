@@ -5,6 +5,9 @@
 #SBATCH --mem=48G
 #SBATCH -t 00:30:00
 #SBATCH -o logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # Once, before training: fold Kev-4B's LoRA adapter into its base so a full fine-tune can start from it.
 # Kev-4B ships as an adapter (rank 16); --full_ft trains every weight and starts from full weights.

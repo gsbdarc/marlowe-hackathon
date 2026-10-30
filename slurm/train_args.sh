@@ -14,6 +14,13 @@ ACCUM=${ACCUM:-$((16 / GPUS))}
 TRAIN_ARGS="--data $WORK/data/train.jsonl --base $BASE --init_from $INIT \
   --full_ft 1 --weights_dtype bf16 --dtype bf16 --checkpointing 1 --device cuda \
   --lr 2e-5 --batch $BATCH --accum $ACCUM --max_state 2048 --max_steps $STEPS --seed 0"
+# Time the job: print when it starts and, when it exits for any reason, how long it ran and its exit code.
+job_timer() {
+  echo "job start: $(date '+%F %T') on $(hostname)"
+  trap 'rc=$?; echo "job end: $(date "+%F %T") after $((SECONDS / 60)) min $((SECONDS % 60)) s, exit $rc"' EXIT
+}
+# Put the minutes:seconds since the job started in front of every line, so the log shows how long each phase took.
+stamp() { while IFS= read -r line; do printf '[%3d:%02d] %s\n' $((SECONDS / 60)) $((SECONDS % 60)) "$line"; done; }
 # Log GPU memory and utilization every 15 seconds, next to the job's log.
 gpu_log() { nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 15 > "$1" & }
 # With WANDB=1, follow this job's log and send its progress to Weights & Biases (scripts/wandb_watch.py).

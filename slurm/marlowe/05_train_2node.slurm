@@ -8,6 +8,9 @@
 #SBATCH --exclusive
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # Two Marlowe nodes, 16 H100s, one torchrun per node, with resume points.
 #   STOP_AFTER=100 sbatch slurm/marlowe/05_train_2node.slurm   # stops after step 100, as a preemption would

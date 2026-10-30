@@ -15,7 +15,7 @@ labels.
 | Task | Where | What you do |
 |---|---|---|
 | [A1. Score Kev-27B before training]({{ '/advanced/a1/' | relative_url }}) | Yens, 1 H200 | Serve Kev-27B and score it on 1,000 test filings |
-| [A2. Fine-tune Qwen 27B]({{ '/advanced/a2/' | relative_url }}) | Marlowe, 1 H100, then 8 H100s | It runs out of memory on one GPU and fits on 8 with FSDP |
+| [A2. Fine-tune Qwen 27B]({{ '/advanced/a2/' | relative_url }}) | Marlowe, 1 H100, then 8 H100s | Fine-tune it on one GPU, then on 8 with FSDP, and compare |
 | [A3. Fine-tune on two nodes]({{ '/advanced/a3/' | relative_url }}) | Marlowe, 16 H100s | Run the same fine-tune across 2 nodes and compare with 1 node |
 | [A4. Inference at scale with Qwen 235B]({{ '/advanced/a4/' | relative_url }}) | Marlowe, 8 H100s | Load Qwen 235B on one node, time the weight load, and label filings |
 | [A5. Distill a student]({{ '/advanced/a5/' | relative_url }}) | Marlowe, 1 H100 | Train Qwen 4B on teacher labels (yours or DARC's) and score it |

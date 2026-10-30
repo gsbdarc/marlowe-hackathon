@@ -17,7 +17,14 @@ fi
 [ -d "$KEV_HOME/kev/.git" ] || git clone -q https://github.com/jaredpalmer/kev.git "$KEV_HOME/kev"
 cd "$KEV_HOME/kev" && git checkout -q "$KEV_COMMIT"
 "$UV" sync --extra serve
-"$UV" pip install --python .venv/bin/python -q flash-linear-attention==0.5.2 wandb
+# The same kernels as Kev's own training image (modal_app.py at this commit). The Gated DeltaNet kernels need Triton
+# 3.7.1: with the Triton 3.4 torch 2.8 pins, fla refuses its gated chunk backward on Hopper GPUs (H100, H200), and
+# Triton 3.9 breaks fla 0.5.2's import.
+"$UV" pip install --python .venv/bin/python -q flash-linear-attention==0.5.2 triton==3.7.1 wandb
+# the DeltaNet short convolution's CUDA kernel (transformers falls back to a slow PyTorch conv without it). The wheel
+# matches torch 2.8 / CUDA 12 / Python 3.13; --no-deps, or resolving its torch requirement puts back Triton 3.4
+"$UV" pip install --python .venv/bin/python -q --no-deps \
+  "https://github.com/Dao-AILab/causal-conv1d/releases/download/v1.7.0/causal_conv1d-1.7.0%2Bcu12torch2.8cxx11abiTRUE-cp313-cp313-linux_x86_64.whl"
 # Models. DARC downloads them into the shared cache before the day. HF_HUB_OFFLINE=1 makes these lines only check
 # they are there, and fail if one is missing: setup never downloads a model.
 for m in jaredpalmer/kev-4b@v1.0 Qwen/Qwen3.5-4B-Base@main jaredpalmer/kev-27b@af0e6d551bdc2cc724f3e9d7a8bee1cd4fb8f7bf; do

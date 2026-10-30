@@ -9,6 +9,9 @@
 #SBATCH --mem=128G
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # The Yens training job on one H100 on Marlowe. Compare its time per step with the Yens.
 #   sbatch slurm/marlowe/03_train_1gpu.slurm

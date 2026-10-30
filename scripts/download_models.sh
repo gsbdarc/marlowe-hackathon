@@ -34,6 +34,14 @@ for m in "${MODELS[@]}"; do
   HF_HUB_OFFLINE=0 get "$m" > /dev/null
   echo "downloaded: $m"
 done
+if [ "$CLUSTER" = marlowe ]; then
+  # Marlowe only: A4 serves Qwen 235B with vLLM, from a container in the project's shared containers folder
+  HF_HUB_OFFLINE=0 hf download Qwen/Qwen3-235B-A22B-Instruct-2507-FP8 --revision e156cb4efae43fbee1a1ab073f946a1377e6b969 > /dev/null
+  echo "downloaded: Qwen/Qwen3-235B-A22B-Instruct-2507-FP8@e156cb4efae43fbee1a1ab073f946a1377e6b969"
+  SIF=$SHARE/containers/vllm-openai_v0.31.0.sif
+  if [ ! -e "$SIF" ]; then mkdir -p "$(dirname "$SIF")" && apptainer pull "$SIF" docker://vllm/vllm-openai:v0.31.0; fi
+  echo "container: $SIF"
+fi
 if [ "$CLUSTER" = yens ]; then chmod -R g-w "$CACHE"; fi   # Yens: read only for all but its owner; Marlowe's stays group-writable
 
 echo "== checking, with downloads off"

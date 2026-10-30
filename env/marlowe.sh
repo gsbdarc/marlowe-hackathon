@@ -9,6 +9,7 @@ export HF_HUB_OFFLINE=1                                      # every model is pr
 export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=$SHARE/$USER/.cache PIP_CACHE_DIR=$SHARE/$USER/.cache/pip
 export TRITON_CACHE_DIR=$SHARE/$USER/.cache/triton TORCHINDUCTOR_CACHE_DIR=$SHARE/$USER/.cache/inductor
+export APPTAINER_CACHEDIR=$SHARE/$USER/.apptainer_cache   # Marlowe's Apptainer guide: not the 32 GB home
 export KEV_PREFIX_CACHE=0
 export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
