@@ -64,11 +64,6 @@ up a 🟩 green sticky, or a 🟥 red one if you are stuck.
 
 ---
 
-## Before you arrive
-
-Work through [Before You Arrive]({{ '/setup/' | relative_url }}): log in to the Yens and Marlowe, clone this
-repository on both, and set up Kev. It takes about 20 minutes.
-
 ## Take it home
 
 Every script here is a template you can adapt: swap in your own documents, questions and labels. [Take It

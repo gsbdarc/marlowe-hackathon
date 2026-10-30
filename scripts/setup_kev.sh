@@ -18,10 +18,14 @@ fi
 cd "$KEV_HOME/kev" && git checkout -q "$KEV_COMMIT"
 "$UV" sync --extra serve
 "$UV" pip install --python .venv/bin/python -q flash-linear-attention==0.5.2 wandb
-# Models. DARC downloads them into the shared cache before the day; with HF_HUB_OFFLINE=1 (the Yens), these lines
-# only check they are there, and fail if one is missing.
+# Models. DARC downloads them into the shared cache before the day. HF_HUB_OFFLINE=1 makes these lines only check
+# they are there, and fail if one is missing: setup never downloads a model.
 for m in jaredpalmer/kev-4b@v1.0 Qwen/Qwen3.5-4B-Base@main jaredpalmer/kev-27b@af0e6d551bdc2cc724f3e9d7a8bee1cd4fb8f7bf; do
-  .venv/bin/hf download "${m%@*}" --revision "${m#*@}" > /dev/null 2>&1 || { echo "model missing from ${HF_HUB_CACHE:-$HF_HOME/hub}: $m" >&2; exit 1; }
+  HF_HUB_OFFLINE=1 .venv/bin/hf download "${m%@*}" --revision "${m#*@}" > /dev/null 2>&1 || { echo "model missing from ${HF_HUB_CACHE:-$HF_HOME/hub}: $m" >&2; exit 1; }
   echo "model ok: $m"
 done
+# Kev-27B ships full weights but loads its tokenizer and config from its base: only those files are needed
+m=Qwen/Qwen3.8-27B@1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
+HF_HUB_OFFLINE=1 .venv/bin/hf download "${m%@*}" --revision "${m#*@}" --exclude "*.safetensors" > /dev/null 2>&1 || { echo "tokenizer missing from ${HF_HUB_CACHE:-$HF_HOME/hub}: $m" >&2; exit 1; }
+echo "tokenizer ok: $m"
 echo "Kev ready: $KEV_HOME/kev at $(git rev-parse --short HEAD), $(.venv/bin/python --version)"

@@ -5,6 +5,7 @@ export DATA=${DATA:-$SHARE/ceo-turnover/data/jev}           # Jev-labeled Item 5
 export WORK=${WORK:-$SHARE/$USER/ceo-turnover}               # your training data, runs and results
 export KEV_HOME=${KEV_HOME:-$SHARE/$USER/kev}                # Kev code and its Python environment (setup_kev.sh)
 export HF_HOME=${HF_HOME:-$SHARE/hf_cache}                   # shared model weights
+export HF_HUB_OFFLINE=1                                      # every model is pre-downloaded by DARC: never download
 export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=$SHARE/$USER/.cache PIP_CACHE_DIR=$SHARE/$USER/.cache/pip
 export TRITON_CACHE_DIR=$SHARE/$USER/.cache/triton TORCHINDUCTOR_CACHE_DIR=$SHARE/$USER/.cache/inductor

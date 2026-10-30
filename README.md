@@ -25,6 +25,9 @@ No data, results or model weights are in this repository. Jev's labeled filings 
 `/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev`. `.gitignore` is a whitelist: only the paths above are
 tracked, and data files are ignored everywhere in the tree.
 
+The models are pre-downloaded into a shared cache on each cluster.
+[Models](https://gsbdarc.github.io/marlowe-hackathon/models/) on the website lists them and how to download them again.
+
 ## Build the site locally
 
 ```bash
