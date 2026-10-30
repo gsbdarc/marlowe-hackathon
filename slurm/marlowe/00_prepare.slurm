@@ -9,6 +9,9 @@
 #SBATCH --mem=64G
 #SBATCH --time=00:30:00
 #SBATCH --output=logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # Once on Marlowe, before the first Marlowe training job: build the training files and Kev-4B as full weights, the same two steps
 # slurm/yens/00_data.slurm and 00_merge_kev.slurm do on the Yens. Skip it if you copied $WORK from the Yens.

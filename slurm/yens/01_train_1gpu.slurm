@@ -7,6 +7,9 @@
 #SBATCH --mem=92G
 #SBATCH -t 01:00:00
 #SBATCH -o logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # Fine-tune Kev-4B on one H200 on the Yens.
 #   sbatch slurm/yens/01_train_1gpu.slurm                           # -> $WORK/runs/cp1-1gpu

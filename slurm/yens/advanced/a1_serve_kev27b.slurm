@@ -7,6 +7,9 @@
 #SBATCH --mem=16G
 #SBATCH -t 02:00:00
 #SBATCH -o logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=nrapstin@stanford.edu
 
 # A1: serve Kev-27B on one H200 and leave it running. Query it from an interactive Yen node, then stop it with
 # scancel. Kev-27B's weights are 51 GB, so it needs an H200 (141 GB); an A40 (48 GB) is too small.

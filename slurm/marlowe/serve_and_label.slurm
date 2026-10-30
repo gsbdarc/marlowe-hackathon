@@ -9,6 +9,9 @@
 #SBATCH --mem=64G
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # Serve a Kev model on one H100 and label the test sample with it, then score against Jev.
 #   sbatch slurm/marlowe/serve_and_label.slurm $WORK/runs/cp4-8gpu cp4
