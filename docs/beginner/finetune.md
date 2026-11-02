@@ -17,7 +17,7 @@ Every command below runs from your clone of the repository on the Yens.
 
 ```bash
 cd /scratch/users/$USER/marlowe-hackathon
-source env/yens.sh
+source scripts/beginner/yens.sh
 ```
 {: .yens }
 
@@ -154,7 +154,7 @@ loads, which is why the job asks for 32 GB.
 ## Run it
 
 ```bash
-sbatch slurm/yens/finetune_kev.slurm
+sbatch slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 
@@ -225,7 +225,7 @@ change what the model learns from those filings, not how long it takes.
 To compare two runs side by side, score them together:
 
 ```bash
-$PY scripts/score.py $WORK/results/b2/<jobid>-valid.jsonl $WORK/results/b2/<other jobid>-valid.jsonl --sample $WORK/data/valid.parquet
+$PY scripts/beginner/score.py $WORK/results/b2/<jobid>-valid.jsonl $WORK/results/b2/<other jobid>-valid.jsonl --sample $WORK/data/valid.parquet
 ```
 {: .yens }
 
@@ -247,7 +247,7 @@ the model does on new filings. So choose your settings on validation, and score 
 filings once, at the end:
 
 ```bash
-EVAL=test RUN=$WORK/runs/b2/<jobid> sbatch slurm/yens/finetune_kev.slurm
+EVAL=test RUN=$WORK/runs/b2/<jobid> sbatch slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 
@@ -269,7 +269,7 @@ Kev-4B as released, on the validation filings, is the baseline every run is comp
 | CEO-change F1 | 0.743 |
 | "Leaves entirely" | 21.0% |
 
-To score it yourself: `RUN=jaredpalmer/kev-4b@v1.0 sbatch slurm/yens/finetune_kev.slurm`.
+To score it yourself: `RUN=jaredpalmer/kev-4b@v1.0 sbatch slurm/yens/beginner/finetune_kev.slurm`.
 
 ---
 
@@ -346,7 +346,7 @@ Our answers come from one run of each setting on an A40.
 <summary><span class="qnum">2</span><span class="qtext">Does storing the frozen backbone in bf16 instead of fp32 change memory, speed or the answers?</span></summary>
 
 ```bash
-WEIGHTS=bf16 sbatch slurm/yens/finetune_kev.slurm
+WEIGHTS=bf16 sbatch slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 
@@ -369,8 +369,8 @@ trained, `A`, `B` and the head, stay in fp32 in both runs.
 <summary><span class="qnum">3</span><span class="qtext">What happens with a learning rate ten times smaller (2e-6) or ten times larger (2e-4)?</span></summary>
 
 ```bash
-LR=2e-6 sbatch slurm/yens/finetune_kev.slurm
-LR=2e-4 sbatch slurm/yens/finetune_kev.slurm
+LR=2e-6 sbatch slurm/yens/beginner/finetune_kev.slurm
+LR=2e-4 sbatch slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 
@@ -392,8 +392,8 @@ the validation scores can.
 <summary><span class="qnum">4</span><span class="qtext">Train on the same 512 filings with 2 or with 32 records per step. Which does better, and which is faster?</span></summary>
 
 ```bash
-RECORDS_PER_STEP=2 sbatch slurm/yens/finetune_kev.slurm
-RECORDS_PER_STEP=32 sbatch slurm/yens/finetune_kev.slurm
+RECORDS_PER_STEP=2 sbatch slurm/yens/beginner/finetune_kev.slurm
+RECORDS_PER_STEP=32 sbatch slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 
@@ -416,9 +416,9 @@ filings went into it, so 256 updates moved the adapter further than 64 or 16. Wi
 <summary><span class="qnum">5</span><span class="qtext">Train a new adapter from the base model at ranks 4, 16 and 64. How does it compare with continuing Kev-4B's?</span></summary>
 
 ```bash
-INIT=scratch RANK=4 sbatch slurm/yens/finetune_kev.slurm
-INIT=scratch RANK=16 sbatch slurm/yens/finetune_kev.slurm
-INIT=scratch RANK=64 sbatch slurm/yens/finetune_kev.slurm
+INIT=scratch RANK=4 sbatch slurm/yens/beginner/finetune_kev.slurm
+INIT=scratch RANK=16 sbatch slurm/yens/beginner/finetune_kev.slurm
+INIT=scratch RANK=64 sbatch slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 
@@ -470,7 +470,7 @@ Of our runs, 2 records per step did best on validation: the same weighted agreem
 on CEO changes, F1 and reasons. Scored once on the 1,000 test filings:
 
 ```bash
-EVAL=test RUN=$WORK/runs/b2/<jobid of your best run> sbatch slurm/yens/finetune_kev.slurm
+EVAL=test RUN=$WORK/runs/b2/<jobid of your best run> sbatch slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 
@@ -494,7 +494,7 @@ of its 99 filings. This is the number to report, because nothing was chosen to s
 <summary><span class="qnum">8</span><span class="qtext">Run a setting on an H200, which trains on 1,920 filings in the same 10 minutes. What do 3.75 times as many filings buy, and do the settings still matter as much?</span></summary>
 
 ```bash
-sbatch -C GPU_MODEL:H200 slurm/yens/finetune_kev.slurm
+sbatch -C GPU_MODEL:H200 slurm/yens/beginner/finetune_kev.slurm
 ```
 {: .yens }
 

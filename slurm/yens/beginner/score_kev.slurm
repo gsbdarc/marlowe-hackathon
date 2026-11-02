@@ -10,11 +10,11 @@
 
 # Beginner exercise 1: serve Kev-4B as released on one GPU, send it the 1,000 test filings, score its answers against
 # Jev's, and log the run to the room's Weights & Biases project. Change one setting at a time and compare:
-#   sbatch slurm/yens/score_kev.slurm                     # an A40, 16 filings at a time, bf16, fused kernels
-#   sbatch -C GPU_MODEL:H200 slurm/yens/score_kev.slurm   # an H200 instead of an A40
-#   CONCURRENCY=64 sbatch slurm/yens/score_kev.slurm      # filings in flight, 1 to 64 (the server's largest batch)
-#   DTYPE=fp32 sbatch slurm/yens/score_kev.slurm          # 32-bit numbers instead of 16-bit (bf16)
-#   FUSED=0 sbatch slurm/yens/score_kev.slurm             # without Kev's fused kernels (transformers' own layer code)
+#   sbatch slurm/yens/beginner/score_kev.slurm                     # an A40, 16 filings at a time, bf16, fused kernels
+#   sbatch -C GPU_MODEL:H200 slurm/yens/beginner/score_kev.slurm   # an H200 instead of an A40
+#   CONCURRENCY=64 sbatch slurm/yens/beginner/score_kev.slurm      # filings in flight, 1 to 64 (the server's largest batch)
+#   DTYPE=fp32 sbatch slurm/yens/beginner/score_kev.slurm          # 32-bit numbers instead of 16-bit (bf16)
+#   FUSED=0 sbatch slurm/yens/beginner/score_kev.slurm             # without Kev's fused kernels (transformers' own layer code)
 # Every job labels all 1,000 filings afresh, into $WORK/results/b1/<jobid>.jsonl.
 # Loading fp32 weights passes through host memory, hence 32 GB (the gpu partition allows 4,000 MB per CPU).
 set -euo pipefail
@@ -47,5 +47,5 @@ for i in $(seq 1 120); do                            # wait up to 10 minutes for
 done
 curl -sf "http://127.0.0.1:$PORT/v1/models" > /dev/null || { echo "Kev server not ready after 10 minutes" >&2; exit 1; }
 echo "$NAME: Kev-4B loaded in $((SECONDS - START)) s on $(hostname), $(nvidia-smi --query-gpu=name,memory.used,memory.total --format=csv,noheader -i 0)"
-$PY scripts/label.py --url "http://127.0.0.1:$PORT" --data "$WORK/data/test1000.jsonl" --out "$OUT" --concurrency "$CONCURRENCY" "${WB[@]}"
-$PY scripts/score.py "$OUT" ${WB:+--wandb --wandb-prefix test/}
+$PY scripts/beginner/label.py --url "http://127.0.0.1:$PORT" --data "$WORK/data/test1000.jsonl" --out "$OUT" --concurrency "$CONCURRENCY" "${WB[@]}"
+$PY scripts/beginner/score.py "$OUT" ${WB:+--wandb --wandb-prefix test/}

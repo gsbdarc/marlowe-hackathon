@@ -11,12 +11,11 @@ permalink: /beginner/data/
 **Goal:** know what you will train on, where Jev's labels come from, and where the files live on the Yens, then get
 your first numbers from the test set.
 
-You need the [setup]({{ '/setup/' | relative_url }}) done: Kev installed, Jev's data copied to your scratch and the
-training files built. Every command below runs from your clone of the repository on the Yens.
+You need the [setup]({{ '/setup/' | relative_url }}) done: Kev installed and the training files built. Every command below runs from your clone of the repository on the Yens.
 
 ```bash
 cd /scratch/users/$USER/marlowe-hackathon
-source env/yens.sh
+source scripts/beginner/yens.sh
 ```
 {: .yens }
 
@@ -241,8 +240,18 @@ matters as much: change a word of an option and you change the task.
 ## Where the data lives: project space and scratch
 
 DARC keeps the original of Jev's labeled filings in project space, at
-`/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev`, read only. In setup you copied it into your scratch,
-next to everything else you make, and `env/yens.sh` points two variables there:
+`/yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev`, read only. Copy it into your scratch, next to
+everything else you make (342 MB), and rebuild the training files from your copy (a CPU job, a few minutes; it also
+writes `valid.parquet`, which [Fine-Tune Kev-4B]({{ '/beginner/finetune/' | relative_url }}) scores against):
+
+```bash
+mkdir -p $DATA
+cp $HACKATHON/data/jev/* $DATA/
+sbatch slurm/yens/beginner/data.slurm
+```
+{: .yens }
+
+`scripts/beginner/yens.sh` points two variables there:
 
 | Variable | Folder | What is in it |
 |---|---|---|
@@ -378,7 +387,8 @@ Jev's answers for scoring. `jev` is your copy of the release.
 
 `$WORK` is in scratch, which is not backed up, and files older than 90 days are deleted at a scheduled downtime. That
 includes your copy of Jev's data. Neither is a loss: copy the data again from DARC's folder, as in
-[setup]({{ '/setup/' | relative_url }}), and `slurm/yens/00_data.slurm` rebuilds the training files in a minute. A
+[Where the data lives](#where-the-data-lives-project-space-and-scratch), and `slurm/yens/beginner/data.slurm` rebuilds the
+training files in a minute. A
 model you spent hours training is worth copying to a project space.
 
 </details>
@@ -652,7 +662,7 @@ Name: weight, dtype: float64
 The sample is drawn on purpose with more CEO changes, and more of the rare statuses, so each can be measured: a
 random 1,000 would hold only one or two temporary leaves. Each filing carries a `weight`, the number of test filings
 it stands for. Add up the weights and you get the whole test split back: 49,592 and 6,742. When you score Kev-4B on
-these 1,000 filings, `scripts/score.py` uses the weights to estimate agreement on all 56,334.
+these 1,000 filings, `scripts/beginner/score.py` uses the weights to estimate agreement on all 56,334.
 
 </details>
 
