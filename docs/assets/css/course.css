@@ -848,3 +848,51 @@ tspan.personalize-token-unset {
 }
 .filing-scroll p { margin: 0 0 0.6rem; }
 .filing-scroll p:first-child { font-weight: 600; margin-bottom: 0; }
+
+/* A3: full fine-tune vs LoRA diagram. Trained weights in the dataviz default blue (slot 1), frozen ones in a warm
+   neutral; every label is in ink, so the figure does not rely on colour alone. */
+.lora-fig { margin: 1rem 0 1.4rem; border: 1px solid #e4e0da; border-radius: 8px; background: #fcfcfb; padding: 0.6rem; }
+.lora-fig svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0 auto; }
+.lora-fig .trained { fill: #2a78d6; }
+.lora-fig .frozen { fill: #e4e0da; stroke: #b5afa6; stroke-width: 1; }
+.lora-fig .divider { stroke: #e4e0da; stroke-width: 1; }
+.lora-fig text { font-family: "Source Sans 3", system-ui, sans-serif; fill: #3a3733; }
+.lora-fig .t-head { font-size: 16px; font-weight: 700; }
+.lora-fig .t-mat { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 26px; font-weight: 600; text-anchor: middle; }
+.lora-fig .trained + .t-mat { fill: #ffffff; }
+.lora-fig .t-mat-s { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 16px; font-weight: 600; text-anchor: middle; }
+.lora-fig .t-r { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 13px; font-style: italic; text-anchor: middle; fill: #3a3733; font-weight: 600; }
+.lora-fig .t-op { font-size: 24px; text-anchor: middle; fill: #605c56; }
+.lora-fig .t-note { font-size: 13px; text-anchor: middle; fill: #55524d; }
+.lora-fig .t-sub { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 12px; text-anchor: middle; fill: #605c56; }
+
+/* Pseudocode blocks (A1-A4): only the structure is coloured. Loop words in the theme's red, the names being set in
+   blue, comments muted; the plain-English steps stay in ink. */
+.main-content pre.pseudo {
+  background: #f7f5f2; border: 1px solid #e4e0da; border-radius: 6px; padding: 0.8rem 1rem; margin: 0.8rem 0 1.2rem;
+  font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.8rem; line-height: 1.7; color: #2b2926;
+  white-space: pre; overflow-x: auto;
+}
+.main-content pre.pseudo .pk { color: #a3312c; font-weight: 600; }
+.main-content pre.pseudo .pv { color: #1f5fa8; font-weight: 600; }
+.main-content pre.pseudo .pc { color: #8a857d; font-style: italic; }
+
+/* A2: one training step. Forward boxes in the dataviz default blue (slot 1), backward in orange (slot 2), the loss in
+   both; labels stay in ink, and each lane is also named in words. */
+.train-fig { margin: 1rem 0 1.2rem; border: 1px solid #e4e0da; border-radius: 8px; background: #fcfcfb; padding: 0.6rem; }
+.train-fig svg { display: block; width: 100%; height: auto; max-width: 780px; margin: 0 auto; }
+.train-fig .tf-fwd  { fill: #eaf2fc; stroke: #2a78d6; stroke-width: 1.5; }
+.train-fig .tf-bwd  { fill: #fdeee7; stroke: #eb6834; stroke-width: 1.5; }
+.train-fig .tf-loss { fill: #f4efe8; stroke: #6b665f; stroke-width: 1.5; }
+.train-fig .tf-label { fill: #ffffff; stroke: #b5afa6; stroke-width: 1; stroke-dasharray: 4 3; }
+.train-fig .tf-line { stroke: #6b665f; stroke-width: 1.5; fill: none; }
+.train-fig .tf-loop { stroke-dasharray: 5 4; }
+.train-fig .tf-head { fill: #6b665f; }
+.train-fig text { font-family: "Source Sans 3", system-ui, sans-serif; fill: #3a3733; text-anchor: middle; }
+.train-fig .tf-b { font-size: 15px; font-weight: 700; }
+.train-fig .tf-t { font-size: 12.5px; fill: #55524d; }
+.train-fig .tf-s { font-size: 12px; fill: #605c56; font-style: italic; }
+.train-fig .tf-lane { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-anchor: start; fill: #8a857d; }
+
+/* A table whose header should not be bold, for example when the header cells are code (the A2 BATCH and ACCUM table). */
+.main-content table.plain-head th { font-weight: 400; }
