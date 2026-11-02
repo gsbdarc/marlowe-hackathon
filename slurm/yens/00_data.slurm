@@ -5,6 +5,9 @@
 #SBATCH --mem=16G
 #SBATCH -t 00:20:00
 #SBATCH -o logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # Build the training, validation and test files from Jev's labels. Submit from the repo:
 #   sbatch slurm/yens/00_data.slurm

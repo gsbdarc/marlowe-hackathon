@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Reference"
-nav_order: 12
+nav_order: 11
 permalink: /reference/
 ---
 
@@ -18,7 +18,7 @@ permalink: /reference/
 | `scripts/make_kev_data.py` | Jev's labels to Kev training records: `train.jsonl`, `valid.jsonl`, `test1000.jsonl` |
 | `scripts/label.py` | sends filings to a running Kev server and saves the answers |
 | `scripts/score.py` | agreement with Jev on the test sample |
-| `slurm/train_args.sh` | the training job every checkpoint runs |
+| `slurm/train_args.sh` | the Kev-4B training job the Yens and Marlowe scripts share |
 
 ## Slurm on the two clusters
 

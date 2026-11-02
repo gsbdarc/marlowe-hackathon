@@ -3,7 +3,7 @@
 
 title: "Marlowe Hackathon 2026"
 tagline: "Stanford GSB · From one GPU on the Yens to many on Marlowe"
-author: GSB DARC Team
+author: GSB DARC and HAI Marlowe teams
 description: >-
   A one-day hands-on hackathon for Stanford GSB researchers: distill a large model's labels on SEC 8-K CEO-turnover
   filings into a small open model, from one GPU on the Yens to multiple nodes on Marlowe.
@@ -35,6 +35,8 @@ aux_links:
     - 'https://github.com/gsbdarc/marlowe-hackathon'
   GSB RCpedia:
     - 'https://rcpedia.stanford.edu'
+  HAI Marlowe Docs:
+    - 'https://marlowe-research.stanford.edu/documentation/'
 
 callouts:
   tip:

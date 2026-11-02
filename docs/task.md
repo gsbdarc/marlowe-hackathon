@@ -16,7 +16,7 @@ about someone else (a director, a CFO, a pay change), and the ones that are abou
 ## Jev's three questions
 
 **Jev** is TypeSafe's hosted decision model. It reads a document and chooses among fixed options, returning a
-probability for each. DARC asked Jev three questions about every Item 5.02 filing (`scripts/questions.py`):
+probability for each. We asked Jev three questions about every Item 5.02 filing (`scripts/questions.py`):
 
 1. **Status:** what happens to the CEO? Not a CEO change, temporary leave, becomes executive chair, becomes
    non-executive chair, stays as a director only, takes another role at the company, leaves the company entirely, or

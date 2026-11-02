@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Take It Home"
-nav_order: 11
+nav_order: 10
 permalink: /take-home/
 ---
 
@@ -52,6 +52,6 @@ learning rate or number of steps there.
 
 ## Applying for Marlowe
 
-A Marlowe project application asks how many GPU-hours your project needs. The estimate from
-[Checkpoint 2]({{ '/checkpoint-2/' | relative_url }}) and the scaling table from Checkpoints 3 to 5 are that number: measure time per
+A Marlowe project application asks how many GPU-hours your project needs. The time per step and filings per second you
+measure in your track give that number: measure time per
 step at two or three scales on a short run, multiply by the steps a full run needs, and add a margin for reruns.

@@ -6,6 +6,9 @@
 #SBATCH --mem=16G
 #SBATCH -t 02:00:00
 #SBATCH -o logs/%x-%j.out
+# Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=<sunet>@stanford.edu
 
 # Serve a Kev model on this GPU and label filings with it, then score against Jev.
 #   sbatch slurm/yens/serve_and_label.slurm                                  # zero-shot Kev-4B on the test sample

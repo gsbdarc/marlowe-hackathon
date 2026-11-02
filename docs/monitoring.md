@@ -115,10 +115,11 @@ WANDB=1 sbatch slurm/yens/01_train_1gpu.slurm
 ```
 {: .yens }
 
-The run appears in your W&B project `marlowe-hackathon`, named after the checkpoint and job ID (for example
+The run appears in your W&B project `marlowe-hackathon`, named after the run and job ID (for example
 `cp1-1gpu-873242`). Charts update every 10 steps.
 
 {: .note }
 > If compute nodes cannot reach wandb.ai, the run will fail to connect. Submit with
 > `WANDB=1 WANDB_MODE=offline sbatch ...`: the run is written to `wandb/` in the repository, and
-> `$KEV_HOME/kev/.venv/bin/wandb sync wandb/offline-run-*` from a login node uploads it afterward.
+> `$KEV_HOME/kev/.venv/bin/wandb sync wandb/offline-run-*` from an interactive Yen node or the Marlowe login node uploads
+> it afterward.

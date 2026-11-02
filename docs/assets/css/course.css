@@ -766,3 +766,85 @@ tspan.personalize-token-unset {
   border-left-width: 3px;
   border-left-color: #0f5e5a;
 }
+
+/* Site title: "Marlowe Hackathon 2026" wrapped onto two lines in the sidebar header at the theme's 1.5rem and filled
+   the 60px header edge to edge. One line, a step smaller, with less side padding, sits centred with room above it. */
+@media (min-width: 50rem) {
+  .side-bar .site-title {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 1.15rem !important;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+}
+
+/* A1: an annotated Kev answer. Each part of the JSON line gets a tinted band in its colour and a numbered badge; the
+   legend under it explains each number. Colours are the dataviz default categorical slots 1, 3, 2, 7, 5 (validated
+   for colour-blind separation on the light surface); the text stays in ink, and the numbers carry the identity too. */
+.anatomy {
+  --a-id: #2a78d6; --a-choice: #1baf7a; --a-conf: #eb6834; --a-probs: #6250d6; --a-future: #e87ba4;
+  border: 1px solid #e4e0da;
+  border-radius: 8px;
+  background: #fcfcfb;
+  padding: 1rem 1.1rem;
+  margin: 1rem 0 1.5rem;
+}
+.anatomy pre {
+  margin: 0 0 1rem;
+  padding: 0.8rem 0.9rem;
+  background: #f7f5f2;
+  border-radius: 6px;
+  font-family: "Source Code Pro", ui-monospace, monospace;
+  font-size: 0.74rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #3a3733;
+}
+.anatomy .a { border-radius: 3px; padding: 1px 3px; border-left: 3px solid; }
+.anatomy .a-id     { background: color-mix(in srgb, var(--a-id) 14%, transparent);     border-color: var(--a-id); }
+.anatomy .a-choice { background: color-mix(in srgb, var(--a-choice) 16%, transparent); border-color: var(--a-choice); }
+.anatomy .a-conf   { background: color-mix(in srgb, var(--a-conf) 14%, transparent);   border-color: var(--a-conf); }
+.anatomy .a-probs  { background: color-mix(in srgb, var(--a-probs) 12%, transparent);  border-color: var(--a-probs); }
+.anatomy .a-future { background: color-mix(in srgb, var(--a-future) 16%, transparent); border-color: var(--a-future); }
+.anatomy .n {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.25rem; height: 1.25rem; padding: 0 0.2rem; border-radius: 0.625rem; box-sizing: border-box;
+  font-family: "Source Sans 3", system-ui, sans-serif; font-size: 0.72rem; font-weight: 700;
+  color: #fff; vertical-align: 1px;
+}
+.anatomy .n-id { background: var(--a-id); }
+.anatomy .n-choice { background: var(--a-choice); }
+.anatomy .n-conf { background: var(--a-conf); }
+.anatomy .n-probs { background: var(--a-probs); }
+.anatomy .n-future { background: var(--a-future); }
+.anatomy .n-meta { background: #6b665f; }
+.anatomy dl { display: grid; grid-template-columns: auto 1fr; gap: 0.55rem 0.7rem; margin: 0; font-size: 0.9em; }
+.anatomy dt { margin: 0; }
+.anatomy dt::after { content: none; }
+.anatomy dd { margin: 0; color: #3a3733; }
+.anatomy-bars { margin: 0.4rem 0 1rem; font-size: 0.85em; }
+.anatomy-bars .row { display: grid; grid-template-columns: 11.5rem 1fr 3.2rem; align-items: center; gap: 0.6rem; margin: 3px 0; }
+.anatomy-bars .ab-label { color: #55524d; text-align: right; }
+.anatomy-bars .track { height: 14px; }
+.anatomy-bars .bar { height: 100%; min-width: 2px; background: var(--a-probs); border-radius: 0 4px 4px 0; }
+.anatomy-bars .ab-value { font-variant-numeric: tabular-nums; color: #55524d; }
+.anatomy-bars .row.top .ab-label, .anatomy-bars .row.top .ab-value { color: #1f1d1a; font-weight: 600; }
+.anatomy-bars .caption { margin: 0 0 0.4rem; font-weight: 600; color: #3a3733; }
+@media (max-width: 650px) { .anatomy-bars .row { grid-template-columns: 8rem 1fr 2.8rem; } }
+
+/* A1: the full text of one filing, in a box that scrolls on its own so the page stays short. */
+.filing-scroll {
+  max-height: 15rem;
+  overflow-y: auto;
+  border: 1px solid #e4e0da;
+  border-left: 3px solid #b5afa6;
+  border-radius: 6px;
+  background: #fcfcfb;
+  padding: 0.7rem 1rem;
+  margin: 0.8rem 0 1.2rem;
+  font-size: 0.9em;
+}
+.filing-scroll p { margin: 0 0 0.6rem; }
+.filing-scroll p:first-child { font-weight: 600; margin-bottom: 0; }
