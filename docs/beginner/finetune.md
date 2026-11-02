@@ -161,7 +161,8 @@ sbatch slurm/yens/finetune_kev.slurm
 The job takes about 17 minutes on an A40. It loads the model and the filings (2 to 3 minutes), trains on 512 filings,
 1% of `train.jsonl`, in 64 steps of 8 (9 minutes; see [What 10 minutes covers](#what-10-minutes-covers)), then
 serves the new adapter, labels the 2,000 validation filings with it and scores the answers against Jev's (5 minutes).
-Its log is `logs/ceo-finetune-<jobid>.out`. The parts to read:
+On an H200 the job trains on 1,920 filings in the same 10 minutes and labels about 3.7 times as fast. Its log is
+`logs/ceo-finetune-<jobid>.out`. The parts to read:
 
 ```
 device=cuda world=1 trainable params=33.8M
@@ -215,11 +216,11 @@ Change one setting at a time, so you know which one made the difference:
 | Frozen backbone | `WEIGHTS=bf16 sbatch ...` | fp32, bf16 | fp32 |
 | Start from | `INIT=scratch RANK=4 sbatch ...` | `kev` (continue Kev-4B), `scratch` (new adapter, rank 4, 16 or 64) | `kev` |
 | GPU | `sbatch -C GPU_MODEL:H200 ...` | A40, H200 | A40 |
-| Filings to train on | `FILINGS=1024 sbatch ...` | up to about 1,800 (the job's 45-minute limit) | 512 |
+| Filings to train on | `FILINGS=1024 sbatch ...` | up to about 1,800 on an A40, 7,000 on an H200 (the job's 45-minute limit) | 512 on an A40, 1,920 on an H200 |
 
-Unless you change `FILINGS`, every run trains on the same 512 filings, so on an A40 every run takes about the same
-time: 9.2 minutes of training, or 8.6 with the bf16 backbone. The other settings change what the model learns from
-those filings, not how long it takes.
+Unless you change `FILINGS`, every run trains for about 10 minutes, whatever the other settings: on 512 filings on an
+A40 (9.2 minutes, or 8.6 with the bf16 backbone) and on 1,920 on an H200 (9.4 to 9.8 minutes). The other settings
+change what the model learns from those filings, not how long it takes.
 
 To compare two runs side by side, score them together:
 
@@ -274,33 +275,38 @@ To score it yourself: `RUN=jaredpalmer/kev-4b@v1.0 sbatch slurm/yens/finetune_ke
 
 ## The room's dashboard
 
-Every job logs to the hackathon's W&B project,
-[darc/Marlowe-Hackathon](https://forge.coreweave.com/wandb/darc/Marlowe-Hackathon), with the tag `exercise-2`, under a
-name made of your SUNet ID, the GPU and the settings, for example `<sunet>-a40-kev-lr2e-5-rps8-fp32-<jobid>`. Each run
-holds the loss every 10 steps, its settings, and its validation scores. The System tab shows the GPU's memory and use.
-Filter the runs table by the tag to see only this exercise. Test runs carry `test` in their name and job type, so they
-stay apart from the tuning runs.
+Every job logs to this exercise's project in the hackathon's W&B team,
+[Marlowe-Hackathon/exercise-2-finetune](https://forge.coreweave.com/wandb/Marlowe-Hackathon/exercise-2-finetune), under
+a name made of your SUNet ID, the GPU and the settings, for example `<sunet>-a40-kev-lr2e-5-rps8-fp32-<jobid>`. Each run
+holds the loss every 10 steps, its settings, and its validation scores, named `valid/...`. The System tab shows the GPU's
+memory and use. Scoring the run on the test filings (`EVAL=test RUN=...`) adds its test scores, named `test/...`, to the
+same run.
 
 ---
 
 ## What 10 minutes covers
 
-Each run gets about 10 minutes of training, so it can only use a small slice of the training data: 512 filings, 1%
-of the 52,757 in `train.jsonl`.
+Each run gets about 10 minutes of training, so it can only use a small slice of the training data: 512 of the 52,757
+filings in `train.jsonl` on an A40 (1%), or 1,920 on an H200 (3.6%).
 
-| On one A40 | Filings | Share of `train.jsonl` | Training time |
+| On one GPU | Filings | Share of `train.jsonl` | Training time |
 |---|---|---|---|
-| One run of this exercise | 512 | 1% | 9.2 minutes |
-| One full pass | 52,757 | 100% | 15.0 hours (13.7 with the bf16 backbone) |
+| One run of this exercise, A40 | 512 | 1% | 9.2 minutes |
+| One run of this exercise, H200 | 1,920 | 3.6% | 9.7 minutes |
+| One full pass, A40 | 52,757 | 100% | 15.0 hours (13.7 with the bf16 backbone) |
+| One full pass, H200 | 52,757 | 100% | 4.4 hours (4.2 with the bf16 backbone) |
 
 The job stops after a set number of filings, not after a set time. The learning rate's schedule needs the number of
-steps before training starts, so `FILINGS` is fixed at what fits in about 10 minutes: 512 filings at about 1.08
-seconds each. The job's 45-minute limit allows up to about 1,800. Every run sees the same 512 filings, chosen by
-`--seed 0`, and never sees the other 99%. The full-pass time is the `epoch hours` in your log.
+steps before training starts, so `FILINGS` is set to what fits in about 10 minutes on the GPU the job lands on: 512
+filings at 1.08 seconds each on an A40, 1,920 at 0.31 seconds on an H200. The job's 45-minute limit allows up to about
+1,800 on an A40 and 7,000 on an H200. Runs on the same GPU see the same filings, chosen by `--seed 0`. The full-pass
+time is the `epoch hours` in your log.
 
-So the scores in this exercise show what 1% of the data can do: on validation, weighted agreement went from 0.882 to
-0.961. They can't show how much a full pass would add. On Marlowe, with many more GPUs, a full pass becomes
-practical.
+So the scores in this exercise show what a few percent of the data can do. On an A40, weighted agreement on
+validation went from 0.882 to 0.961. The H200's extra filings, in the same 10 minutes, mostly helped on CEO changes:
+with the default settings, agreement on them rose from 0.744 to 0.840 on validation, while weighted agreement barely
+moved (0.961 to 0.962). Neither shows how much a full pass would add. On Marlowe, with many more GPUs, a full pass
+becomes practical.
 
 ---
 
@@ -479,6 +485,38 @@ EVAL=test RUN=$WORK/runs/b2/<jobid of your best run> sbatch slurm/yens/finetune_
 Nine minutes of training on 1% of `train.jsonl` cut Kev-4B's disagreements with Jev by three quarters, from 11.6% of
 the test split's filings to 2.8%. Every status rose except "interim steps aside", 84.8% before and 82.8% after, which is 2
 of its 99 filings. This is the number to report, because nothing was chosen to suit these filings.
+
+</details>
+
+### More filings in the same time
+
+<details class="quiz" markdown="1">
+<summary><span class="qnum">8</span><span class="qtext">Run a setting on an H200, which trains on 1,920 filings in the same 10 minutes. What do 3.75 times as many filings buy, and do the settings still matter as much?</span></summary>
+
+```bash
+sbatch -C GPU_MODEL:H200 slurm/yens/finetune_kev.slurm
+```
+{: .yens }
+
+Agreement on the validation CEO changes, one run of each setting on each GPU:
+
+| Setting | A40, 512 filings | H200, 1,920 filings |
+|---|---|---|
+| Default | 0.744 | 0.840 |
+| lr 2e-6 | 0.636 | 0.761 |
+| lr 2e-4 | 0.706 | 0.856 |
+| 2 per step | 0.802 | 0.861 |
+| 32 per step | 0.739 | 0.815 |
+| bf16 backbone | 0.740 | 0.839 |
+| New adapter, rank 4 | 0.655 | 0.856 |
+| New adapter, rank 16 | 0.642 | 0.848 |
+| New adapter, rank 64 | 0.626 | 0.798 |
+
+Every setting gained, and most of the gaps between them closed: 2 per step, lr 2e-4 and a new rank-4 adapter all
+reached 0.856 to 0.861, within chance of each other and of the default. A new adapter trained on 1,920 filings
+matches continuing Kev-4B, so what Kev-4B learned before matters less once there is more data. Only lr 2e-6 and rank
+64 stayed clearly behind. On the test filings, 2 per step on the H200 reached 0.976 weighted and 0.869 on CEO
+changes, against 0.972 and 0.844 on the A40.
 
 </details>
 
