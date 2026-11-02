@@ -62,6 +62,7 @@ def main():
     ap.add_argument("runs", nargs="+")
     ap.add_argument("--sample", default=os.path.join(os.environ.get("WORK", "."), "data", "test1000.parquet"))
     ap.add_argument("--wandb", action="store_true", help="add the scores to each run's W&B run (from label.py --wandb)")
+    ap.add_argument("--wandb-prefix", default="", help="put before each score's name in W&B, e.g. test/, so one run can hold validation and test scores")
     a = ap.parse_args()
     sample = pd.read_parquet(a.sample)
     sample["status"], sample["why"] = sample.status.astype(int), sample.why.astype(int)
@@ -79,7 +80,7 @@ def main():
             run_id = json.load(open(p.replace(".jsonl", "_summary.json"))).get("wandb_run_id") or os.environ.get("WANDB_RUN_ID")
             if run_id:
                 run = wandb.init(id=run_id, resume="must")
-                run.summary.update({k: v for k, v in r.items() if k != "run"})
+                run.summary.update({a.wandb_prefix + k: v for k, v in r.items() if k != "run"})
                 run.finish()
 
 

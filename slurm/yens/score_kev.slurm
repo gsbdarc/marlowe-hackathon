@@ -25,9 +25,10 @@ OUT=$WORK/results/b1/$SLURM_JOB_ID.jsonl
 mkdir -p logs "$WORK/results/b1"
 nvidia-smi --query-gpu=timestamp,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > "logs/gpu-$SLURM_JOB_ID.csv" &
 
-# The room's W&B project. The shared key is a line WANDB_API_KEY=... in .env at the top of the repo, which git ignores.
-export WANDB_PROJECT=${WANDB_PROJECT:-Marlowe-Hackathon}
-export WANDB_ENTITY=${WANDB_ENTITY:-darc} WANDB_TAGS=exercise-1
+# This exercise's project in the room's W&B team. The team's key is a line WANDB_API_KEY=... in .env at the top of the
+# repo, which git ignores.
+export WANDB_PROJECT=${WANDB_PROJECT:-exercise-1-inference}
+export WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 GPU=$(nvidia-smi --query-gpu=name --format=csv,noheader -i 0 | awk '{print tolower($2)}')
 NAME=$USER-$GPU-c$CONCURRENCY-$KEV_DTYPE$([ "$KEV_FUSED" = 0 ] && echo -nofused || true)-$SLURM_JOB_ID
@@ -47,4 +48,4 @@ done
 curl -sf "http://127.0.0.1:$PORT/v1/models" > /dev/null || { echo "Kev server not ready after 10 minutes" >&2; exit 1; }
 echo "$NAME: Kev-4B loaded in $((SECONDS - START)) s on $(hostname), $(nvidia-smi --query-gpu=name,memory.used,memory.total --format=csv,noheader -i 0)"
 $PY scripts/label.py --url "http://127.0.0.1:$PORT" --data "$WORK/data/test1000.jsonl" --out "$OUT" --concurrency "$CONCURRENCY" "${WB[@]}"
-$PY scripts/score.py "$OUT" ${WB:+--wandb}
+$PY scripts/score.py "$OUT" ${WB:+--wandb --wandb-prefix test/}
