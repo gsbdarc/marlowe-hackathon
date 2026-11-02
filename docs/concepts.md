@@ -17,7 +17,7 @@ The terms used on the other pages, and what each means here.
 and a set of questions with fixed answer options, and it returns, for each question, a probability for every option.
 It does not write free text, so its answers can go straight into a table.
 
-DARC sent Jev every Item 5.02 filing since 2004, about 296,000 of them, with three questions: what happens to the
+We sent Jev every Item 5.02 filing since 2004, about 296,000 of them, with three questions: what happens to the
 CEO, why, and whether the change was announced in advance. Labeling them all took about 20 minutes and cost about
 $19. Those answers are this hackathon's labels. Jev is the reference we measure against, not ground truth: a filing
 Jev gets wrong stays wrong in the labels.
