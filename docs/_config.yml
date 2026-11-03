@@ -11,6 +11,9 @@ description: >-
 baseurl: '/marlowe-hackathon'
 url: 'https://gsbdarc.github.io'
 
+# Show the post-class survey link (sidebar and home page). Set to true on the day of the event.
+show_survey: false
+
 exclude:
   - Gemfile
   - Gemfile.lock

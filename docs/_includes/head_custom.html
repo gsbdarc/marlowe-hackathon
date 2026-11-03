@@ -5,3 +5,15 @@
 <link rel="stylesheet" href="{{ '/assets/css/course.css' | relative_url }}">
 
 <script src="{{ '/assets/js/personalize.js' | relative_url }}" defer></script>
+
+<!-- Links in the page content open in a new tab, so the walkthrough stays open. Same-page # links and the sidebar do not. -->
+<script>
+document.addEventListener("click", function (e) {
+  var a = e.target.closest && e.target.closest(".main-content a[href]");
+  if (!a) return;
+  var url = new URL(a.href, location.href);
+  if (url.origin + url.pathname === location.origin + location.pathname && url.hash) return;
+  a.target = "_blank";
+  a.rel = "noopener";
+});
+</script>
