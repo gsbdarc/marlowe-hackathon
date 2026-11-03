@@ -16,7 +16,6 @@
 # A2, part 1: the Qwen3.8-27B full fine-tune on one H100. On one GPU, Kev's trainer keeps the fp32 master weights and
 # optimizer state in host memory (~310 GB), hence --mem=480G.
 #   sbatch slurm/marlowe/advanced/a2_train_1gpu.slurm
-#   RUN=a3-lora EXTRA_ARGS="--full_ft 0 --lora 16 --lr 2e-4" sbatch slurm/marlowe/advanced/a2_train_1gpu.slurm   # a LoRA (A3 bonus)
 set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh

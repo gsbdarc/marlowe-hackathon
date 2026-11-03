@@ -2,7 +2,7 @@
 
 Kev serves Jev's API (POST /v1/systemone), so the request is the same one Jev answered: the filing as the state and the
 three questions. With --api chat, the same filing and questions go to POST /v1/chat/completions as one prompt with
-numbered options, and the server is asked for JSON limited to those options (structured outputs); the answers are
+numbered options, and the reply is held to the Answers schema (structured outputs); the answers are
 saved in the same form, so score.py scores either. Labels in the input file are never sent.
 
     $PY scripts/label.py --url http://127.0.0.1:8009 --data $WORK/data/test1000.jsonl --out $WORK/results/kev-4b.jsonl
@@ -20,8 +20,10 @@ import os
 import statistics
 import time
 from concurrent.futures import ThreadPoolExecutor
+from typing import Literal
 
 import requests
+from pydantic import BaseModel, ConfigDict
 
 from questions import (FUTURE_INSTRUCTIONS, REASON, STATUS, STATUS_INSTRUCTIONS, WHY_INSTRUCTIONS, questions,
                        state)
@@ -38,33 +40,36 @@ def ask(url, model, rec, timeout):
         return {"id": rec["_meta"]["id"], "ok": False, "seconds": time.perf_counter() - t, "error": f"{type(e).__name__}: {e}"}
 
 
-# --api chat: the questions as one prompt, and a JSON schema that holds the answer to the options
-ANSWER_SCHEMA = {"type": "object", "additionalProperties": False, "required": ["status", "why", "future"],
-                 "properties": {"status": {"type": "integer", "enum": list(STATUS)},
-                                "why": {"type": "integer", "enum": list(REASON)},
-                                "future": {"type": "boolean"}}}
+# --api chat: the questions as one prompt, and the reply as a Pydantic model. Its JSON schema goes with every request
+# (structured outputs), and vLLM allows only the tokens that keep the reply valid against it.
+class Answers(BaseModel):
+    model_config = ConfigDict(extra="forbid")   # no other fields
+    status: Literal[tuple(STATUS)]              # an option number, 1 to 8
+    why: Literal[tuple(REASON)]                 # an option number, 1 to 8
+    future: bool                                # true or false
 
 
 def chat_prompt(state_text):
     options = lambda d: "\n".join(f"{k}. {v}" for k, v in d.items())
+    # No "reply with JSON" here: the Answers schema sets the format. Each question is headed by its field in Answers.
     return (f"{state_text}\n\n---\n\nAnswer three questions about the filing above.\n\n"
-            f"1. {STATUS_INSTRUCTIONS}\n{options(STATUS)}\n\n"
-            f"2. {WHY_INSTRUCTIONS}\n{options(REASON)}\n\n"
-            f"3. {FUTURE_INSTRUCTIONS}\n\n"
-            'Reply with JSON only: {"status": <option number for 1>, "why": <option number for 2>, "future": <true or false for 3>}')
+            f"status: {STATUS_INSTRUCTIONS}\n{options(STATUS)}\n\n"
+            f"why: {WHY_INSTRUCTIONS}\n{options(REASON)}\n\n"
+            f"future: {FUTURE_INSTRUCTIONS}")
 
 
 def ask_chat(url, model, rec, timeout):
     body = {"model": model, "messages": [{"role": "user", "content": chat_prompt(rec["state"])}],
             "temperature": 0, "max_tokens": 64,
-            "response_format": {"type": "json_schema", "json_schema": {"name": "answers", "schema": ANSWER_SCHEMA}}}
+            "response_format": {"type": "json_schema",
+                                "json_schema": {"name": "answers", "schema": Answers.model_json_schema()}}}
     t = time.perf_counter()
     try:
         r = requests.post(f"{url}/v1/chat/completions", json=body, timeout=timeout)
         r.raise_for_status()
-        a = json.loads(r.json()["choices"][0]["message"]["content"])
-        answers = {"status": {"choice": STATUS[a["status"]]}, "why": {"choice": REASON[a["why"]]},
-                   "future": {"noul": 1.0 if a["future"] else 0.0}}
+        a = Answers.model_validate_json(r.json()["choices"][0]["message"]["content"])
+        answers = {"status": {"choice": STATUS[a.status]}, "why": {"choice": REASON[a.why]},
+                   "future": {"noul": 1.0 if a.future else 0.0}}
         return {"id": rec["_meta"]["id"], "ok": True, "seconds": time.perf_counter() - t, "answers": answers}
     except (requests.RequestException, KeyError, IndexError, ValueError, TypeError) as e:
         return {"id": rec["_meta"]["id"], "ok": False, "seconds": time.perf_counter() - t, "error": f"{type(e).__name__}: {e}"}
