@@ -69,8 +69,10 @@ up a 🟩 green sticky, or a 🟥 red one if you are stuck.
 Every script here is a template you can adapt: swap in your own documents, questions and labels. [Take It
 Home]({{ '/take-home/' | relative_url }}) shows what to change.
 
+{% if site.show_survey %}
 ---
 
 ## Post-class survey
 
 At the end of the day, tell us how it went: [darc.stanford.edu/hackathon-survey](https://darc.stanford.edu/hackathon-survey).
+{% endif %}

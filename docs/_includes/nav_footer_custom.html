@@ -1,10 +1,12 @@
 <!-- The participant's SUNet ID, filled into every command on the site by assets/js/personalize.js. Adapted from the
      Yens Onboarding site. This include renders twice per page (desktop sidebar and mobile footer), so the input is
      marked with data-personalize rather than an id. The Stanford block "S" is used unaltered. -->
+{% if site.show_survey %}
 <div class="personalize survey">
   <p class="personalize-title">Post-class survey</p>
   <p class="personalize-blurb">Tell us how the day went. <a href="https://darc.stanford.edu/hackathon-survey" target="_blank" rel="noopener">Take the survey</a></p>
 </div>
+{% endif %}
 <div class="personalize">
   <p class="personalize-title">Your details</p>
   <p class="personalize-blurb">Set your SUNet ID once and the commands on every page fill it in. Stored in this
