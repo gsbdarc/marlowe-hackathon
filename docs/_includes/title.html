@@ -1,0 +1,8 @@
+{%- comment -%}
+  Overrides just-the-docs' title.html: the site title, then the event's date from _config.yml (event_date)
+  under it in the sidebar header.
+{%- endcomment -%}
+<span class="site-title-name">{{ site.title }}</span>
+{%- if site.event_date -%}
+<span class="site-event">{{ site.event_date }}</span>
+{%- endif -%}

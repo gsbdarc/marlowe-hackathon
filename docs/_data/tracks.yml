@@ -1,0 +1,75 @@
+# The track maps on the home page (_includes/track_map.html). One list per track, one entry per task, in order.
+#   title: what the task does, without the model; model: the model(s), shown as a label
+#   platform: Yens or Marlowe; nodes and gpus: what the task runs on
+#   kinds: Inference, Fine-tuning, LoRA, Distillation; add " bonus" for an optional part
+#   concepts: four links to the main ideas the page teaches; anchor is the heading's id on that page (empty for the top)
+#   then: an optional note on the arrow to the next task
+advanced:
+  - id: A1
+    title: Score before training
+    url: /advanced/a1/
+    model: Kev-27B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 H200
+    kinds: [Inference]
+    then: the baseline
+    concepts:
+      - {name: "Serving a model with Slurm", anchor: step-2-start-the-server}
+      - {name: "Probabilities over classes", anchor: what-happens-to-each-filing}
+      - {name: "Choice and confidence", anchor: what-kevs-answers-look-like}
+      - {name: "Throughput and latency", anchor: step-4-label-and-score-from-the-interactive-node}
+  - id: A2
+    title: Fine-tune on one node
+    url: /advanced/a2/
+    model: Qwen 27B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100, then 8
+    kinds: [Fine-tuning]
+    then: the same job on 2 nodes
+    concepts:
+      - {name: "The training loop", anchor: the-training-loop}
+      - {name: "Batch size and accumulation", anchor: batch-and-accum}
+      - {name: "Checkpoints", anchor: checkpoints-saving-the-training-to-disk}
+      - {name: "FSDP across 8 GPUs", anchor: step-3-fine-tune-on-8-h100s-with-fsdp}
+  - id: A3
+    title: Fine-tune on two nodes
+    url: /advanced/a3/
+    model: Qwen 27B
+    platform: Marlowe
+    nodes: 2 nodes
+    gpus: 16 H100s
+    kinds: [Fine-tuning, LoRA bonus]
+    concepts:
+      - {name: "Training across nodes", anchor: step-2-fine-tune-on-two-nodes}
+      - {name: "Speedup from 8 to 16 GPUs", anchor: step-4-where-did-the-time-go}
+      - {name: "How LoRA works", anchor: how-lora-works}
+      - {name: "Full fine-tune or LoRA?", anchor: full-fine-tune-or-lora}
+  - id: A4
+    title: Inference at scale
+    url: /advanced/a4/
+    model: Qwen 235B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 8 H100s
+    kinds: [Inference]
+    then: teacher labels
+    concepts:
+      - {name: "Tensor parallelism and MoE", anchor: step-2-start-the-server}
+      - {name: "The KV cache", anchor: kv-cache}
+      - {name: "Structured outputs", anchor: structured-outputs}
+      - {name: "Concurrency and throughput", anchor: step-5-label-at-scale}
+  - id: A5
+    title: Distill a student
+    url: /advanced/a5/
+    model: Qwen 235B to Qwen 4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100
+    kinds: [Distillation, LoRA]
+    concepts:
+      - {name: "What distillation is", anchor: ""}
+      - {name: "Labels from a large model", anchor: step-2-make-the-training-data}
+      - {name: "Training the small model", anchor: step-3-train-the-students}
+      - {name: "Scoring the small model", anchor: step-4-score-the-students}
