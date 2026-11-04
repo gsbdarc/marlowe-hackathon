@@ -4,7 +4,8 @@
  * both, so a command can be copied straight from the page instead of edited in the terminal, where the typos happen.
  * `$USER` already works as typed in the shell, so an unset one is left plain rather than marked as missing.
  *
- *   - Only inside code: prose such as "your <sunet>" is left alone.
+ *   - Only inside code: prose such as "your <sunet>" is left alone. Code marked `.literal` is left alone too, for a
+ *     sentence that names the placeholder itself: `<sunet>`{: .literal } in Markdown.
  *   - Each occurrence becomes its own <span>, so an unfilled one can be clicked to jump to the field.
  *   - The literal token stays on the span, so clearing the field puts the placeholders back.
  *
@@ -30,6 +31,7 @@
     if (!root) return;
     Array.prototype.forEach.call(root.querySelectorAll('code, pre'), function (host) {
       if (host.tagName === 'CODE' && host.closest('pre')) return;      // walked as part of its <pre>
+      if (host.closest('.literal')) return;                           // names the placeholder, not a command
       var walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT, null);
       var texts = [];
       while (walker.nextNode()) texts.push(walker.currentNode);

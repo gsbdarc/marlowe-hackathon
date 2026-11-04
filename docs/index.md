@@ -31,15 +31,15 @@ measure what each costs on the Yens and on Marlowe. [The task and the data]({{ '
 
 ## Tracks
 
-Pick one track. Each task ends in a check-in: post your result in the Slack channel and put
+Pick one track. Each task ends in a check-in: post your result in [{{ site.slack_channel }}]({{ site.slack_url }}) on Slack and put
 up a 🟩 green sticky, or a 🟥 red one if you are stuck.
 
 | Task | [Beginner]({{ '/beginner/' | relative_url }}) | [Intermediate]({{ '/intermediate/' | relative_url }}) | [Advanced]({{ '/advanced/' | relative_url }}) |
 |---|---|---|---|
-| 1 | [Score Kev-4B before training]({{ '/beginner/b1/' | relative_url }}) (Yens, 1 GPU) | [Fine-tune and profile Kev-4B]({{ '/intermediate/i1/' | relative_url }}) (Yens, 1 GPU) | [Score Kev-27B before training]({{ '/advanced/a1/' | relative_url }}) (Yens, 1 H200) |
-| 2 | [Fine-tune Kev-4B]({{ '/beginner/b2/' | relative_url }}) (Yens, 1 GPU) | [Move your data with Globus]({{ '/intermediate/i2/' | relative_url }}) (Yens to Marlowe) | [Fine-tune Qwen 27B]({{ '/advanced/a2/' | relative_url }}) (Marlowe, 1 H100, then 8 H100s) |
+| 1 | [Score before training]({{ '/beginner/b1/' | relative_url }}) (Yens, 1 GPU) | [Fine-tune and profile]({{ '/intermediate/i1/' | relative_url }}) (Yens, 1 GPU) | [Score before training]({{ '/advanced/a1/' | relative_url }}) (Yens, 1 H200) |
+| 2 | [Fine-tune on one GPU]({{ '/beginner/b2/' | relative_url }}) (Yens, 1 GPU) | [Move your data with Globus]({{ '/intermediate/i2/' | relative_url }}) (Yens to Marlowe) | [Fine-tune on one node]({{ '/advanced/a2/' | relative_url }}) (Marlowe, 1 H100, then 8 H100s) |
 | 3 | [Label filings on one Marlowe GPU]({{ '/beginner/b3/' | relative_url }}) (Marlowe, 1 H100) | [Label the test split on a node]({{ '/intermediate/i3/' | relative_url }}) (Marlowe, 1 node) | [Fine-tune on two nodes]({{ '/advanced/a3/' | relative_url }}) (Marlowe, 16 H100s) |
-| 4 | [Label on a full node]({{ '/beginner/b4/' | relative_url }}) (Marlowe, 1 node) | [Label the corpus on two nodes]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 2 nodes) | [Inference at scale with Qwen 235B]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
+| 4 | [Label on a full node]({{ '/beginner/b4/' | relative_url }}) (Marlowe, 1 node) | [Label the corpus on two nodes]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 2 nodes) | [Inference at scale]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
 | 5 | | | [Distill a student]({{ '/advanced/a5/' | relative_url }}) (Marlowe, 1 H100) |
 
 ### The Advanced track at a glance

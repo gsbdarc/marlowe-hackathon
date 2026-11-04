@@ -11,6 +11,10 @@ description: >-
 baseurl: '/marlowe-hackathon'
 url: 'https://gsbdarc.github.io'
 
+# The participants' Slack channel: every check-in links to it
+slack_channel: "#marlowe-hackathon-2026"
+slack_url: "https://stanford.enterprise.slack.com/archives/C0CFQ9T0KCY"
+
 # The event's date, shown under the site title in the sidebar (_includes/title.html)
 event_date: "November 13, 2026"
 

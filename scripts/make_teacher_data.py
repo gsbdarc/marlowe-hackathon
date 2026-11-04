@@ -8,8 +8,8 @@ labels, a filing the teacher calls "not a CEO change" keeps only the status ques
 It also writes the same filings with Jev's labels, so you can train a second student on the same filings and see
 whether the teacher made the difference.
 
-    $PY scripts/make_teacher_data.py $WORK/results/qwen-235b-train.jsonl
-    # writes $WORK/data/teacher-qwen-235b-train.jsonl and $WORK/data/teacher-jev.jsonl
+    $PY scripts/make_teacher_data.py $WORK/results/a4-c64.jsonl --out $WORK/data/teacher-qwen-235b.jsonl
+    # writes $WORK/data/teacher-qwen-235b.jsonl and $WORK/data/teacher-jev.jsonl
 """
 import argparse
 import json

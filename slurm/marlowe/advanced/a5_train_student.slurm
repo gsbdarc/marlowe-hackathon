@@ -16,13 +16,13 @@
 # A5: distill a student. Train Qwen3.5-4B-Base as a LoRA, with Kev's trainer, on a teacher's labels from
 # scripts/make_teacher_data.py. The argument names the teacher: its labels are $WORK/data/teacher-<name>.jsonl, and the
 # student is saved in $WORK/runs/a5-<name>.
-#   sbatch slurm/marlowe/advanced/a5_train_student.slurm qwen-235b-train   # the student of Qwen 235B
+#   sbatch slurm/marlowe/advanced/a5_train_student.slurm qwen-235b         # the student of Qwen 235B
 #   sbatch slurm/marlowe/advanced/a5_train_student.slurm jev               # the same filings, with Jev's labels
 set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
 source slurm/train_args.sh             # job_timer, stamp, gpu_log
-TEACHER=${1:?name the teacher, for example qwen-235b-train or jev}
+TEACHER=${1:?name the teacher, for example qwen-235b or jev}
 DATA=$WORK/data/teacher-$TEACHER.jsonl
 OUT=$WORK/runs/a5-$TEACHER
 [ -f "$DATA" ] || { echo "no $DATA: run scripts/make_teacher_data.py first" >&2; exit 1; }

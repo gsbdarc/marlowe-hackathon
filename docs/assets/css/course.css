@@ -531,6 +531,7 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.python-repl,
 .main-content div.highlighter-rouge.file,
 .main-content div.highlighter-rouge.python-file,
+.main-content div.highlighter-rouge.record,
 .main-content div.highlighter-rouge.prompt,
 .main-content div.highlighter-rouge.output {
   border: 0;
@@ -545,6 +546,7 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.python-repl::before,
 .main-content div.highlighter-rouge.file::before,
 .main-content div.highlighter-rouge.python-file::before,
+.main-content div.highlighter-rouge.record::before,
 .main-content div.highlighter-rouge.prompt::before,
 .main-content div.highlighter-rouge.output::before {
   display: inline-block;
@@ -571,6 +573,7 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.python-repl > div.highlight,
 .main-content div.highlighter-rouge.file > div.highlight,
 .main-content div.highlighter-rouge.python-file > div.highlight,
+.main-content div.highlighter-rouge.record > div.highlight,
 .main-content div.highlighter-rouge.prompt > div.highlight,
 .main-content div.highlighter-rouge.output > div.highlight {
   border-top-left-radius: 0;     /* the tab sits on this corner */
@@ -657,7 +660,17 @@ tspan.personalize-token-unset {
   color: #6a7280;
   border-left-color: #6a7280;
 }
-/* A whole prompt is long: keep it to a box the reader scrolls inside. */
+/* A record from a data file, such as one line of a .jsonl file, shown whole. Grey like output: it is to read. */
+.main-content div.highlighter-rouge.record::before {
+  content: "{ }  Training record";
+  color: #6a7280;
+  border-left-color: #6a7280;
+}
+/* A record has very long lines (the filing is one JSON string): wrap them, so the box scrolls one way only. */
+.main-content div.highlighter-rouge.record pre.highlight,
+.main-content div.highlighter-rouge.record pre.highlight code { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* A whole prompt or record is long: keep it to a box the reader scrolls inside. */
+.main-content div.highlighter-rouge.record pre.highlight,
 .main-content div.highlighter-rouge.prompt pre.highlight {
   max-height: 22rem;
   overflow-y: auto;
@@ -700,6 +713,7 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.python-repl > div.highlight > pre.highlight,
 .main-content div.highlighter-rouge.file > div.highlight > pre.highlight,
 .main-content div.highlighter-rouge.python-file > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.record > div.highlight > pre.highlight,
 .main-content div.highlighter-rouge.prompt > div.highlight > pre.highlight,
 .main-content div.highlighter-rouge.output > div.highlight > pre.highlight {
   border-top-left-radius: 0;
@@ -1071,3 +1085,28 @@ tspan.personalize-token-unset {
   .side-bar .site-header { height: auto; max-height: none; min-height: 60px; }
   .side-bar .site-title { padding-top: 0.9rem; padding-bottom: 0.9rem; }
 }
+
+/* Job ID fields (assets/js/jobid.js): one above each code block that has <jobid> in it. Small and quiet, like the
+   block's own tab, so the command stays the thing to read. An unfilled <jobid> in the block is marked. */
+.main-content .jobid-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0.5rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 1rem;
+}
+.main-content .jobid-name { font-weight: 700; color: #3a3733; white-space: nowrap; }
+.main-content .jobid-field input {
+  width: 15rem;
+  max-width: 100%;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #b5afa6;
+  border-radius: 5px;
+  background: #fff;
+  font-family: "Source Code Pro", "SFMono-Regular", menlo, monospace;
+  font-size: 1rem;
+}
+.main-content .jobid-field input:focus { outline: 2px solid #8c1515; outline-offset: 1px; }
+.main-content .jobid-field + div.highlighter-rouge { margin-top: 0; }
+.main-content span.jobid-token.jobid-unset { background: #fdf1d8; border-radius: 2px; }
