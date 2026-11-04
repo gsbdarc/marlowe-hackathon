@@ -22,7 +22,7 @@ source env/marlowe.sh
 GPUS=1
 source slurm/train_27b_args.sh
 job_timer
-OUT=$WORK/runs/a2-1gpu
+OUT=$WORK/runs/${RUN:-a2-1gpu}
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
 cd "$KEV_HOME/kev"
