@@ -3,9 +3,9 @@
 # step. Sourced by lora_1gpu.slurm, lora_4gpu.slurm and lora_8gpu.slurm, which set GPUS first.
 # The settings match B3 Part 2 and B4's full fine-tunes (100 steps of 16 filings, lr 2e-5), so every method trains on
 # the same 1,600 filings, in the same order, 16 a step, and score_test.slurm compares them on the same test filings.
-# Kev's own trainer runs LoRA on one GPU only; the data-parallel version is the lora-ddp branch of Kev, checked out
-# next to it:
-#   git -C $KEV_HOME/kev worktree add $KEV_HOME/kev-lora-ddp lora-ddp
+# Kev's own trainer runs LoRA on one GPU only. The data-parallel version is scripts/beginner/kev-lora-ddp.patch,
+# applied to a second checkout of Kev next to yours ($KEV_HOME/kev-lora-ddp, made here the first time; it uses Kev's
+# own Python).
 # Settings, set before sbatch:
 #   LR=2e-5                learning rate
 #   RECORDS_PER_STEP=16    filings per optimizer step, in total across the GPUs; a multiple of GPUS
@@ -18,8 +18,12 @@ LR=${LR:-2e-5} RECORDS_PER_STEP=${RECORDS_PER_STEP:-16} STEPS=${STEPS:-100} WEIG
 KEV_DDP=${KEV_DDP:-$KEV_HOME/kev-lora-ddp}
 if [ $((RECORDS_PER_STEP % GPUS)) != 0 ]; then echo "RECORDS_PER_STEP must be a multiple of $GPUS" >&2; exit 1; fi
 if [ "$STEPS" -lt 20 ]; then echo "STEPS must be at least 20" >&2; exit 1; fi
-if ! grep -q "def sum_gradients" "$KEV_DDP/kev/full_ft.py" 2>/dev/null; then
-  echo "no data-parallel Kev in $KEV_DDP: git -C $KEV_HOME/kev worktree add $KEV_DDP lora-ddp" >&2; exit 1
+if [ ! -d "$KEV_DDP" ]; then           # first time: a second checkout of Kev, with the data-parallel patch
+  git -C "$KEV_HOME/kev" worktree add --detach "$KEV_DDP" HEAD
+  git -C "$KEV_DDP" apply "$PWD/scripts/beginner/kev-lora-ddp.patch"
+fi
+if ! grep -q "def sum_gradients" "$KEV_DDP/kev/full_ft.py"; then
+  echo "$KEV_DDP has no data-parallel LoRA: git -C $KEV_DDP apply $PWD/scripts/beginner/kev-lora-ddp.patch" >&2; exit 1
 fi
 RUN=$WORK/runs/lora-ddp/$SLURM_JOB_ID
 mkdir -p logs "$WORK/runs/lora-ddp"
