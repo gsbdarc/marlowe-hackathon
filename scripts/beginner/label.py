@@ -85,6 +85,9 @@ def main():
     todo = [r for r in recs if r["_meta"]["id"] not in done]
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
     print(f"{len(recs):,} filings, {len(done):,} already answered, {len(todo):,} to send at concurrency {a.concurrency}", flush=True)
+    if not todo:   # e.g. a job requeued after it had finished: keep the summary of the run that did the work
+        print("nothing to send: every filing is already answered", flush=True)
+        return
     run, peak = None, 0.0
     if a.wandb:
         import wandb
