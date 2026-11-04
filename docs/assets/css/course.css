@@ -925,3 +925,149 @@ tspan.personalize-token-unset {
 
 /* A table whose header should not be bold, for example when the header cells are code (the A2 BATCH and ACCUM table). */
 .main-content table.plain-head th { font-weight: 400; }
+
+/* ── Track map on the home page (_includes/track_map.html) ────────────────
+   One card per task, top to bottom, joined by arrows. Text is in the body ink;
+   colour is kept to accents: the card's left edge and a dot on the platform
+   chip carry the cluster (Yens cardinal, Marlowe teal, as on the terminal
+   tabs), and the kind chips are tinted by kind. Every chip is labelled in
+   text, so no meaning rests on colour alone. Links sit in a fixed two-column
+   grid, so four of them always make two rows. */
+.track-map { margin: 1rem 0 1.6rem; }
+.track-map .tm-card {
+  display: grid;
+  grid-template-columns: minmax(14rem, 18rem) 1fr;
+  gap: 0.6rem 1.4rem;
+  align-items: start;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e4e0da;
+  border-left: 4px solid var(--tm-plat);
+  border-radius: 8px;
+  background: #fcfcfb;
+}
+.track-map .tm-on-yens { --tm-plat: #8c1515; }
+.track-map .tm-on-marlowe { --tm-plat: #0f5e5a; }
+.main-content .track-map a.tm-title {
+  color: #1c1e21;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.main-content .track-map a.tm-title:hover { text-decoration: underline; }
+.track-map .tm-id {
+  display: inline-block;
+  margin-right: 0.3rem;
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  background: #3a3733;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.track-map .tm-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.track-map .tm-chip {
+  padding: 0.05rem 0.5rem;
+  border: 1px solid #cfc9c0;
+  border-radius: 999px;
+  background: #fff;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #3a3733;
+  white-space: nowrap;
+}
+.track-map .tm-platform::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.3rem;
+  border-radius: 50%;
+  background: var(--tm-plat);
+  vertical-align: 0.02rem;
+}
+.track-map .tm-kind { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.68rem; }
+.track-map .tm-k-inference    { border-color: #2a78d6; background: #eaf2fc; }
+.track-map .tm-k-fine-tuning  { border-color: #eb6834; background: #fdeee7; }
+.track-map .tm-k-lora         { border-color: #1baf7a; background: #e6f6ef; }
+.track-map .tm-k-distillation { border-color: #6250d6; background: #efedfb; }
+.track-map .tm-kind.bonus     { border-style: dashed; background: #fff; }
+.main-content .track-map p.tm-jump-label {
+  margin: 0 0 0.3rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a857d;
+}
+.main-content .track-map ul.tm-concepts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.main-content .track-map ul.tm-concepts > li { margin: 0; padding: 0; }
+.main-content .track-map ul.tm-concepts > li::before { content: none; display: none; }
+.main-content .track-map .tm-concepts a {
+  display: block;
+  height: 100%;
+  padding: 0.22rem 0.6rem;
+  border: 1px solid #e4e0da;
+  border-radius: 6px;
+  background: #fff;
+  color: #1c1e21;
+  font-size: 0.86rem;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.main-content .track-map .tm-concepts a:hover { border-color: #8a857d; background: #f7f5f2; text-decoration: underline; }
+.track-map .tm-arrow {
+  position: relative;
+  height: 1.6rem;
+  margin-left: 1.6rem;
+  border-left: 2px solid #b5afa6;
+}
+.track-map .tm-arrow::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: -6px;
+  border: 5px solid transparent;
+  border-top: 6px solid #b5afa6;
+  border-bottom: 0;
+}
+.track-map .tm-arrow span {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.6rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #6b665f;
+}
+@media (max-width: 760px) {
+  .track-map .tm-card { grid-template-columns: 1fr; }
+}
+
+/* The event's date under the site title in the sidebar header (_includes/title.html). The header grows to fit it;
+   the title keeps its own size and the date sits under it in the sans, smaller and grey. */
+.side-bar .site-title { flex-direction: column; align-items: flex-start; justify-content: center; }
+.side-bar .site-event {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+  white-space: normal;
+  color: #6b665f;
+}
+@media (min-width: 50rem) {
+  .side-bar .site-header { height: auto; max-height: none; min-height: 60px; }
+  .side-bar .site-title { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+}

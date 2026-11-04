@@ -12,8 +12,6 @@ tracks: each starts on the Yens and then fine-tunes an open-weight model across 
 H100 cluster. You leave with a working Marlowe job, Slurm templates for your own research, and the measurements a
 Marlowe project application asks for.
 
-**Friday, November 13, 2026 · 10:00 am to 5:00 pm · GSB, in person**
-
 ---
 
 ## The project: CEO turnover in SEC filings
@@ -43,6 +41,12 @@ up a 🟩 green sticky, or a 🟥 red one if you are stuck.
 | 3 | [Label filings on one Marlowe GPU]({{ '/beginner/b3/' | relative_url }}) (Marlowe, 1 H100) | [Label the test split on a node]({{ '/intermediate/i3/' | relative_url }}) (Marlowe, 1 node) | [Fine-tune on two nodes]({{ '/advanced/a3/' | relative_url }}) (Marlowe, 16 H100s) |
 | 4 | [Label on a full node]({{ '/beginner/b4/' | relative_url }}) (Marlowe, 1 node) | [Label the corpus on two nodes]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 2 nodes) | [Inference at scale with Qwen 235B]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
 | 5 | | | [Distill a student]({{ '/advanced/a5/' | relative_url }}) (Marlowe, 1 H100) |
+
+### The Advanced track at a glance
+
+Each card links to its page and to the main ideas the page teaches.
+
+{% include track_map.html track="advanced" %}
 
 ---
 
