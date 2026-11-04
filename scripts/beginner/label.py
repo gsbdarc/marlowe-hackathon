@@ -7,6 +7,10 @@ three questions. Labels in the input file are never sent.
 
     $PY scripts/beginner/label.py --url http://127.0.0.1:8009 --data $WORK/data/test1000.jsonl --out $WORK/results/kev-4b.jsonl
     $PY scripts/beginner/label.py --url ... --data $DATA/item502_v1.parquet --limit 10000 --out $WORK/results/all.jsonl
+    $PY scripts/beginner/label.py --url ... --data ... --shard 3 --shards 8 --out $WORK/results/b5/<jobid>/shard-3.jsonl
+
+With --shard I --shards N, it sends only every Nth filing, starting from the Ith (0 to N-1): N copies, one per GPU,
+label the filings between them with no overlap (slurm/marlowe/beginner/label.sh, B5).
 
 --data is a JSONL from make_kev_data.py, or Jev's parquet itself (every filing with text, in filing order).
 
@@ -45,7 +49,8 @@ def ask(url, model, rec, timeout):
 
 def gpu():
     """(name, GB in use, GB in all) of the job's GPU, from nvidia-smi."""
-    out = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.used,memory.total", "--format=csv,noheader,nounits", "-i", "0"],
+    index = os.environ.get("CUDA_VISIBLE_DEVICES", "0").split(",")[0]   # nvidia-smi ignores CUDA_VISIBLE_DEVICES: ask for it
+    out = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.used,memory.total", "--format=csv,noheader,nounits", "-i", index],
                          capture_output=True, text=True, check=True).stdout
     name, used, total = (x.strip() for x in out.split(","))
     return name, int(used) / 1024, int(total) / 1024
@@ -60,6 +65,8 @@ def main():
     ap.add_argument("--concurrency", type=int, default=16)
     ap.add_argument("--timeout", type=float, default=300)
     ap.add_argument("--limit", type=int, default=0, help="label only the first N filings")
+    ap.add_argument("--shard", type=int, default=0, help="which share of the filings to send, 0 to --shards - 1")
+    ap.add_argument("--shards", type=int, default=1, help="split the filings into this many shares, one per GPU")
     ap.add_argument("--wandb", metavar="NAME", help="also log the run to Weights & Biases under this name")
     a = ap.parse_args()
     if a.data.endswith(".parquet"):
@@ -71,6 +78,7 @@ def main():
         recs = [json.loads(line) for line in open(a.data)]
     if a.limit:
         recs = recs[:a.limit]
+    recs = recs[a.shard::a.shards]
     done = set()
     if os.path.exists(a.out):
         done = {json.loads(line)["id"] for line in open(a.out) if json.loads(line).get("ok")}
@@ -110,7 +118,7 @@ def main():
                "filings_per_second": round(len(ok) / wall, 2) if wall else None,
                "latency_p50": round(statistics.median(ok), 3) if ok else None,
                "latency_p95": round(sorted(ok)[int(0.95 * (len(ok) - 1))], 3) if ok else None,
-               "concurrency": a.concurrency}
+               "concurrency": a.concurrency, "shard": a.shard, "shards": a.shards}
     if run:
         b = requests.get(f"{a.url}/v1/models", timeout=30).json()["models"][0]["batches"]
         summary.update(gpu_memory_peak_gb=round(peak, 1), mean_batch=round(b["requests"] / b["count"], 1) if b["count"] else None)
