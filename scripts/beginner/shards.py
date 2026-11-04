@@ -44,7 +44,10 @@ def main():
         shards, job, ids = load(p)
         n = sum(s["succeeded"] for s in shards)
         failed = sum(s["filings"] - s["succeeded"] for s in shards)
-        wall = max(s["wall_seconds"] for s in shards)          # the job waits for its slowest shard
+        wall = max((s["wall_seconds"] for s in shards), default=0)   # the job waits for its slowest shard
+        if not wall:
+            print(f"{os.path.basename(p.rstrip('/')):<10}no labeling time in its summaries (still running, or nothing was sent)")
+            continue
         rate = n / wall
         hours = corpus / rate / 3600                             # every filing, at this rate
         gpu_hours = hours * job["gpus"]

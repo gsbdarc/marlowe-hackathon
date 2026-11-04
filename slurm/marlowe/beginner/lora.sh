@@ -27,6 +27,13 @@ if ! grep -q "def sum_gradients" "$KEV_DDP/kev/full_ft.py"; then
 fi
 RUN=$WORK/runs/lora-ddp/$SLURM_JOB_ID
 mkdir -p logs "$WORK/runs/lora-ddp"
+# The preempt partition can stop a job and requeue it under the same ID. LoRA keeps no resume point, so an unfinished
+# run starts again from step 0; a finished one (head.pt written) is not trained twice.
+if [ -f "$RUN/head.pt" ]; then
+  echo "$RUN is already trained"; $PY scripts/step_times.py "$RUN" --per-step "$RECORDS_PER_STEP"; exit 0
+elif [ -d "$RUN" ]; then
+  echo "an unfinished run in $RUN (the job was stopped and requeued): training again from step 0"; rm -rf "$RUN"
+fi
 nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > "logs/gpu-$SLURM_JOB_ID.csv" &
 GPUMON=$!; trap 'kill $GPUMON 2>/dev/null || true' EXIT
 
