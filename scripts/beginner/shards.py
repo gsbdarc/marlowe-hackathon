@@ -55,8 +55,9 @@ def main():
         print(f"{os.path.basename(p.rstrip('/')):<10}{job['gpus']:>5}{n:>9,}{failed:>7}{rate:>10.1f}{job['load_seconds']:>7}"
               f"{hours:>10.2f}{gpu_hours:>10.2f}{gpu_hours * a.gpu_hour:>8.2f}{jev:>7.2f}")
         mine = sum(tokens.get(i, 0) for i in ids)
-        print(f"{'':<10}these {n:,} filings: {mine / 1e6:.1f}M tokens, ${mine / 1e9 * JEV_PER_BILLION:.2f} from Jev;"
-              f" {wall / 60:.1f} min on {job['gpus']} GPU(s), ${wall / 3600 * job['gpus'] * a.gpu_hour:.2f} at ${a.gpu_hour:.2f}/GPU-hour")
+        print(f"{'':<10}{len(ids):,} answers saved: {mine / 1e6:.1f}M tokens, ${mine / 1e9 * JEV_PER_BILLION:.2f} from Jev;"
+              f" the last run labeled {n:,} in {wall / 60:.1f} min on {job['gpus']} GPU(s),"
+              f" ${wall / 3600 * job['gpus'] * a.gpu_hour:.2f} at ${a.gpu_hour:.2f}/GPU-hour")
     print(f"\nall hours, GPU-hours, GPUs $: labeling all {corpus:,} filings at the job's rate ({corpus_tokens / 1e6:.0f}M tokens);"
           f" Jev $: the same filings from Jev at ${JEV_PER_BILLION:.0f} per billion input tokens")
 
