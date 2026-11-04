@@ -5,11 +5,7 @@ each filing in train.jsonl (same id) and replaces Jev's labels with the teacher'
 gives no probabilities, so every target puts all its weight on the teacher's choice (a hard label). As with Jev's
 labels, a filing the teacher calls "not a CEO change" keeps only the status question.
 
-It also writes the same filings with Jev's labels, so you can train a second student on the same filings and see
-whether the teacher made the difference.
-
     $PY scripts/make_teacher_data.py $WORK/results/a4-c64.jsonl --out $WORK/data/teacher-qwen-235b.jsonl
-    # writes $WORK/data/teacher-qwen-235b.jsonl and $WORK/data/teacher-jev.jsonl
 """
 import argparse
 import json
@@ -44,12 +40,10 @@ def main():
     ap.add_argument("answers", help="label.py --out file with the teacher's answers on training filings")
     ap.add_argument("--data", default=os.path.join(os.environ.get("WORK", "."), "data", "train.jsonl"))
     ap.add_argument("--out", help="default: $WORK/data/teacher-<name of the answers file>.jsonl")
-    ap.add_argument("--jev-out", help="default: $WORK/data/teacher-jev.jsonl")
     a = ap.parse_args()
     data_dir = os.path.dirname(os.path.abspath(a.data))
     name = os.path.splitext(os.path.basename(a.answers))[0]
     out = a.out or os.path.join(data_dir, f"teacher-{name}.jsonl")
-    jev_out = a.jev_out or os.path.join(data_dir, "teacher-jev.jsonl")
 
     answers = {}
     for line in open(a.answers):
@@ -58,7 +52,7 @@ def main():
             answers[r["id"]] = r["answers"]
 
     n = changes = 0
-    with open(out, "w") as fo, open(jev_out, "w") as fj:
+    with open(out, "w") as fo:
         for line in open(a.data):
             rec = json.loads(line)
             ans = answers.get(rec["_meta"]["id"])
@@ -66,13 +60,11 @@ def main():
                 continue
             t = teacher_record(rec, ans)
             fo.write(json.dumps(t) + "\n")
-            fj.write(line if line.endswith("\n") else line + "\n")
             n += 1
             changes += t["questions"]["status"]["label"] != NOT_A_CHANGE
     print(f"{len(answers):,} teacher answers; {n:,} filings matched in {a.data}")
     print(f"the teacher calls {changes:,} of them CEO changes")
     print(f"wrote {out}")
-    print(f"wrote {jev_out} (the same filings with Jev's labels)")
 
 
 if __name__ == "__main__":

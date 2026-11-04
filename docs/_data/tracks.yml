@@ -69,7 +69,7 @@ advanced:
     gpus: 1 H100
     kinds: [Distillation, LoRA]
     concepts:
-      - {name: "What distillation is", anchor: ""}
+      - {name: "What distillation is", anchor: fine-tuning-and-distillation}
       - {name: "Labels from a large model", anchor: step-2-make-the-training-data}
-      - {name: "Training the small model", anchor: step-3-train-the-students}
-      - {name: "Scoring the small model", anchor: step-4-score-the-students}
+      - {name: "Training the small model", anchor: step-3-train-the-student}
+      - {name: "Scoring the small model", anchor: step-4-score-the-student}
