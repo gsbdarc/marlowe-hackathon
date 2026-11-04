@@ -530,6 +530,9 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.jupyter-terminal,
 .main-content div.highlighter-rouge.python-repl,
 .main-content div.highlighter-rouge.file,
+.main-content div.highlighter-rouge.python-file,
+.main-content div.highlighter-rouge.record,
+.main-content div.highlighter-rouge.prompt,
 .main-content div.highlighter-rouge.output {
   border: 0;
   border-radius: 0;
@@ -542,6 +545,9 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.jupyter-terminal::before,
 .main-content div.highlighter-rouge.python-repl::before,
 .main-content div.highlighter-rouge.file::before,
+.main-content div.highlighter-rouge.python-file::before,
+.main-content div.highlighter-rouge.record::before,
+.main-content div.highlighter-rouge.prompt::before,
 .main-content div.highlighter-rouge.output::before {
   display: inline-block;
   position: relative;
@@ -566,6 +572,9 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.jupyter-terminal > div.highlight,
 .main-content div.highlighter-rouge.python-repl > div.highlight,
 .main-content div.highlighter-rouge.file > div.highlight,
+.main-content div.highlighter-rouge.python-file > div.highlight,
+.main-content div.highlighter-rouge.record > div.highlight,
+.main-content div.highlighter-rouge.prompt > div.highlight,
 .main-content div.highlighter-rouge.output > div.highlight {
   border-top-left-radius: 0;     /* the tab sits on this corner */
   border-left-width: 3px;
@@ -651,6 +660,37 @@ tspan.personalize-token-unset {
   color: #6a7280;
   border-left-color: #6a7280;
 }
+/* A record from a data file, such as one line of a .jsonl file, shown whole. Grey like output: it is to read. */
+.main-content div.highlighter-rouge.record::before {
+  content: "{ }  Training record";
+  color: #6a7280;
+  border-left-color: #6a7280;
+}
+/* A record has very long lines (the filing is one JSON string): wrap them, so the box scrolls one way only. */
+.main-content div.highlighter-rouge.record pre.highlight,
+.main-content div.highlighter-rouge.record pre.highlight code { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* A whole prompt or record is long: keep it to a box the reader scrolls inside. */
+.main-content div.highlighter-rouge.record pre.highlight,
+.main-content div.highlighter-rouge.prompt pre.highlight {
+  max-height: 22rem;
+  overflow-y: auto;
+}
+/* An excerpt from a Python script in the repo, to read rather than type. */
+.main-content div.highlighter-rouge.python-file::before {
+  content: "\01F40D  Python Script";
+  color: #1f5f8b;
+  border-left-color: #1f5f8b;
+}
+.main-content div.highlighter-rouge.python-file > div.highlight {
+  border-left-color: #1f5f8b;
+}
+/* Text sent to a model, such as the prompt label.py builds. Grey like output:
+   it is something to read, not to type. */
+.main-content div.highlighter-rouge.prompt::before {
+  content: "\2192  Prompt";
+  color: #6a7280;
+  border-left-color: #6a7280;
+}
 /* The tab butts against the box's top-left corner, so that corner has to be
    square. It is squared on `div.highlight` above, which does work — measured:
    that element carries both the 3px coloured rail and a 0px radius on every
@@ -672,6 +712,9 @@ tspan.personalize-token-unset {
 .main-content div.highlighter-rouge.jupyter-terminal > div.highlight > pre.highlight,
 .main-content div.highlighter-rouge.python-repl > div.highlight > pre.highlight,
 .main-content div.highlighter-rouge.file > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.python-file > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.record > div.highlight > pre.highlight,
+.main-content div.highlighter-rouge.prompt > div.highlight > pre.highlight,
 .main-content div.highlighter-rouge.output > div.highlight > pre.highlight {
   border-top-left-radius: 0;
 }
@@ -848,3 +891,222 @@ tspan.personalize-token-unset {
 }
 .filing-scroll p { margin: 0 0 0.6rem; }
 .filing-scroll p:first-child { font-weight: 600; margin-bottom: 0; }
+
+/* A3: full fine-tune vs LoRA diagram. Trained weights in the dataviz default blue (slot 1), frozen ones in a warm
+   neutral; every label is in ink, so the figure does not rely on colour alone. */
+.lora-fig { margin: 1rem 0 1.4rem; border: 1px solid #e4e0da; border-radius: 8px; background: #fcfcfb; padding: 0.6rem; }
+.lora-fig svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0 auto; }
+.lora-fig .trained { fill: #2a78d6; }
+.lora-fig .frozen { fill: #e4e0da; stroke: #b5afa6; stroke-width: 1; }
+.lora-fig .divider { stroke: #e4e0da; stroke-width: 1; }
+.lora-fig text { font-family: "Source Sans 3", system-ui, sans-serif; fill: #3a3733; }
+.lora-fig .t-head { font-size: 16px; font-weight: 700; }
+.lora-fig .t-mat { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 26px; font-weight: 600; text-anchor: middle; }
+.lora-fig .trained + .t-mat { fill: #ffffff; }
+.lora-fig .t-mat-s { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 16px; font-weight: 600; text-anchor: middle; }
+.lora-fig .t-r { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 13px; font-style: italic; text-anchor: middle; fill: #3a3733; font-weight: 600; }
+.lora-fig .t-op { font-size: 24px; text-anchor: middle; fill: #605c56; }
+.lora-fig .t-note { font-size: 13px; text-anchor: middle; fill: #55524d; }
+.lora-fig .t-sub { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 12px; text-anchor: middle; fill: #605c56; }
+
+/* Pseudocode blocks (A1-A4): only the structure is coloured. Loop words in the theme's red, the names being set in
+   blue, comments muted; the plain-English steps stay in ink. */
+.main-content pre.pseudo {
+  background: #f7f5f2; border: 1px solid #e4e0da; border-radius: 6px; padding: 0.8rem 1rem; margin: 0.8rem 0 1.2rem;
+  font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.8rem; line-height: 1.7; color: #2b2926;
+  white-space: pre; overflow-x: auto;
+}
+.main-content pre.pseudo .pk { color: #a3312c; font-weight: 600; }
+.main-content pre.pseudo .pv { color: #1f5fa8; font-weight: 600; }
+.main-content pre.pseudo .pc { color: #8a857d; font-style: italic; }
+
+/* A2: one training step. Forward boxes in the dataviz default blue (slot 1), backward in orange (slot 2), the loss in
+   both; labels stay in ink, and each lane is also named in words. */
+.train-fig { margin: 1rem 0 1.2rem; border: 1px solid #e4e0da; border-radius: 8px; background: #fcfcfb; padding: 0.6rem; }
+.train-fig svg { display: block; width: 100%; height: auto; max-width: 780px; margin: 0 auto; }
+.train-fig .tf-fwd  { fill: #eaf2fc; stroke: #2a78d6; stroke-width: 1.5; }
+.train-fig .tf-bwd  { fill: #fdeee7; stroke: #eb6834; stroke-width: 1.5; }
+.train-fig .tf-loss { fill: #f4efe8; stroke: #6b665f; stroke-width: 1.5; }
+.train-fig .tf-label { fill: #ffffff; stroke: #b5afa6; stroke-width: 1; stroke-dasharray: 4 3; }
+.train-fig .tf-line { stroke: #6b665f; stroke-width: 1.5; fill: none; }
+.train-fig .tf-loop { stroke-dasharray: 5 4; }
+.train-fig .tf-head { fill: #6b665f; }
+.train-fig text { font-family: "Source Sans 3", system-ui, sans-serif; fill: #3a3733; text-anchor: middle; }
+.train-fig .tf-b { font-size: 15px; font-weight: 700; }
+.train-fig .tf-t { font-size: 12.5px; fill: #55524d; }
+.train-fig .tf-s { font-size: 12px; fill: #605c56; font-style: italic; }
+.train-fig .tf-lane { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-anchor: start; fill: #8a857d; }
+
+/* A table whose header should not be bold, for example when the header cells are code (the A2 BATCH and ACCUM table). */
+.main-content table.plain-head th { font-weight: 400; }
+
+/* ── Track map on the home page (_includes/track_map.html) ────────────────
+   One card per task, top to bottom, joined by arrows. Text is in the body ink;
+   colour is kept to accents: the card's left edge and a dot on the platform
+   chip carry the cluster (Yens cardinal, Marlowe teal, as on the terminal
+   tabs), and the kind chips are tinted by kind. Every chip is labelled in
+   text, so no meaning rests on colour alone. Links sit in a fixed two-column
+   grid, so four of them always make two rows. */
+.track-map { margin: 1rem 0 1.6rem; }
+.track-map .tm-card {
+  display: grid;
+  grid-template-columns: minmax(14rem, 18rem) 1fr;
+  gap: 0.6rem 1.4rem;
+  align-items: start;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e4e0da;
+  border-left: 4px solid var(--tm-plat);
+  border-radius: 8px;
+  background: #fcfcfb;
+}
+.track-map .tm-on-yens { --tm-plat: #8c1515; }
+.track-map .tm-on-marlowe { --tm-plat: #0f5e5a; }
+.main-content .track-map a.tm-title {
+  color: #1c1e21;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.main-content .track-map a.tm-title:hover { text-decoration: underline; }
+.track-map .tm-id {
+  display: inline-block;
+  margin-right: 0.3rem;
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  background: #3a3733;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.track-map .tm-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.track-map .tm-chip {
+  padding: 0.05rem 0.5rem;
+  border: 1px solid #cfc9c0;
+  border-radius: 999px;
+  background: #fff;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #3a3733;
+  white-space: nowrap;
+}
+.track-map .tm-platform::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.3rem;
+  border-radius: 50%;
+  background: var(--tm-plat);
+  vertical-align: 0.02rem;
+}
+.track-map .tm-kind { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.68rem; }
+.track-map .tm-k-inference    { border-color: #2a78d6; background: #eaf2fc; }
+.track-map .tm-k-fine-tuning  { border-color: #eb6834; background: #fdeee7; }
+.track-map .tm-k-lora         { border-color: #1baf7a; background: #e6f6ef; }
+.track-map .tm-k-distillation { border-color: #6250d6; background: #efedfb; }
+.track-map .tm-kind.bonus     { border-style: dashed; background: #fff; }
+.main-content .track-map p.tm-jump-label {
+  margin: 0 0 0.3rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a857d;
+}
+.main-content .track-map ul.tm-concepts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.main-content .track-map ul.tm-concepts > li { margin: 0; padding: 0; }
+.main-content .track-map ul.tm-concepts > li::before { content: none; display: none; }
+.main-content .track-map .tm-concepts a {
+  display: block;
+  height: 100%;
+  padding: 0.22rem 0.6rem;
+  border: 1px solid #e4e0da;
+  border-radius: 6px;
+  background: #fff;
+  color: #1c1e21;
+  font-size: 0.86rem;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.main-content .track-map .tm-concepts a:hover { border-color: #8a857d; background: #f7f5f2; text-decoration: underline; }
+.track-map .tm-arrow {
+  position: relative;
+  height: 1.6rem;
+  margin-left: 1.6rem;
+  border-left: 2px solid #b5afa6;
+}
+.track-map .tm-arrow::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: -6px;
+  border: 5px solid transparent;
+  border-top: 6px solid #b5afa6;
+  border-bottom: 0;
+}
+.track-map .tm-arrow span {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.6rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #6b665f;
+}
+@media (max-width: 760px) {
+  .track-map .tm-card { grid-template-columns: 1fr; }
+}
+
+/* The event's date under the site title in the sidebar header (_includes/title.html). The header grows to fit it;
+   the title keeps its own size and the date sits under it in the sans, smaller and grey. */
+.side-bar .site-title { flex-direction: column; align-items: flex-start; justify-content: center; }
+.side-bar .site-event {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+  white-space: normal;
+  color: #6b665f;
+}
+@media (min-width: 50rem) {
+  .side-bar .site-header { height: auto; max-height: none; min-height: 60px; }
+  .side-bar .site-title { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+}
+
+/* Job ID fields (assets/js/jobid.js): one above each code block that has <jobid> in it. Small and quiet, like the
+   block's own tab, so the command stays the thing to read. An unfilled <jobid> in the block is marked. */
+.main-content .jobid-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0.5rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 1rem;
+}
+.main-content .jobid-name { font-weight: 700; color: #3a3733; white-space: nowrap; }
+.main-content .jobid-field input {
+  width: 15rem;
+  max-width: 100%;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #b5afa6;
+  border-radius: 5px;
+  background: #fff;
+  font-family: "Source Code Pro", "SFMono-Regular", menlo, monospace;
+  font-size: 1rem;
+}
+.main-content .jobid-field input:focus { outline: 2px solid #8c1515; outline-offset: 1px; }
+.main-content .jobid-field + div.highlighter-rouge { margin-top: 0; }
+.main-content span.jobid-token.jobid-unset { background: #fdf1d8; border-radius: 2px; }

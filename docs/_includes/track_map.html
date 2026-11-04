@@ -1,0 +1,24 @@
+{%- comment -%}
+  A track at a glance: one card per task with its platform, nodes and GPUs, model, what kind of work it is, and links
+  to the main ideas it teaches. Data: _data/tracks.yml. Use: {% include track_map.html track="advanced" %}
+{%- endcomment -%}
+{%- assign tasks = site.data.tracks[include.track] -%}
+<div class="track-map">
+{%- for t in tasks -%}
+{%- assign page_url = t.url | relative_url -%}
+<div class="tm-card tm-on-{{ t.platform | downcase }}">
+<div class="tm-head">
+<a class="tm-title" href="{{ page_url }}"><span class="tm-id">{{ t.id }}</span> {{ t.title }}</a>
+<div class="tm-tags"><span class="tm-chip tm-platform">{{ t.platform }}</span><span class="tm-chip">{{ t.nodes }} · {{ t.gpus }}</span><span class="tm-chip tm-model">{{ t.model }}</span></div>
+<div class="tm-tags">{% for k in t.kinds %}<span class="tm-chip tm-kind tm-k-{{ k | downcase }}">{{ k }}</span>{% endfor %}</div>
+</div>
+<div class="tm-jump">
+<p class="tm-jump-label">Jump to</p>
+<ul class="tm-concepts">{% for c in t.concepts %}<li><a href="{{ page_url }}{% if c.anchor != '' %}#{{ c.anchor }}{% endif %}">{{ c.name }}</a></li>{% endfor %}</ul>
+</div>
+</div>
+{%- unless forloop.last -%}
+<div class="tm-arrow" aria-hidden="true">{% if t.then %}<span>{{ t.then }}</span>{% endif %}</div>
+{%- endunless -%}
+{%- endfor -%}
+</div>
