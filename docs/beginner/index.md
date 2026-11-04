@@ -8,11 +8,15 @@ permalink: /beginner/
 
 # Beginner track
 
-First GPU jobs. Most of the work is on the Yens; Marlowe comes at the end, with one GPU and then a full node.
+For researchers who have not trained a model or used a GPU cluster before. You score Kev-4B against Jev and fine-tune
+Qwen 4B on one GPU on the Yens, then run the same fine-tune on Marlowe, first on one H100 and then on all eight GPUs of a
+node, and finally label filings with your model on all eight GPUs at once. Nothing here needs code of your own: every
+step is a script in this repository.
 
 | Task | Where | What you do |
 |---|---|---|
-| [B1. Score before training]({{ '/beginner/b1/' | relative_url }}) | Yens, 1 GPU | Score Kev-4B before training on 1,000 test filings. |
-| [B2. Fine-tune on one GPU]({{ '/beginner/b2/' | relative_url }}) | Yens, 1 GPU | Fine-tune Kev-4B for 100 steps, then score it again. |
-| [B3. Label filings on one Marlowe GPU]({{ '/beginner/b3/' | relative_url }}) | Marlowe, 1 H100 | Label a slice of filings with the fine-tuned Kev-4B. |
-| [B4. Label on a full node]({{ '/beginner/b4/' | relative_url }}) | Marlowe, 1 node (8 H100s) | Run the same labeling job on 8 GPUs, one slice each. |
+| [B1. Score before training]({{ '/beginner/b1/' | relative_url }}) | Yens, 1 GPU | Score Kev-4B as released on 1,000 test filings. |
+| [B2. Fine-tune on one GPU]({{ '/beginner/b2/' | relative_url }}) | Yens, 1 GPU | Fine-tune for 10 minutes on Jev's labels, getting as far as you can, then score it against Kev-4B. |
+| [B3. Fine-tune on one Marlowe GPU]({{ '/beginner/b3/' | relative_url }}) | Marlowe, 1 H100 | Run the same fine-tune and compare its speed with the Yens GPU. |
+| [B4. Fine-tune on a full node]({{ '/beginner/b4/' | relative_url }}) | Marlowe, 8 H100s | Run the same fine-tune on 8 GPUs and compare seconds per step. |
+| [B5. Inference at scale]({{ '/beginner/b5/' | relative_url }}) | Marlowe, 8 H100s | Label filings with your model, one shard per GPU, and tune GPU utilization. |
