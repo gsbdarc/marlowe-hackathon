@@ -7,15 +7,15 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=00:30:00
+#SBATCH --time=00:20:00
 #SBATCH --output=logs/%x-%j.out
 # Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=<sunet>@stanford.edu
 
-# Beginner B3: the B2 fine-tune on one H100, to compare its speed with the Yens. It trains on the same 512 filings as
-# a B2 run on an A40, with the settings you give it, then prints the time per step. It does not score the model. Use
-# the settings of your B2 job:
+# Beginner B3: the B2 fine-tune on one H100, to compare its speed with the Yens. Like B2, it trains for about 10
+# minutes, with the settings you give it, then prints the time per step. It does not score the model. Use the settings
+# of your B2 job:
 #   sbatch slurm/marlowe/beginner/finetune_kev.slurm             # B2's defaults
 #   LR=2e-4 sbatch slurm/marlowe/beginner/finetune_kev.slurm     # or whatever your B2 job set
 # The run is $WORK/runs/b3/<jobid>.
@@ -24,7 +24,6 @@ module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FA
 source env/marlowe.sh
 INIT=${INIT:-kev} RANK=${RANK:-16} RECORDS_PER_STEP=${RECORDS_PER_STEP:-8} WEIGHTS=${WEIGHTS:-fp32}
 LR=${LR:-$([ "$INIT" = scratch ] && echo 2e-4 || echo 2e-5)}
-FILINGS=${FILINGS:-512}                # a B2 run's filings on an A40, so the two runs do the same work
 if [ "$INIT" = kev ] && [ "$RANK" != 16 ]; then echo "Kev-4B's adapter has rank 16; other ranks need INIT=scratch" >&2; exit 1; fi
 RUN=$WORK/runs/b3/$SLURM_JOB_ID
 mkdir -p logs "$WORK/runs/b3"
@@ -37,6 +36,10 @@ export WANDB_PROJECT=${WANDB_PROJECT:-exercise-3-marlowe} WANDB_ENTITY=${WANDB_E
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 if [ -r .env ]; then set -a; source ./.env; set +a; fi
 GPU=$(nvidia-smi --query-gpu=name --format=csv,noheader -i 0 | awk '{print tolower($2)}')
+# Filings to train on: about 10 minutes, as in B2 (1.08 s each on an A40, 0.31 s on an H200, 0.49 s on an H100). On
+# your first Marlowe run; later runs reuse the GPU kernels it compiled ($XDG_CACHE_HOME/triton) and train for about
+# 7.5 minutes.
+FILINGS=${FILINGS:-1216}
 NAME=$USER-$GPU-$([ "$INIT" = scratch ] && echo "scratch-r$RANK" || echo kev)-lr$LR-rps$RECORDS_PER_STEP-$WEIGHTS
 
 ARGS=(--data "$WORK/data/train.jsonl" --base Qwen/Qwen3.5-4B-Base --base_revision 1001bb4d826a52d1f399e183466143f4da7b741b
