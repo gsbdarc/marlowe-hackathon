@@ -26,7 +26,7 @@ cd "$KEV_HOME/kev" && git checkout -q "$KEV_COMMIT"
 "$UV" pip install --python .venv/bin/python -q --no-deps \
   "https://github.com/Dao-AILab/causal-conv1d/releases/download/v1.7.0/causal_conv1d-1.7.0%2Bcu12torch2.8cxx11abiTRUE-cp313-cp313-linux_x86_64.whl"
 # Models. DARC downloads them into the shared cache before the day. HF_HUB_OFFLINE=1 makes these lines only check
-# they are there: setup never downloads a model. The Beginner track needs only the 4B models, so a missing one fails
+# they are there: setup never downloads a model. The Intermediate track needs only the 4B models, so a missing one fails
 # setup; Kev-27B is for the Advanced track, so a missing Kev-27B only prints a note.
 have() { HF_HUB_OFFLINE=1 .venv/bin/hf download "${1%@*}" --revision "${1#*@}" "${@:2}" > /dev/null 2>&1; }
 CACHE=${HF_HUB_CACHE:-$HF_HOME/hub}
@@ -41,6 +41,6 @@ if have "$m" && have "$t" --exclude "*.safetensors"; then
   echo "model ok: $m"
   echo "tokenizer ok: $t"
 else
-  echo "Kev-27B not in $CACHE: fine for the Beginner track; the Advanced track (A1 on) needs it"
+  echo "Kev-27B not in $CACHE: fine for the Intermediate track; the Advanced track (A1 on) needs it"
 fi
 echo "Kev ready: $KEV_HOME/kev at $(git rev-parse --short HEAD), $(.venv/bin/python --version)"

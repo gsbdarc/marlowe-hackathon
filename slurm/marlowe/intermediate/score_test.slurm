@@ -13,10 +13,10 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=<sunet>@stanford.edu
 
-# Score several runs on the same 1,000 test filings (B1's test1000), one after another on one H100, and print them in
+# Score several runs on the same 1,000 test filings (I1's test1000), one after another on one H100, and print them in
 # one table: the way to compare training methods (LoRA on 1, 4 or 8 GPUs, full fine-tune on 1 or 8) on equal terms.
-#   RUNS="kev-4b=jaredpalmer/kev-4b@v1.0 lora-1gpu=$WORK/runs/lora-ddp/<jobid> full-8gpu=$WORK/runs/b4/<jobid>" \
-#     sbatch slurm/marlowe/beginner/score_test.slurm
+#   RUNS="kev-4b=jaredpalmer/kev-4b@v1.0 lora-1gpu=$WORK/runs/lora-ddp/<jobid> full-8gpu=$WORK/runs/i4/<jobid>" \
+#     sbatch slurm/marlowe/intermediate/score_test.slurm
 # Each entry is <name>=<run>: a released run, or a run folder with head.pt. EVAL=valid scores the 2,000 validation
 # filings instead (EVAL="valid test" both). A run already labeled on a sample is not labeled again: delete
 # $WORK/results/compare/<name>-<sample>.jsonl to redo it.
@@ -36,7 +36,7 @@ done
 if [ ! -f "$WORK/data/test1000.parquet" ] || [ ! -f "$WORK/data/valid.parquet" ]; then
   echo "building the validation and test samples in $WORK/data"
   TMP=$WORK/data/.build-$SLURM_JOB_ID
-  $PY scripts/beginner/make_kev_data.py --out "$TMP"
+  $PY scripts/intermediate/make_kev_data.py --out "$TMP"
   mv "$TMP"/valid.jsonl "$TMP"/valid.parquet "$TMP"/test1000.jsonl "$TMP"/test1000.parquet "$WORK/data/"
   rm -rf "$TMP"
 fi
@@ -63,7 +63,7 @@ for R in $RUNS; do
   for E in $EVAL; do
     case $E in valid) DATA=$WORK/data/valid.jsonl ;; test) DATA=$WORK/data/test1000.jsonl ;; esac
     [ -f "$OUT/$NAME-$E.jsonl" ] && continue
-    $PY scripts/beginner/label.py --url "http://127.0.0.1:$PORT" --data "$DATA" --out "$OUT/$NAME-$E.part.jsonl" --concurrency 16
+    $PY scripts/intermediate/label.py --url "http://127.0.0.1:$PORT" --data "$DATA" --out "$OUT/$NAME-$E.part.jsonl" --concurrency 16
     for f in "$OUT/$NAME-$E.part"*; do mv "$f" "${f/.part/}"; done   # the answers and their _summary.json, once complete
   done
   kill $SERVER; wait $SERVER 2>/dev/null || true; SERVER=
@@ -74,5 +74,5 @@ for E in $EVAL; do
   FILES=()
   for R in $RUNS; do FILES+=("$OUT/${R%%=*}-$E.jsonl"); done
   echo; echo "=== $E: $(basename "$SAMPLE") ==="
-  $PY scripts/beginner/score.py "${FILES[@]}" --sample "$SAMPLE"
+  $PY scripts/intermediate/score.py "${FILES[@]}" --sample "$SAMPLE"
 done

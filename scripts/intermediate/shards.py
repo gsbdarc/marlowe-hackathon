@@ -1,8 +1,8 @@
-"""Add up a B5 labeling job: the shards one per GPU, how fast they went together, and what labeling every filing would
+"""Add up a I5 labeling job: the shards one per GPU, how fast they went together, and what labeling every filing would
 take and cost, against Jev.
 
-    $PY scripts/beginner/shards.py $WORK/results/b5/<jobid>
-    $PY scripts/beginner/shards.py $WORK/results/b5/<1-GPU jobid> $WORK/results/b5/<8-GPU jobid>     # side by side
+    $PY scripts/intermediate/shards.py $WORK/results/i5/<jobid>
+    $PY scripts/intermediate/shards.py $WORK/results/i5/<1-GPU jobid> $WORK/results/i5/<8-GPU jobid>     # side by side
 
 Reads <dir>/shard-*_summary.json (label.py) and <dir>/job-*.json (label.sh: GPUs and load time, one per node of a
 job array). Run it again once every task of an array is done: each task prints only what had finished when it did.
@@ -13,7 +13,7 @@ import glob
 import json
 import os
 
-JEV_PER_BILLION = 42.0        # dollars per billion input tokens (B1)
+JEV_PER_BILLION = 42.0        # dollars per billion input tokens (I1)
 
 
 def load(d):

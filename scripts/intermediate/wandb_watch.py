@@ -1,6 +1,6 @@
 """Send a training job's progress to Weights & Biases while it runs.
 
-The beginner track's copy of scripts/wandb_watch.py, with --run-dir added; the other tracks use
+The intermediate track's copy of scripts/wandb_watch.py, with --run-dir added; the other tracks use
 scripts/wandb_watch.py.
 
 kev.train prints a line every 10 optimizer steps:
@@ -8,10 +8,10 @@ kev.train prints a line every 10 optimizer steps:
     ep0 step 40/100 loss 0.412 kl 0.087 anchor 0.000 0.311s/rec
 
 This script follows the job's log, sends the loss and the speed to W&B, and stops when training saves or stops. Run on the
-GPU node, W&B also records the node's GPU utilization and memory on its System tab. slurm/yens/beginner/finetune_kev.slurm
+GPU node, W&B also records the node's GPU utilization and memory on its System tab. slurm/yens/intermediate/finetune_kev.slurm
 starts it when .env holds the room's W&B key:
 
-    sbatch slurm/yens/beginner/finetune_kev.slurm
+    sbatch slurm/yens/intermediate/finetune_kev.slurm
 
 It needs `wandb login` once (your API key goes to ~/.netrc, never into this repo). Where compute nodes cannot reach
 the internet, set WANDB_MODE=offline and run `wandb sync` on the run directory afterward from a login node.

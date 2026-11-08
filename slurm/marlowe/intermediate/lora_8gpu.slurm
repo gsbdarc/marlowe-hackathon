@@ -15,7 +15,7 @@
 
 # LoRA fine-tune of Kev-4B on all 8 H100s of one node, data parallel: each GPU a whole copy of the model, trained on 2
 # of each step's 16 filings, the adapter gradients summed every step. Same settings as lora_1gpu.slurm; see lora.sh.
-#   sbatch slurm/marlowe/beginner/lora_8gpu.slurm
+#   sbatch slurm/marlowe/intermediate/lora_8gpu.slurm
 # The run is $WORK/runs/lora-ddp/<jobid>; score it with score_test.slurm.
 GPUS=8
-source slurm/marlowe/beginner/lora.sh
+source slurm/marlowe/intermediate/lora.sh

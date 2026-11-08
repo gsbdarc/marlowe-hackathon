@@ -8,8 +8,8 @@
 
 # Build the training, validation and test files from your copy of Jev's labels, with valid.parquet for scoring
 # exercise 2 on validation. Submit from the repo:
-#   sbatch slurm/yens/beginner/data.slurm
+#   sbatch slurm/yens/intermediate/data.slurm
 set -euo pipefail
-source scripts/beginner/yens.sh
+source scripts/intermediate/yens.sh
 mkdir -p logs
-$PY scripts/beginner/make_kev_data.py
+$PY scripts/intermediate/make_kev_data.py

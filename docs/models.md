@@ -26,8 +26,8 @@ and set `HF_HUB_OFFLINE=1`, so setup and jobs read from the cache and never down
 
 | Model | Size | Used by |
 |---|---|---|
-| [Kev-4B](https://huggingface.co/jaredpalmer/kev-4b) | 160 MB (adapter) | [Beginner]({{ '/beginner/' | relative_url }}) |
-| [Qwen3.5-4B-Base](https://huggingface.co/Qwen/Qwen3.5-4B-Base) | 9.3 GB (full weights) | [Beginner]({{ '/beginner/' | relative_url }})<br>[Intermediate]({{ '/intermediate/' | relative_url }})<br>[Advanced]({{ '/advanced/' | relative_url }}) |
+| [Kev-4B](https://huggingface.co/jaredpalmer/kev-4b) | 160 MB (adapter) | [Intermediate]({{ '/intermediate/' | relative_url }}) |
+| [Qwen3.5-4B-Base](https://huggingface.co/Qwen/Qwen3.5-4B-Base) | 9.3 GB (full weights) | [Intermediate]({{ '/intermediate/' | relative_url }})<br>[Advanced]({{ '/advanced/' | relative_url }}) |
 | [Kev-27B](https://huggingface.co/jaredpalmer/kev-27b) | 51 GB (full weights) | [Advanced]({{ '/advanced/' | relative_url }}) |
 | [Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B) | Yens: 23 MB (tokenizer only)<br>Marlowe: 56 GB (full weights) | [Advanced]({{ '/advanced/' | relative_url }}) |
 | [Qwen3-235B-A22B-Instruct-2507-FP8](https://huggingface.co/Qwen/Qwen3-235B-A22B-Instruct-2507-FP8) | Marlowe only: 237 GB (full weights, FP8) | [Advanced]({{ '/advanced/' | relative_url }}) |

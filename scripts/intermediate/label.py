@@ -1,23 +1,23 @@
 """Send filings to a running Kev server and save its answers.
 
-The beginner track's copy of scripts/label.py, with --wandb added; the other tracks use scripts/label.py.
+The intermediate track's copy of scripts/label.py, with --wandb added; the other tracks use scripts/label.py.
 
 Kev serves Jev's API (POST /v1/systemone), so the request is the same one Jev answered: the filing as the state and the
 three questions. Labels in the input file are never sent.
 
-    $PY scripts/beginner/label.py --url http://127.0.0.1:8009 --data $WORK/data/test1000.jsonl --out $WORK/results/kev-4b.jsonl
-    $PY scripts/beginner/label.py --url ... --data $DATA/item502_v1.parquet --limit 10000 --out $WORK/results/all.jsonl
-    $PY scripts/beginner/label.py --url ... --data ... --shard 3 --shards 8 --out $WORK/results/b5/<jobid>/shard-3.jsonl
+    $PY scripts/intermediate/label.py --url http://127.0.0.1:8009 --data $WORK/data/test1000.jsonl --out $WORK/results/kev-4b.jsonl
+    $PY scripts/intermediate/label.py --url ... --data $DATA/item502_v1.parquet --limit 10000 --out $WORK/results/all.jsonl
+    $PY scripts/intermediate/label.py --url ... --data ... --shard 3 --shards 8 --out $WORK/results/i5/<jobid>/shard-3.jsonl
 
 With --shard I --shards N, it sends only every Nth filing, starting from the Ith (0 to N-1): N copies, one per GPU,
-label the filings between them with no overlap (slurm/marlowe/beginner/label.sh, B5).
+label the filings between them with no overlap (slurm/marlowe/intermediate/label.sh, I5).
 
 --data is a JSONL from make_kev_data.py, or Jev's parquet itself (every filing with text, in filing order).
 
 Writes one line per filing: {"id", "ok", "seconds", "answers"} (or "error"), then <out>_summary.json with the
 throughput. A rerun skips filings already answered.
 
-With --wandb NAME (slurm/yens/beginner/score_kev.slurm), the run also goes to Weights & Biases: the server's settings, the speed
+With --wandb NAME (slurm/yens/intermediate/score_kev.slurm), the run also goes to Weights & Biases: the server's settings, the speed
 and GPU memory every 100 filings, and at the end the peak memory and the mean batch the server ran. Run it on the GPU
 node, as the job does: it reads the GPU with nvidia-smi, and W&B's System tab charts that GPU.
 """

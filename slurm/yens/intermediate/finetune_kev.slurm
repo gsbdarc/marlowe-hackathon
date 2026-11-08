@@ -8,15 +8,15 @@
 #SBATCH -t 00:45:00
 #SBATCH -o logs/%x-%j.out
 
-# Beginner exercise 2: fine-tune Kev-4B's LoRA adapter for about 10 minutes on one GPU, score the result on the 2,000
+# Intermediate I2: fine-tune Kev-4B's LoRA adapter for about 10 minutes on one GPU, score the result on the 2,000
 # validation filings, and log the run to the room's Weights & Biases project. Change one setting at a time and compare:
-#   sbatch slurm/yens/beginner/finetune_kev.slurm                       # continue Kev-4B's adapter: lr 2e-5, 8 filings a step, fp32
-#   LR=2e-4 sbatch slurm/yens/beginner/finetune_kev.slurm               # the learning rate
-#   RECORDS_PER_STEP=32 sbatch slurm/yens/beginner/finetune_kev.slurm   # filings per optimizer step (the same FILINGS in total)
-#   WEIGHTS=bf16 sbatch slurm/yens/beginner/finetune_kev.slurm          # the frozen backbone in bf16 instead of fp32
-#   INIT=scratch RANK=4 sbatch slurm/yens/beginner/finetune_kev.slurm   # a new adapter (rank 4, 16 or 64) on the base model
-#   sbatch -C GPU_MODEL:H200 slurm/yens/beginner/finetune_kev.slurm     # an H200: 1,920 filings in the same 10 minutes
-# Score without training: RUN=jaredpalmer/kev-4b@v1.0 is the baseline, RUN=$WORK/runs/b2/<jobid> a run you trained.
+#   sbatch slurm/yens/intermediate/finetune_kev.slurm                       # continue Kev-4B's adapter: lr 2e-5, 8 filings a step, fp32
+#   LR=2e-4 sbatch slurm/yens/intermediate/finetune_kev.slurm               # the learning rate
+#   RECORDS_PER_STEP=32 sbatch slurm/yens/intermediate/finetune_kev.slurm   # filings per optimizer step (the same FILINGS in total)
+#   WEIGHTS=bf16 sbatch slurm/yens/intermediate/finetune_kev.slurm          # the frozen backbone in bf16 instead of fp32
+#   INIT=scratch RANK=4 sbatch slurm/yens/intermediate/finetune_kev.slurm   # a new adapter (rank 4, 16 or 64) on the base model
+#   sbatch -C GPU_MODEL:H200 slurm/yens/intermediate/finetune_kev.slurm     # an H200: 1,920 filings in the same 10 minutes
+# Score without training: RUN=jaredpalmer/kev-4b@v1.0 is the baseline, RUN=$WORK/runs/i2/<jobid> a run you trained.
 # Once you have chosen your settings on validation, score that one run on the test filings: EVAL=test RUN=...
 set -euo pipefail
 source env/yens.sh
@@ -27,7 +27,7 @@ ID=${ID:-$SLURM_JOB_ID}                              # names this run's files; f
 for E in $EVAL; do case $E in valid|test) ;; *) echo "EVAL is valid, test or both (\"valid test\")" >&2; exit 1 ;; esac; done
 if [ "$INIT" = kev ] && [ "$RANK" != 16 ]; then echo "Kev-4B's adapter has rank 16; other ranks need INIT=scratch" >&2; exit 1; fi
 case $RUN in /*) [ -f "$RUN/head.pt" ] || { echo "no trained run in $RUN" >&2; exit 1; } ;; esac   # kev.serve would fall back to a toy model
-mkdir -p logs "$WORK/runs/b2" "$WORK/results/b2"
+mkdir -p logs "$WORK/runs/i2" "$WORK/results/i2"
 nvidia-smi --query-gpu=timestamp,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > "logs/gpu-$ID.csv" &
 GPUMON=$!
 
@@ -44,7 +44,7 @@ FILINGS=${FILINGS:-$([ "$GPU" = h200 ] && echo 1920 || echo 512)}
 
 LABEL=() RELEASED=
 if [ -z "$RUN" ]; then                               # train, then score the new adapter
-  RUN=$WORK/runs/b2/$ID
+  RUN=$WORK/runs/i2/$ID
   NAME=$USER-$GPU-$([ "$INIT" = scratch ] && echo "scratch-r$RANK" || echo kev)-lr$LR-rps$RECORDS_PER_STEP-$WEIGHTS
   ARGS=(--data "$WORK/data/train.jsonl" --base Qwen/Qwen3.5-4B-Base --base_revision 1001bb4d826a52d1f399e183466143f4da7b741b
         --device cuda --dtype bf16 --weights_dtype "$WEIGHTS" --checkpointing 1 --max_state 2048 --seed 0
@@ -52,7 +52,7 @@ if [ -z "$RUN" ]; then                               # train, then score the new
   if [ "$INIT" = kev ]; then ARGS+=(--init_from jaredpalmer/kev-4b@v1.0); fi
   if [ -n "$WB" ]; then                              # one W&B run for the job: the training curve, then the scores
     export WANDB_RUN_ID=$(python3 -c 'import uuid; print(uuid.uuid4().hex[:12])') WANDB_JOB_TYPE=train
-    $PY scripts/beginner/wandb_watch.py --log "$PWD/logs/ceo-finetune-$ID.out" --run-dir "$RUN" --name "$NAME" &
+    $PY scripts/intermediate/wandb_watch.py --log "$PWD/logs/ceo-finetune-$ID.out" --run-dir "$RUN" --name "$NAME" &
     WATCH=$!
   fi
   (cd "$KEV_HOME/kev" && $PY -m kev.train "${ARGS[@]}")
@@ -82,7 +82,7 @@ for E in $EVAL; do
   esac
   if [ -n "$RELEASED" ] && [ -n "$WB" ]; then export WANDB_JOB_TYPE=$E; LABEL=(--wandb "$USER-$GPU-$(basename "$RUN")-$E-$ID"); fi
   echo "scoring the $E filings"
-  OUT=$WORK/results/b2/$ID-$E.jsonl
-  $PY scripts/beginner/label.py --url "http://127.0.0.1:$PORT" --data "$DATA" --out "$OUT" --concurrency 16 "${LABEL[@]}"
-  $PY scripts/beginner/score.py "$OUT" --sample "$SAMPLE" ${WB:+--wandb --wandb-prefix $E/}
+  OUT=$WORK/results/i2/$ID-$E.jsonl
+  $PY scripts/intermediate/label.py --url "http://127.0.0.1:$PORT" --data "$DATA" --out "$OUT" --concurrency 16 "${LABEL[@]}"
+  $PY scripts/intermediate/score.py "$OUT" --sample "$SAMPLE" ${WB:+--wandb --wandb-prefix $E/}
 done

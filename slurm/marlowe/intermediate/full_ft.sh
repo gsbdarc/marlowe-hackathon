@@ -1,5 +1,5 @@
-# The full fine-tune of B3 and B4: every one of Qwen 4B's 4.2 billion weights is trained, starting from Kev-4B, instead
-# of B2's LoRA adapter. Sourced by full_ft_1gpu.slurm (B3) and full_ft_8gpu.slurm (B4), which set GPUS first.
+# The full fine-tune of I3 and I4: every one of Qwen 4B's 4.2 billion weights is trained, starting from Kev-4B, instead
+# of I2's LoRA adapter. Sourced by full_ft_1gpu.slurm (I3) and full_ft_8gpu.slurm (I4), which set GPUS first.
 #   One GPU:  the bf16 weights and gradients sit on the H100; the fp32 master weights and the optimizer's moments
 #             (about 50 GB) sit in the node's memory and stream to and from the GPU every step.
 #   8 GPUs:   torchrun starts 8 copies of the trainer, one per GPU. FSDP2 gives each 1/8 of the weights, gradients,
@@ -21,7 +21,7 @@ nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.t
 GPUMON=$!; trap 'kill $GPUMON 2>/dev/null || true' EXIT
 
 if [ ! -f "$INIT/checkpoint/head.pt" ]; then
-  if [ "$GPUS" != 1 ]; then echo "no $INIT yet: run B3's sbatch slurm/marlowe/beginner/full_ft_1gpu.slurm first" >&2; exit 1; fi
+  if [ "$GPUS" != 1 ]; then echo "no $INIT yet: run I3's sbatch slurm/marlowe/intermediate/full_ft_1gpu.slurm first" >&2; exit 1; fi
   echo "merging Kev-4B's adapter into Qwen 4B, once: $INIT"
   rm -rf "$INIT"
   (cd "$KEV_HOME/kev" && $PY scripts/merge_lora_checkpoint.py --lora jaredpalmer/kev-4b@v1.0 --out "$INIT" --weights_dtype bf16)
@@ -37,7 +37,7 @@ ARGS=(--data "$WORK/data/train.jsonl" --base Qwen/Qwen3.5-4B-Base --base_revisio
       --max_state 2048 --seed 0 --lr "$LR" --batch 1 --accum $((RECORDS_PER_STEP / GPUS)) --max_steps "$STEPS" --out "$RUN")
 WATCH=
 if [ -n "${WANDB_API_KEY:-}" ] || [ "${WANDB_MODE:-}" = offline ]; then
-  $PY scripts/beginner/wandb_watch.py --log "$PWD/logs/$SLURM_JOB_NAME-$SLURM_JOB_ID.out" --run-dir "$RUN" --name "$NAME" --gpus "$GPUS" &
+  $PY scripts/intermediate/wandb_watch.py --log "$PWD/logs/$SLURM_JOB_NAME-$SLURM_JOB_ID.out" --run-dir "$RUN" --name "$NAME" --gpus "$GPUS" &
   WATCH=$!
 else
   echo "W&B off: no WANDB_API_KEY in .env"
