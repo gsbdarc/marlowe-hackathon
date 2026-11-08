@@ -8,21 +8,21 @@
 #SBATCH -t 00:30:00
 #SBATCH -o logs/%x-%j.out
 
-# Beginner exercise 1: serve Kev-4B as released on one GPU, send it the 1,000 test filings, score its answers against
+# Intermediate I1: serve Kev-4B as released on one GPU, send it the 1,000 test filings, score its answers against
 # Jev's, and log the run to the room's Weights & Biases project. Change one setting at a time and compare:
-#   sbatch slurm/yens/beginner/score_kev.slurm                     # an A40, 16 filings at a time, bf16, fused kernels
-#   sbatch -C GPU_MODEL:H200 slurm/yens/beginner/score_kev.slurm   # an H200 instead of an A40
-#   CONCURRENCY=64 sbatch slurm/yens/beginner/score_kev.slurm      # filings in flight, 1 to 64 (the server's largest batch)
-#   DTYPE=fp32 sbatch slurm/yens/beginner/score_kev.slurm          # 32-bit numbers instead of 16-bit (bf16)
-#   FUSED=0 sbatch slurm/yens/beginner/score_kev.slurm             # without Kev's fused kernels (transformers' own layer code)
-# Every job labels all 1,000 filings afresh, into $WORK/results/b1/<jobid>.jsonl.
+#   sbatch slurm/yens/intermediate/score_kev.slurm                     # an A40, 16 filings at a time, bf16, fused kernels
+#   sbatch -C GPU_MODEL:H200 slurm/yens/intermediate/score_kev.slurm   # an H200 instead of an A40
+#   CONCURRENCY=64 sbatch slurm/yens/intermediate/score_kev.slurm      # filings in flight, 1 to 64 (the server's largest batch)
+#   DTYPE=fp32 sbatch slurm/yens/intermediate/score_kev.slurm          # 32-bit numbers instead of 16-bit (bf16)
+#   FUSED=0 sbatch slurm/yens/intermediate/score_kev.slurm             # without Kev's fused kernels (transformers' own layer code)
+# Every job labels all 1,000 filings afresh, into $WORK/results/i1/<jobid>.jsonl.
 # Loading fp32 weights passes through host memory, hence 32 GB (the gpu partition allows 4,000 MB per CPU).
 set -euo pipefail
 source env/yens.sh
 CONCURRENCY=${CONCURRENCY:-16}
 export KEV_DTYPE=${DTYPE:-bf16} KEV_FUSED=${FUSED:-1}
-OUT=$WORK/results/b1/$SLURM_JOB_ID.jsonl
-mkdir -p logs "$WORK/results/b1"
+OUT=$WORK/results/i1/$SLURM_JOB_ID.jsonl
+mkdir -p logs "$WORK/results/i1"
 nvidia-smi --query-gpu=timestamp,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > "logs/gpu-$SLURM_JOB_ID.csv" &
 
 # This exercise's project in the room's W&B team. The team's key is a line WANDB_API_KEY=... in .env at the top of the
@@ -47,5 +47,5 @@ for i in $(seq 1 120); do                            # wait up to 10 minutes for
 done
 curl -sf "http://127.0.0.1:$PORT/v1/models" > /dev/null || { echo "Kev server not ready after 10 minutes" >&2; exit 1; }
 echo "$NAME: Kev-4B loaded in $((SECONDS - START)) s on $(hostname), $(nvidia-smi --query-gpu=name,memory.used,memory.total --format=csv,noheader -i 0)"
-$PY scripts/beginner/label.py --url "http://127.0.0.1:$PORT" --data "$WORK/data/test1000.jsonl" --out "$OUT" --concurrency "$CONCURRENCY" "${WB[@]}"
-$PY scripts/beginner/score.py "$OUT" ${WB:+--wandb --wandb-prefix test/}
+$PY scripts/intermediate/label.py --url "http://127.0.0.1:$PORT" --data "$WORK/data/test1000.jsonl" --out "$OUT" --concurrency "$CONCURRENCY" "${WB[@]}"
+$PY scripts/intermediate/score.py "$OUT" ${WB:+--wandb --wandb-prefix test/}

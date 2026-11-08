@@ -1,16 +1,16 @@
 # LoRA fine-tune of Kev-4B on 1, 4 or 8 H100s, data parallel (like DDP): every GPU holds the whole model and its own
 # copy of the adapter, trains on its share of each step's filings, and the GPUs add up their adapter gradients once per
 # step. Sourced by lora_1gpu.slurm, lora_4gpu.slurm and lora_8gpu.slurm, which set GPUS first.
-# The settings match B3 Part 2 and B4's full fine-tunes (100 steps of 16 filings, lr 2e-5), so every method trains on
+# The settings match I3 Part 2 and I4's full fine-tunes (100 steps of 16 filings, lr 2e-5), so every method trains on
 # the same 1,600 filings, in the same order, 16 a step, and score_test.slurm compares them on the same test filings.
-# Kev's own trainer runs LoRA on one GPU only. The data-parallel version is scripts/beginner/kev-lora-ddp.patch,
+# Kev's own trainer runs LoRA on one GPU only. The data-parallel version is scripts/intermediate/kev-lora-ddp.patch,
 # applied to a second checkout of Kev next to yours ($KEV_HOME/kev-lora-ddp, made here the first time; it uses Kev's
 # own Python).
 # Settings, set before sbatch:
 #   LR=2e-5                learning rate
 #   RECORDS_PER_STEP=16    filings per optimizer step, in total across the GPUs; a multiple of GPUS
 #   STEPS=100              optimizer steps (at least 20: the learning rate warms up over the first 10%)
-#   WEIGHTS=fp32           the frozen backbone's weights (fp32, as in B2 and B3 Part 1, or bf16)
+#   WEIGHTS=fp32           the frozen backbone's weights (fp32, as in I2 and I3 Part 1, or bf16)
 set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
@@ -20,10 +20,10 @@ if [ $((RECORDS_PER_STEP % GPUS)) != 0 ]; then echo "RECORDS_PER_STEP must be a 
 if [ "$STEPS" -lt 20 ]; then echo "STEPS must be at least 20" >&2; exit 1; fi
 if [ ! -d "$KEV_DDP" ]; then           # first time: a second checkout of Kev, with the data-parallel patch
   git -C "$KEV_HOME/kev" worktree add --detach "$KEV_DDP" HEAD
-  git -C "$KEV_DDP" apply "$PWD/scripts/beginner/kev-lora-ddp.patch"
+  git -C "$KEV_DDP" apply "$PWD/scripts/intermediate/kev-lora-ddp.patch"
 fi
 if ! grep -q "def sum_gradients" "$KEV_DDP/kev/full_ft.py"; then
-  echo "$KEV_DDP has no data-parallel LoRA: git -C $KEV_DDP apply $PWD/scripts/beginner/kev-lora-ddp.patch" >&2; exit 1
+  echo "$KEV_DDP has no data-parallel LoRA: git -C $KEV_DDP apply $PWD/scripts/intermediate/kev-lora-ddp.patch" >&2; exit 1
 fi
 RUN=$WORK/runs/lora-ddp/$SLURM_JOB_ID
 mkdir -p logs "$WORK/runs/lora-ddp"
@@ -47,7 +47,7 @@ ARGS=(--data "$WORK/data/train.jsonl" --base Qwen/Qwen3.5-4B-Base --base_revisio
       --max_state 2048 --seed 0 --lr "$LR" --batch 1 --accum $((RECORDS_PER_STEP / GPUS)) --max_steps "$STEPS" --out "$RUN")
 WATCH=
 if [ -n "${WANDB_API_KEY:-}" ] || [ "${WANDB_MODE:-}" = offline ]; then
-  $PY scripts/beginner/wandb_watch.py --log "$PWD/logs/$SLURM_JOB_NAME-$SLURM_JOB_ID.out" --run-dir "$RUN" --name "$NAME" --gpus "$GPUS" &
+  $PY scripts/intermediate/wandb_watch.py --log "$PWD/logs/$SLURM_JOB_NAME-$SLURM_JOB_ID.out" --run-dir "$RUN" --name "$NAME" --gpus "$GPUS" &
   WATCH=$!
 else
   echo "W&B off: no WANDB_API_KEY in .env"
@@ -60,4 +60,4 @@ else
 fi
 if [ -n "$WATCH" ]; then wait $WATCH; fi
 $PY scripts/step_times.py "$RUN" --per-step "$RECORDS_PER_STEP"
-echo "score it: RUNS=\"lora-${GPUS}gpu=$RUN\" sbatch slurm/marlowe/beginner/score_test.slurm"
+echo "score it: RUNS=\"lora-${GPUS}gpu=$RUN\" sbatch slurm/marlowe/intermediate/score_test.slurm"

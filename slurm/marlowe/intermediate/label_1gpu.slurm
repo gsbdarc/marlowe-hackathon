@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J b5-label-1gpu
+#SBATCH -J i5-label-1gpu
 #SBATCH --account=marlowe-m000106
 #SBATCH --partition=preempt
 #SBATCH --nodes=1
@@ -13,9 +13,9 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=<sunet>@stanford.edu
 
-# Beginner B5: one H100's share of label_8gpu.slurm, to compare with: the filings split 8 ways, and this job labels
+# Intermediate I5: one H100's share of label_8gpu.slurm, to compare with: the filings split 8 ways, and this job labels
 # the first shard, 37,060 filings, the same as GPU 0 does in the 8-GPU job.
-#   sbatch slurm/marlowe/beginner/label_1gpu.slurm
-# The answers are $WORK/results/b5/<jobid>/shard-0.jsonl.
+#   sbatch slurm/marlowe/intermediate/label_1gpu.slurm
+# The answers are $WORK/results/i5/<jobid>/shard-0.jsonl.
 SHARDS=${SHARDS:-8}
-source slurm/marlowe/beginner/label.sh
+source slurm/marlowe/intermediate/label.sh

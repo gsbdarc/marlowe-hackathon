@@ -1,11 +1,11 @@
 """Score a model's answers against Jev's on the test sample.
 
-The beginner track's copy of scripts/score.py, with --wandb added; the other tracks use scripts/score.py.
+The intermediate track's copy of scripts/score.py, with --wandb added; the other tracks use scripts/score.py.
 
 Agreement with Jev measures how well the student copies the teacher. "Weighted" uses the sample weights, so it
 estimates agreement over the whole 2022-2026 test split rather than over the oversampled rare statuses.
 
-    $PY scripts/beginner/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/kev-4b-step500.jsonl
+    $PY scripts/intermediate/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/kev-4b-step500.jsonl
 
 Prints one row per run and writes <run>_scores.json next to each run. With --wandb, the scores also go to the W&B run
 that label.py --wandb started for each one.

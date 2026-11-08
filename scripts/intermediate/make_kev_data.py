@@ -1,15 +1,15 @@
 """Turn Jev's labels into Kev training records, and draw the evaluation sample.
 
-The beginner track's copy of scripts/make_kev_data.py, which also writes valid.parquet for scoring on validation;
-the other tracks use scripts/make_kev_data.py. slurm/yens/beginner/data.slurm runs it on your copy of Jev's data.
+The intermediate track's copy of scripts/make_kev_data.py, which also writes valid.parquet for scoring on validation;
+the other tracks use scripts/make_kev_data.py. slurm/yens/intermediate/data.slurm runs it on your copy of Jev's data.
 
 Each record is one filing in Kev's training format (a System One request plus a label on every question). The label is
 Jev's answer and the target is Jev's full probability distribution, so the student learns from the teacher's soft labels.
 Filings Jev calls "not a CEO change" get only the status question: Jev answers why and future for every filing, but
 they mean nothing when the CEO is not leaving.
 
-    $PY scripts/beginner/make_kev_data.py                    # train.jsonl, valid.jsonl, test1000.jsonl (+ .parquet) in $WORK/data
-    $PY scripts/beginner/make_kev_data.py --neg-ratio 1 --max-train 20000
+    $PY scripts/intermediate/make_kev_data.py                    # train.jsonl, valid.jsonl, test1000.jsonl (+ .parquet) in $WORK/data
+    $PY scripts/intermediate/make_kev_data.py --neg-ratio 1 --max-train 20000
 
 Splits are Jev's, by filing year: train 2004-2018, valid 2019-2021, test 2022-2026.
   --neg-ratio   in train, keep this many "not a CEO change" filings per CEO change (87% of filings are not)

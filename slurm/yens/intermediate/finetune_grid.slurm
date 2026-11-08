@@ -11,13 +11,13 @@
 # Every setting of exercise 2 in one job, one after another on one GPU, for the room's reference dashboard. Each setting
 # trains for about 10 minutes (finetune_kev.slurm's default for the GPU), then is scored on the validation and the test
 # filings, all in its own W&B run. Participants run one setting at a time with finetune_kev.slurm.
-#   sbatch -C GPU_MODEL:H200 slurm/yens/beginner/finetune_grid.slurm    # about 2 hours on an H200
-# Each setting's log is logs/ceo-finetune-<jobid>-<setting>.out, and its run is $WORK/runs/b2/<jobid>-<setting>.
+#   sbatch -C GPU_MODEL:H200 slurm/yens/intermediate/finetune_grid.slurm    # about 2 hours on an H200
+# Each setting's log is logs/ceo-finetune-<jobid>-<setting>.out, and its run is $WORK/runs/i2/<jobid>-<setting>.
 set -uo pipefail
 mkdir -p logs
 while read -r name vars; do
   echo "$(date +%T) $name: $vars"
-  env ID="$SLURM_JOB_ID-$name" EVAL="valid test" $vars bash slurm/yens/beginner/finetune_kev.slurm < /dev/null \
+  env ID="$SLURM_JOB_ID-$name" EVAL="valid test" $vars bash slurm/yens/intermediate/finetune_kev.slurm < /dev/null \
     > "logs/ceo-finetune-$SLURM_JOB_ID-$name.out" 2>&1 || echo "  $name failed: see logs/ceo-finetune-$SLURM_JOB_ID-$name.out"
 done <<'EOF'
 default      INIT=kev
