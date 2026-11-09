@@ -1110,3 +1110,24 @@ tspan.personalize-token-unset {
 .main-content .jobid-field input:focus { outline: 2px solid #8c1515; outline-offset: 1px; }
 .main-content .jobid-field + div.highlighter-rouge { margin-top: 0; }
 .main-content span.jobid-token.jobid-unset { background: #fdf1d8; border-radius: 2px; }
+
+/* "Found a problem?" block in the sidebar: a link styled as a button that opens a new GitHub issue with the page
+   filled in. */
+.report-issue-button {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid #8c1515;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #8c1515;
+  text-decoration: none;
+}
+.report-issue-button:hover,
+.report-issue-button:focus {
+  background: #8c1515;
+  color: #fff;
+  text-decoration: none;
+}
+.report-issue { padding-bottom: 0.75rem; }
