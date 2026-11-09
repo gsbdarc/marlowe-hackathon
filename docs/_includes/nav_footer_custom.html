@@ -21,5 +21,20 @@
   </label>
   <p class="personalize-status" data-personalize-status></p>
 </div>
+<div class="personalize report-issue">
+  <p class="personalize-title">Found a problem?</p>
+  {%- capture issue_body -%}
+Page: {{ site.url }}{{ site.baseurl }}{{ page.url }}
+Cluster (Yens or Marlowe):
+
+What I did:
+
+What I expected:
+
+What happened (paste the command and its output):
+  {%- endcapture %}
+  <a class="report-issue-button" target="_blank" rel="noopener"
+     href="https://github.com/gsbdarc/marlowe-hackathon/issues/new?title={{ page.title | append: ': ' | url_encode }}&body={{ issue_body | url_encode }}">File an issue</a>
+</div>
 <p class="personalize-credit">Built with
   <a href="https://github.com/just-the-docs/just-the-docs" target="_blank" rel="noopener noreferrer">Just the Docs</a>.</p>
