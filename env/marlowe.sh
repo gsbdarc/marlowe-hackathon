@@ -19,3 +19,9 @@ export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingf
 export PY=$KEV_HOME/kev/.venv/bin/python
 export MARLOWE_ACCOUNT=${MARLOWE_ACCOUNT:-marlowe-c001}
 mkdir -p "$WORK" "$HF_HOME" "$XDG_CACHE_HOME"
+
+# In a terminal, say what was set; jobs and scripts source this quietly
+case $- in
+  *i*) printf '%s paths for this terminal:\n' "Marlowe"
+       printf '  %-9s %s\n' WORK "$WORK" KEV_HOME "$KEV_HOME" PY "$PY" models "$HF_HUB_CACHE" caches "$XDG_CACHE_HOME" ;;
+esac

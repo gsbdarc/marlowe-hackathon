@@ -18,3 +18,9 @@ export KEV_PREFIX_CACHE=0                                    # time every filing
 export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
 mkdir -p "$WORK" "$HF_HOME" "$XDG_CACHE_HOME"
+
+# In a terminal, say what was set; jobs and scripts source this quietly
+case $- in
+  *i*) printf '%s paths for this terminal:\n' "Yens"
+       printf '  %-9s %s\n' WORK "$WORK" KEV_HOME "$KEV_HOME" PY "$PY" models "$HF_HUB_CACHE" caches "$XDG_CACHE_HOME" ;;
+esac
