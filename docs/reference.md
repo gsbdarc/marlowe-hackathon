@@ -12,7 +12,7 @@ permalink: /reference/
 | Script | What it does |
 |---|---|
 | `env/yens.sh`, `env/marlowe.sh` | every path and cache setting; every job sources one |
-| `scripts/setup_kev.sh` | installs Kev (commit `53cb0b5`), its Python environment and the Kev-4B weights |
+| `scripts/setup_kev.sh` | checks the shared Kev (commit `53cb0b5`) and the models; it never changes Kev. Instructors build Kev with `setup/setup.sh` |
 | `scripts/questions.py` | Jev's three questions and the text the model reads |
 | `scripts/look.py` | counts and examples from Jev's labels |
 | `scripts/make_kev_data.py` | Jev's labels to Kev training records: `train.jsonl`, `valid.jsonl`, `test1000.jsonl` |
