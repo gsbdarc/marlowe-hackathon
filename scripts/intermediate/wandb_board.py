@@ -33,7 +33,7 @@ def i1():
     speed = bars(("filings_per_second", "Filings per second"),
                  ("gpu_memory_peak_gb", "Peak GPU memory (GB)"),
                  ("mean_batch", "Average batch the server ran"))
-    speed.append(wr.LinePlot(title="Filings per second while labeling", y=["filings_per_second"]))
+    speed.append(wr.LinePlot(title="Filings per second while labeling", y=["filings_per_second_so_far"]))
     options = wr.ParallelCoordinatesPlot(title="Options against speed and agreement", columns=[
         wr.ParallelCoordinatesPlotColumn(metric=wr.Config(k)) for k in ("gpu", "concurrency", "dtype", "fused")] + [
         wr.ParallelCoordinatesPlotColumn(metric=wr.SummaryMetric(k)) for k in ("filings_per_second", "test/status_agree_weighted")])

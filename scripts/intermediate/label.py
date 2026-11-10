@@ -111,7 +111,7 @@ def main():
                 if run:
                     used = gpu()[1]
                     peak = max(peak, used)
-                    run.log({"filings_per_second": rate, "failed": bad, "gpu_memory_used_gb": used}, step=i)
+                    run.log({"filings_per_second_so_far": rate, "failed": bad, "gpu_memory_used_gb": used}, step=i)
             if i == 20 and all(not x["ok"] for x in rows):
                 ex.shutdown(wait=False, cancel_futures=True)   # do not wait for the requests still queued
                 raise SystemExit(f"stopping: the first 20 requests all failed ({rows[-1]['error']})")
