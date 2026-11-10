@@ -5,12 +5,14 @@ each filing in train.jsonl (same id) and replaces Jev's labels with the teacher'
 gives no probabilities, so every target puts all its weight on the teacher's choice (a hard label). As with Jev's
 labels, a filing the teacher calls "not a CEO change" keeps only the status question.
 
-    $PY scripts/make_teacher_data.py $WORK/results/a4-c64.jsonl --out $WORK/data/teacher-qwen-235b.jsonl
+    $PY scripts/advanced/make_teacher_data.py $WORK/results/a4-c64.jsonl --out $WORK/data/teacher-qwen-235b.jsonl
 """
 import argparse
 import json
 import os
+import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))   # questions.py is shared, in scripts/
 from questions import STATUS, questions
 
 NOT_A_CHANGE = STATUS[1]

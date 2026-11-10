@@ -21,7 +21,7 @@ set -euo pipefail
 module load slurm mps
 source env/marlowe.sh
 GPUS=8
-source slurm/train_27b_args.sh
+source slurm/marlowe/advanced/train_27b_args.sh
 job_timer
 RUN=${RUN:-a2-8gpu}
 OUT=$WORK/runs/$RUN

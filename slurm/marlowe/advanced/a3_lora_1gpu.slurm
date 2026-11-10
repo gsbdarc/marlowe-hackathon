@@ -20,7 +20,7 @@ set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
 GPUS=1
-source slurm/train_27b_args.sh
+source slurm/marlowe/advanced/train_27b_args.sh
 # The LoRA settings come after TRAIN_ARGS, so they replace its --full_ft 1 and --lr 2e-6
 LORA_ARGS="--full_ft 0 --lora 16 --lr 2e-4"
 job_timer
