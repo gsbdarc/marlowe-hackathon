@@ -14,6 +14,20 @@ Marlowe project application asks for.
 
 ---
 
+## Objectives
+
+The day works if, by the end of it:
+
+- **Everyone runs a GPU job on Marlowe.** Every track reaches Marlowe, whatever your starting point.
+- **Each track table leaves with a working result:** a model you trained or ran, scored against Jev's labels and
+  posted in [{{ site.slack_channel }}]({{ site.slack_url }}).
+- **Everyone knows where to get help afterwards:** [RCpedia](https://rcpedia.stanford.edu) for the Yens,
+  [Marlowe's documentation](https://marlowe-research.stanford.edu/documentation/) for Marlowe, and the Slack channel.
+- **Everyone knows how their PI's group signs up for Marlowe,** with the GPU-hour numbers a project application asks
+  for ([Applying for Marlowe]({{ '/take-home/' | relative_url }}#applying-for-marlowe)).
+
+---
+
 ## The project: CEO turnover in SEC filings
 
 When a public company's CEO leaves, the company files an 8-K under **Item 5.02**. A large hosted model, **Jev**, has
