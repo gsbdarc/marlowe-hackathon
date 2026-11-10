@@ -9,44 +9,40 @@ takes a few minutes and changes nothing. Participants never run it. In class the
 
 | | Yens | Marlowe |
 |---|---|---|
-| Shared folder, read only for participants | `/scratch/shared/marlowe_hackathon` (also the instructors' clone) | `/scratch/c001/marlowe-hackathon` |
-| Instructors' clone, which runs this script | the shared folder itself | `repo/` |
-| Models | `hf/hub` | `models/` |
-| vLLM container | | `containers/vllm-openai_v0.31.0.sif` |
-| Kev and its Python, prebuilt and shared | `kev/` | `kev/` |
-| Jev's release | `data/jev` | `data/jev` |
-| Training and test files | `data/` | `data/` |
+| Shared folder, read only for participants | `/scratch/shared/marlowe_hackathon` | `/scratch/c001/marlowe-hackathon` |
 | Each participant's folder | `/scratch/users/<sunet>` | `/scratch/c001/users/<sunet>` |
 
-On Marlowe, after setup:
+Inside the shared folder, on both clusters:
 
 ```
-/scratch/c001/marlowe-hackathon/        shared, read only for participants
-├── data/          Jev's release (jev/) and train, valid, test1000
-├── models/        the Hugging Face model cache
-├── containers/    the vLLM container
-├── kev/           the shared Kev and its Python
-└── repo/          the instructors' clone, which runs setup/setup.sh
-/scratch/c001/users/<sunet>/            each participant's
-├── marlowe-hackathon/   their clone
-├── ceo-turnover/        $WORK: their data copy, runs and results
-└── .cache/              pip, Triton, vLLM, Apptainer and Hugging Face caches
+data/          Jev's release (jev/) and train, valid, test1000
+models/        the Hugging Face model cache
+containers/    the vLLM container (Marlowe only)
+kev/           the shared Kev and its Python
+repo/          the instructors' clone, which runs setup/setup.sh
 ```
+
+Each participant's folder holds their clone (`marlowe-hackathon/`), their work (`ceo-turnover/`, which is `$WORK`)
+and `.cache/`, where every cache goes, never the home folder.
 
 The paths come from `env/yens.sh` and `env/marlowe.sh`; change them there.
 
 ## Run it
 
-On the Yens, from an interactive node:
+Clone into `repo/` in the shared folder; the script fills in the folders next to it.
+
+On the Yens, from an interactive node. Jev's release is copied from DARC's project space,
+`/yen/projects/darc/marlowe_hackathon`:
 
 ```bash
-cd /scratch/shared/marlowe_hackathon
+git clone https://github.com/gsbdarc/marlowe-hackathon.git /scratch/shared/marlowe_hackathon/repo
+cd /scratch/shared/marlowe_hackathon/repo
 bash setup/setup.sh
 ```
 
-On Marlowe, from the login node, clone into `repo/` in the shared folder; the script fills in the folders next to it. Jev's release lives only on the Yens, in
-`/scratch/shared/marlowe_hackathon/data/jev` (it is not on GitHub or Hugging Face), so the script copies it over with
-`rsync` and asks you to log in to the Yens once: password, then Duo.
+On Marlowe, from the login node. Jev's release lives only on the Yens (it is not on GitHub or Hugging Face), so the
+script copies it from `/scratch/shared/marlowe_hackathon/data/jev` with `rsync` and asks you to log in to the Yens
+once: password, then Duo. Run the Yens setup first.
 
 ```bash
 git clone https://github.com/gsbdarc/marlowe-hackathon.git /scratch/c001/marlowe-hackathon/repo

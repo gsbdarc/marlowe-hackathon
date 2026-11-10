@@ -19,7 +19,7 @@ and set `HF_HUB_OFFLINE=1`, so setup and jobs read from the cache and never down
 
 | Cluster | Shared cache (`HF_HUB_CACHE`) |
 |---|---|
-| Yens | `/scratch/shared/marlowe_hackathon/hf/hub` |
+| Yens | `/scratch/shared/marlowe_hackathon/models` |
 | Marlowe | `/scratch/c001/marlowe-hackathon/models` |
 
 ## What is in the cache

@@ -1,11 +1,11 @@
 # Settings for jobs on the Yens. Source it, don't run it:  source env/yens.sh
 # Every cache and config goes to scratch, never home. Change DATA if your copy of the data is elsewhere.
-export HACKATHON=/scratch/shared/marlowe_hackathon
+export HACKATHON=/scratch/shared/marlowe_hackathon          # shared, read only: data, models, kev, repo
 export DATA=${DATA:-$HACKATHON/data/jev}                     # Jev-labeled Item 5.02 release (read only)
 export WORK=${WORK:-/scratch/users/$USER/ceo-turnover}      # your training data, runs and results
 export KEV_HOME=${KEV_HOME:-$HACKATHON/kev}                 # Kev and its Python, prebuilt by setup/setup.sh (read only)
 export HF_HOME=${HF_HOME:-/scratch/users/$USER/.cache/huggingface}   # your Hugging Face settings and lock files
-export HF_HUB_CACHE=${HF_HUB_CACHE:-$HACKATHON/hf/hub}       # model weights, downloaded by DARC (read only)
+export HF_HUB_CACHE=${HF_HUB_CACHE:-$HACKATHON/models}       # model weights, downloaded by setup/setup.sh (read only)
 export HF_HUB_OFFLINE=1                                      # every model is already in HF_HUB_CACHE: never download
 export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=/scratch/users/$USER/.cache PIP_CACHE_DIR=/scratch/users/$USER/.cache/pip
