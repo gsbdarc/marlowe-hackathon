@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J a4-qwen235b-server
-#SBATCH --account=marlowe-m000106
+#SBATCH --account=marlowe-c001
 #SBATCH --partition=preempt
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -34,6 +34,6 @@ gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
 # 32 GB home. The container sees this job's environment, so HF_HOME (the shared model cache) and HF_HUB_OFFLINE=1
 # from env/marlowe.sh apply inside it.
 export VLLM_CACHE_ROOT=$XDG_CACHE_HOME/vllm FLASHINFER_WORKSPACE_DIR=$XDG_CACHE_HOME/flashinfer
-apptainer exec --nv --bind /scratch/m000106 "$SIF" \
+apptainer exec --nv --bind /scratch/c001 "$SIF" \
   vllm serve "$MODEL" --revision "$REVISION" --served-model-name qwen-235b \
     --tensor-parallel-size 8 --max-model-len 16384 --host 0.0.0.0 --port "$PORT" ${VLLM_ARGS:-} 2>&1 | stamp

@@ -24,7 +24,7 @@ permalink: /reference/
 
 | | Yens | Marlowe |
 |---|---|---|
-| GPU partition | `gpu`, with `-C GPU_MODEL:H200` for the H200s | `preempt` (basic access), account `marlowe-m000106` |
+| GPU partition | `gpu`, with `-C GPU_MODEL:H200` for the H200s | `preempt` (basic access), account `marlowe-c001` |
 | GPUs | 2 H200 (141 GB) on yen-gpu4; A40s and A30s on the other GPU nodes | 8 H100 (80 GB) per node |
 | Time limit | 1 day | 4 hours on `preempt`; a preempted job is requeued and starts again |
 | Memory per CPU | at most 4,000 MB on `gpu` | see `scontrol show partition preempt` |

@@ -22,11 +22,11 @@ scale.
 
 No data, results or model weights are in this repository. Jev's labeled filings are on the Yens at
 `/scratch/shared/marlowe_hackathon/data/jev` and on Marlowe at
-`/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev`. `.gitignore` is a whitelist: only the paths above are
+`/scratch/c001/marlowe-hackathon/data/jev`. `.gitignore` is a whitelist: only the paths above are
 tracked, and data files are ignored everywhere in the tree.
 
-The models are pre-downloaded into a shared cache on each cluster.
-[Models](https://gsbdarc.github.io/marlowe-hackathon/models/) on the website lists them and how to download them again.
+The models and data are pre-loaded into a shared folder on each cluster by `setup/setup.sh`, which instructors run
+once per cluster: see [setup/README.md](setup/README.md).
 
 ## Build the site locally
 
