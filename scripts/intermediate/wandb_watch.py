@@ -9,7 +9,7 @@ kev.train prints a line every 10 optimizer steps:
 
 This script follows the job's log, sends the loss and the speed to W&B, and stops when training saves or stops. Run on the
 GPU node, W&B also records the node's GPU utilization and memory on its System tab. slurm/yens/intermediate/finetune_kev.slurm
-starts it when .env holds the room's W&B key:
+starts it when it finds the hackathon's shared W&B key ($HACKATHON/wandb.env, or a .env of your own):
 
     sbatch slurm/yens/intermediate/finetune_kev.slurm
 
@@ -21,6 +21,7 @@ import json
 import os
 import re
 import signal
+import subprocess
 import sys
 import time
 
@@ -50,8 +51,12 @@ def main():
     ap.add_argument("--project", default=os.environ.get("WANDB_PROJECT", "marlowe-hackathon"))
     ap.add_argument("--run-dir", help="the run's --out directory: its training_config.json settings go into the W&B config")
     a = ap.parse_args()
+    gpu = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader", "-i", "0"],
+                         capture_output=True, text=True, check=True).stdout.strip()
     run = wandb.init(project=a.project, name=f"{a.name}-{os.environ.get('SLURM_JOB_ID', 'local')}",
-                     config={"gpus": a.gpus, "job": os.environ.get("SLURM_JOB_ID"), "node": os.uname().nodename})
+                     config={"user": os.environ.get("USER"), "gpu": gpu, "gpus": a.gpus,   # everyone shares one W&B key
+                             "job": os.environ.get("SLURM_JOB_ID"), "node": os.uname().nodename})
+    print(f"W&B run: {run.url}", flush=True)
     signal.signal(signal.SIGTERM, lambda *_: (run.finish(exit_code=1), sys.exit(0)))   # the job ended first
     last, cfg = None, a.run_dir and os.path.join(a.run_dir, "training_config.json")
     for line in follow(a.log):

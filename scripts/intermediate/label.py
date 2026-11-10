@@ -97,6 +97,7 @@ def main():
             "user": os.environ.get("USER"), "job": os.environ.get("SLURM_JOB_ID"), "gpu": name,
             "gpu_memory_gb": round(total, 1), "model": card["run"], "dtype": card["dtype"],
             "fused": os.environ.get("KEV_FUSED") != "0", "concurrency": a.concurrency, "filings": len(todo)})
+        print(f"W&B run: {run.url}", flush=True)
     start, rows = time.perf_counter(), []
     ex = ThreadPoolExecutor(a.concurrency)
     with open(a.out, "a") as f:
