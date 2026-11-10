@@ -31,7 +31,7 @@ mkdir -p logs && echo "$(hostname -s):$PORT" > "$WORK/qwen-235b.server"
 echo "serving $MODEL at http://$(hostname -s):$PORT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
 # Marlowe's Apptainer guide: bind the project's scratch into the container and keep every cache there, not in the
-# 32 GB home. The container sees this job's environment, so HF_HOME (the shared model cache) and HF_HUB_OFFLINE=1
+# 32 GB home. The container sees this job's environment, so HF_HUB_CACHE (the shared model cache) and HF_HUB_OFFLINE=1
 # from env/marlowe.sh apply inside it.
 export VLLM_CACHE_ROOT=$XDG_CACHE_HOME/vllm FLASHINFER_WORKSPACE_DIR=$XDG_CACHE_HOME/flashinfer
 apptainer exec --nv --bind /scratch/c001 "$SIF" \

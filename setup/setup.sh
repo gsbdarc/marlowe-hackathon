@@ -42,14 +42,16 @@ if [ "$CLUSTER" = marlowe ]; then
   if [ -e "$SIF" ]; then echo "already there: $SIF"
   else mkdir -p "$(dirname "$SIF")" && apptainer pull "$SIF" docker://vllm/vllm-openai:v0.31.0; changed=1; fi
 fi
-if [ "$changed" = 1 ]; then chmod -R g-w "$CACHE"; fi     # read only for everyone but its owner
+if [ "$changed" = 1 ] && [ -O "$CACHE" ]; then chmod -R g-w "$CACHE"; fi     # read only for everyone but its owner
 for m in "${MODELS[@]}"; do
   get "$m" --offline || { echo "model missing from $CACHE: $m" >&2; exit 1; }
   echo "model ok: $m"
 done
 
-echo "== 2. Kev, for you, in $KEV_HOME"
-bash scripts/setup_kev.sh                  # skips what is already installed; needed to build the data
+echo "== 2. Kev, in $KEV_HOME"
+bash scripts/setup_kev.sh                  # skips what is already installed; step 3 needs it
+# Marlowe: everyone uses this prebuilt Kev, so make it read only for everyone but its owner
+if [ "$CLUSTER" = marlowe ] && [ -O "$KEV_HOME" ]; then chmod -R g-w "$KEV_HOME"; fi
 
 echo "== 3. data, in $(dirname "$DATA")"
 OUT=$(dirname "$DATA")                     # train, valid and test1000 go next to the release
@@ -80,7 +82,7 @@ else
   $PY scripts/make_kev_data.py --out "$OUT"
   changed=1
 fi
-if [ "$changed" = 1 ]; then chmod -R g-w "$OUT"; fi       # read only for everyone but its owner
+if [ "$changed" = 1 ] && [ -O "$OUT" ]; then chmod -R g-w "$OUT"; fi       # read only for everyone but its owner
 # /scratch/c001/users: each participant makes a folder here. env/marlowe.sh may already have made it, for your own Kev
 if [ "$CLUSTER" = marlowe ]; then
   mkdir -p "$(dirname "$ME")"

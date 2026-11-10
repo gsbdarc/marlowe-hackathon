@@ -1,11 +1,12 @@
 # Settings for jobs on Marlowe. Source it, don't run it:  source env/marlowe.sh
 # Marlowe home is 32 GB, so code, weights, caches and runs all go to the class's scratch space, /scratch/c001.
 export SHARE=${SHARE:-/scratch/c001/marlowe-hackathon}      # shared and read only: data, models, container
-export ME=${ME:-/scratch/c001/users/$USER}                   # yours: your clone, Kev, runs and caches
+export ME=${ME:-/scratch/c001/users/$USER}                   # yours: your clone, runs and caches
 export DATA=${DATA:-$SHARE/data/jev}                         # Jev-labeled Item 5.02 release (read only)
 export WORK=${WORK:-$ME/ceo-turnover}                        # your training data, runs and results
-export KEV_HOME=${KEV_HOME:-$ME/kev}                         # Kev code and its Python environment (setup_kev.sh)
-export HF_HOME=${HF_HOME:-$SHARE/hf_cache}                   # shared model weights
+export KEV_HOME=${KEV_HOME:-$SHARE/kev}                      # Kev and its Python, prebuilt by setup/setup.sh (read only)
+export HF_HOME=${HF_HOME:-$ME/hf}                            # your Hugging Face settings and lock files
+export HF_HUB_CACHE=${HF_HUB_CACHE:-$SHARE/hf_cache/hub}     # model weights, downloaded by setup/setup.sh (read only)
 export HF_HUB_OFFLINE=1                                      # every model is pre-downloaded by DARC: never download
 export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=$ME/.cache PIP_CACHE_DIR=$ME/.cache/pip

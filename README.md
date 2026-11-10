@@ -14,6 +14,7 @@ scale.
 | Path | What |
 |---|---|
 | `docs/` | the website (Jekyll, just-the-docs), deployed by `.github/workflows/pages.yml` on every push to `main` |
+| `setup/` | instructor setup: models, container and data on each cluster, run once per cluster ([setup/README.md](setup/README.md)) |
 | `env/` | paths and cache settings for the Yens (`yens.sh`) and Marlowe (`marlowe.sh`) |
 | `scripts/` | setup, data preparation, labeling, scoring, step timing, and the Weights & Biases sidecar |
 | `slurm/train_args.sh` | the training job every checkpoint runs |
