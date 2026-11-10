@@ -1,13 +1,19 @@
 #!/bin/bash
-# One-time setup, run where you log in (an interactive Yen node, or the Marlowe login node), not in a job: Kev's code
-# and Python environment, and a check that the models are in the shared cache.
+# Checks the shared Kev and the models, where you log in (an interactive Yen node, or the Marlowe login node):
 #   source env/yens.sh      (or env/marlowe.sh)
 #   bash scripts/setup_kev.sh
-# Takes about 3 minutes and about 8 GB of scratch. Safe to rerun: finished steps are skipped.
+# It never changes Kev. KEV_HOME is one Kev for everyone, which setup/setup.sh builds with KEV_BUILD=1: Kev's code and
+# Python environment, about 3 minutes and 8 GB. Safe to rerun: finished steps are skipped.
 set -euo pipefail
 : "${KEV_HOME:?source env/yens.sh or env/marlowe.sh first}"
 KEV_COMMIT=53cb0b5                       # the Kev commit DARC tested
 UV=$KEV_HOME/bin/uv
+if [ "${KEV_BUILD:-0}" != 1 ]; then
+  [ -x "$KEV_HOME/kev/.venv/bin/python" ] \
+    || { echo "no Kev in $KEV_HOME: the instructors build it with setup/setup.sh" >&2; exit 1; }
+  echo "using the shared Kev in $KEV_HOME"
+  cd "$KEV_HOME/kev"
+else
 mkdir -p "$KEV_HOME"
 if [ ! -x "$UV" ]; then                  # uv is not installed on the clusters; install it into KEV_HOME
   # pip --target, not a venv: Marlowe's system Python has no ensurepip, so python3 -m venv fails there
@@ -25,6 +31,7 @@ cd "$KEV_HOME/kev" && git checkout -q "$KEV_COMMIT"
 # matches torch 2.8 / CUDA 12 / Python 3.13; --no-deps, or resolving its torch requirement puts back Triton 3.4
 "$UV" pip install --python .venv/bin/python -q --no-deps \
   "https://github.com/Dao-AILab/causal-conv1d/releases/download/v1.7.0/causal_conv1d-1.7.0%2Bcu12torch2.8cxx11abiTRUE-cp313-cp313-linux_x86_64.whl"
+fi
 # Models. DARC downloads them into the shared cache before the day. HF_HUB_OFFLINE=1 makes these lines only check
 # they are there: setup never downloads a model. The Intermediate track needs only the 4B models, so a missing one fails
 # setup; Kev-27B is for the Advanced track, so a missing Kev-27B only prints a note.

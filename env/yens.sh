@@ -1,16 +1,30 @@
 # Settings for jobs on the Yens. Source it, don't run it:  source env/yens.sh
-# Every cache and config goes to scratch, never home. Change DATA if your copy of the data is elsewhere.
-export HACKATHON=/scratch/shared/marlowe_hackathon
-export DATA=${DATA:-$HACKATHON/data/jev}                     # Jev-labeled Item 5.02 release (read only)
-export WORK=${WORK:-/scratch/users/$USER/ceo-turnover}      # your training data, runs and results
-export KEV_HOME=${KEV_HOME:-/scratch/users/$USER/kev}       # Kev code and its Python environment (setup_kev.sh)
-export HF_HOME=${HF_HOME:-/scratch/users/$USER/hf}          # your Hugging Face settings and lock files
-export HF_HUB_CACHE=${HF_HUB_CACHE:-$HACKATHON/hf/hub}       # model weights, downloaded by DARC (read only)
+# Every cache and config goes to scratch, never home. Sourcing it always resets these paths.
+export HACKATHON=/scratch/shared/marlowe_hackathon          # shared, read only: data, models, kev, repo
+export DATA=$HACKATHON/data/jev                     # Jev-labeled Item 5.02 release (read only)
+export CLASS_DATA=$HACKATHON/data             # train, valid, test1000, built by setup/setup.sh (read only)
+export WORK=/scratch/users/$USER/ceo-turnover      # your training data, runs and results
+export KEV_HOME=$HACKATHON/kev                 # Kev and its Python, prebuilt by setup/setup.sh (read only)
+export HF_HOME=/scratch/users/$USER/.cache/huggingface   # your Hugging Face settings and lock files
+export HF_HUB_CACHE=$HACKATHON/models       # model weights, downloaded by setup/setup.sh (read only)
 export HF_HUB_OFFLINE=1                                      # every model is already in HF_HUB_CACHE: never download
 export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=/scratch/users/$USER/.cache PIP_CACHE_DIR=/scratch/users/$USER/.cache/pip
 export TRITON_CACHE_DIR=/scratch/users/$USER/.cache/triton TORCHINDUCTOR_CACHE_DIR=/scratch/users/$USER/.cache/inductor
+export APPTAINER_CACHEDIR=/scratch/users/$USER/.cache/apptainer MPLCONFIGDIR=/scratch/users/$USER/.cache/matplotlib
+export WANDB_CACHE_DIR=/scratch/users/$USER/.cache/wandb WANDB_DATA_DIR=/scratch/users/$USER/.cache/wandb
+export WANDB_CONFIG_DIR=/scratch/users/$USER/.cache/wandb-config CUDA_CACHE_PATH=/scratch/users/$USER/.cache/nv
+export FLASHINFER_WORKSPACE_DIR=/scratch/users/$USER/.cache/flashinfer
 export KEV_PREFIX_CACHE=0                                    # time every filing on its own
 export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
-mkdir -p "$WORK" "$HF_HOME" "$XDG_CACHE_HOME"
+mkdir -p "$WORK/results" "$HF_HOME" "$XDG_CACHE_HOME"   # $WORK/results: label.py and tee write there
+
+# In a terminal, say what was set; jobs and scripts source this quietly
+case $- in
+  *i*) printf '%s paths for this terminal:\n' "Yens"
+       printf '  shared, read only:\n'
+       printf '    %-10s %s\n' CLASS_DATA "$CLASS_DATA" models "$HF_HUB_CACHE" KEV_HOME "$KEV_HOME" PY "$PY"
+       printf '  yours:\n'
+       printf '    %-10s %s\n' WORK "$WORK" caches "$XDG_CACHE_HOME" ;;
+esac

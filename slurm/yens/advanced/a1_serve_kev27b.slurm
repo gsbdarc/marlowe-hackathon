@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/bash
 #SBATCH -J kev27b-server
 #SBATCH -p gpu
 #SBATCH -G 1

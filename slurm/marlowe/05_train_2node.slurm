@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J ceo-cp5
-#SBATCH --account=marlowe-m000106
+#SBATCH --account=marlowe-c001
 #SBATCH --partition=preempt
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1

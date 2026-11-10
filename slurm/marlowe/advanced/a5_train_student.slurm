@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J a5-student
-#SBATCH --account=marlowe-m000106
+#SBATCH --account=marlowe-c001
 #SBATCH --partition=preempt
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,7 +14,7 @@
 #SBATCH --mail-user=<sunet>@stanford.edu
 
 # A5: distill a student. Train Qwen3.5-4B-Base as a LoRA, with Kev's trainer, on a teacher's labels from
-# scripts/make_teacher_data.py. The argument names the teacher: its labels are $WORK/data/teacher-<name>.jsonl, and the
+# scripts/advanced/make_teacher_data.py. The argument names the teacher: its labels are $WORK/data/teacher-<name>.jsonl, and the
 # student is saved in $WORK/runs/a5-<name>.
 #   sbatch slurm/marlowe/advanced/a5_train_student.slurm qwen-235b         # the student of Qwen 235B
 set -euo pipefail
@@ -24,7 +24,7 @@ source slurm/train_args.sh             # job_timer, stamp, gpu_log
 TEACHER=${1:?name the teacher, for example qwen-235b}
 DATA=$WORK/data/teacher-$TEACHER.jsonl
 OUT=$WORK/runs/a5-$TEACHER
-[ -f "$DATA" ] || { echo "no $DATA: run scripts/make_teacher_data.py first" >&2; exit 1; }
+[ -f "$DATA" ] || { echo "no $DATA: run scripts/advanced/make_teacher_data.py first" >&2; exit 1; }
 job_timer
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"

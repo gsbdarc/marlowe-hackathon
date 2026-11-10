@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J a3-27b-2node
-#SBATCH --account=marlowe-m000106
+#SBATCH --account=marlowe-c001
 #SBATCH --partition=preempt
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ set -euo pipefail
 module load slurm mps
 source env/marlowe.sh
 GPUS=16
-source slurm/train_27b_args.sh
+source slurm/marlowe/advanced/train_27b_args.sh
 job_timer
 OUT=$WORK/runs/a3-2node
 mkdir -p logs && rm -rf "$OUT"

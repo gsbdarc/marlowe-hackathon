@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J a2-27b-1gpu
-#SBATCH --account=marlowe-m000106
+#SBATCH --account=marlowe-c001
 #SBATCH --partition=preempt
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
 GPUS=1
-source slurm/train_27b_args.sh
+source slurm/marlowe/advanced/train_27b_args.sh
 job_timer
 OUT=$WORK/runs/${RUN:-a2-1gpu}
 mkdir -p logs && rm -rf "$OUT"
