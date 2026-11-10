@@ -50,18 +50,22 @@ done
 
 echo "== 2. Kev, in $KEV_HOME"
 bash scripts/setup_kev.sh                  # skips what is already installed; step 3 needs it
-# Marlowe: everyone uses this prebuilt Kev, so make it read only for everyone but its owner
-if [ "$CLUSTER" = marlowe ] && [ -O "$KEV_HOME" ]; then chmod -R g-w "$KEV_HOME"; fi
+# everyone uses this prebuilt Kev, so make it read only for everyone but its owner
+if [ -O "$KEV_HOME" ]; then chmod -R g-w "$KEV_HOME"; fi
 
 echo "== 3. data, in $(dirname "$DATA")"
 OUT=$(dirname "$DATA")                     # train, valid and test1000 go next to the release
 changed=0
 YENS_JEV=/scratch/shared/marlowe_hackathon/data/jev   # Jev's release lives on the Yens: it is not on GitHub or Hugging Face
 if [ ! -e "$DATA/MANIFEST.json" ]; then
-  [ "$CLUSTER" = marlowe ] || { echo "Jev's release is not in $DATA" >&2; exit 1; }
-  echo "copying Jev's release from the Yens: log in to the Yens when asked"
   mkdir -p "$DATA"
-  rsync -a --info=progress2 "$USER@yen.stanford.edu:$YENS_JEV/" "$DATA/"
+  if [ "$CLUSTER" = yens ]; then          # the original, in DARC's project space
+    cp /yen/projects/darc/marlowe_hackathon/ceo-turnover/data/jev/* "$DATA/"
+    echo "copied Jev's release from /yen/projects/darc/marlowe_hackathon"
+  else
+    echo "copying Jev's release from the Yens: log in to the Yens when asked"
+    rsync -a --info=progress2 "$USER@yen.stanford.edu:$YENS_JEV/" "$DATA/"
+  fi
   changed=1
 fi
 python3 - "$DATA" <<'PY'

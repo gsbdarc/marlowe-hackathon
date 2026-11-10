@@ -3,8 +3,8 @@
 # and Python environment, and a check that the models are in the shared cache.
 #   source env/yens.sh      (or env/marlowe.sh)
 #   bash scripts/setup_kev.sh
-# Takes about 3 minutes and about 8 GB of scratch. Safe to rerun: finished steps are skipped. On Marlowe, KEV_HOME is a
-# shared Kev the instructors prebuilt (setup/setup.sh): it is read only, so this only checks it and the models.
+# Takes about 3 minutes and about 8 GB of scratch. Safe to rerun: finished steps are skipped. KEV_HOME is a shared Kev
+# the instructors prebuilt with setup/setup.sh: for participants it is read only, so this only checks it and the models.
 set -euo pipefail
 : "${KEV_HOME:?source env/yens.sh or env/marlowe.sh first}"
 KEV_COMMIT=53cb0b5                       # the Kev commit DARC tested

@@ -3,7 +3,7 @@
 export HACKATHON=/scratch/shared/marlowe_hackathon
 export DATA=${DATA:-$HACKATHON/data/jev}                     # Jev-labeled Item 5.02 release (read only)
 export WORK=${WORK:-/scratch/users/$USER/ceo-turnover}      # your training data, runs and results
-export KEV_HOME=${KEV_HOME:-/scratch/users/$USER/kev}       # Kev code and its Python environment (setup_kev.sh)
+export KEV_HOME=${KEV_HOME:-$HACKATHON/kev}                 # Kev and its Python, prebuilt by setup/setup.sh (read only)
 export HF_HOME=${HF_HOME:-/scratch/users/$USER/hf}          # your Hugging Face settings and lock files
 export HF_HUB_CACHE=${HF_HUB_CACHE:-$HACKATHON/hf/hub}       # model weights, downloaded by DARC (read only)
 export HF_HUB_OFFLINE=1                                      # every model is already in HF_HUB_CACHE: never download
