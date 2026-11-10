@@ -58,7 +58,7 @@ Marlowe downloads about 330 GB, most of it Qwen 235B, so start it well before th
 | Step | What it does | Skipped when |
 |---|---|---|
 | 1. Models | downloads each model at its pinned revision with `hf download`, using a temporary copy of `huggingface_hub` 1.32.0, the version Kev uses. No token is needed: the models are public. On the Yens, Qwen3.8-27B is tokenizer and config only; on Marlowe it is full weights, and Qwen 235B and the vLLM container are added for A4. Then it makes the cache read only and checks every model with downloads off | the model is already in the cache |
-| 2. Kev | runs `scripts/setup_kev.sh` to build the shared Kev everyone uses, in `kev/`, and makes it read only. Step 3 needs Kev's Python | each part already installed |
+| 2. Kev | builds the shared Kev everyone uses, in `kev/`, with `KEV_BUILD=1 bash scripts/setup_kev.sh`, and makes it read only. Without `KEV_BUILD=1`, as participants run it, `setup_kev.sh` only checks Kev and never changes it. Step 3 needs Kev's Python | Kev is already there |
 | 3. Data | copies Jev's release into `data/jev`: on the Yens from DARC's project space (`/yen/projects/darc/marlowe_hackathon`), on Marlowe from the Yens with `rsync`. It checks each file against `MANIFEST.json`, builds `train.jsonl`, `valid.jsonl`, `test1000.jsonl` and `test1000.parquet` with `scripts/make_kev_data.py`, and makes them read only. On Marlowe it also makes `/scratch/c001/users`, where each participant makes a folder for their own clone | the release or the training and test files are already there (the checksums are always checked) |
 
 The files it makes belong to whoever runs it, and only that person can change them afterwards. Run it as the

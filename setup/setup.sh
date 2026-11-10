@@ -49,9 +49,13 @@ for m in "${MODELS[@]}"; do
 done
 
 echo "== 2. Kev, in $KEV_HOME"
-bash scripts/setup_kev.sh                  # skips what is already installed; step 3 needs it
-# everyone uses this prebuilt Kev, so make it read only for everyone but its owner
-if [ -O "$KEV_HOME" ]; then chmod -R g-w "$KEV_HOME"; fi
+if [ -x "$PY" ]; then
+  echo "already there: $KEV_HOME"
+  bash scripts/setup_kev.sh                # only checks it and the models
+else
+  KEV_BUILD=1 bash scripts/setup_kev.sh    # builds it; step 3 needs it
+  chmod -R g-w "$KEV_HOME"                 # everyone uses this Kev: read only for everyone but its owner
+fi
 
 echo "== 3. data, in $(dirname "$DATA")"
 OUT=$(dirname "$DATA")                     # train, valid and test1000 go next to the release
