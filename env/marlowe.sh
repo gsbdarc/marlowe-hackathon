@@ -12,6 +12,8 @@ export UV_CACHE_DIR=$KEV_HOME/uv-cache UV_PYTHON_INSTALL_DIR=$KEV_HOME/uv-python
 export XDG_CACHE_HOME=$ME/.cache PIP_CACHE_DIR=$ME/.cache/pip
 export TRITON_CACHE_DIR=$ME/.cache/triton TORCHINDUCTOR_CACHE_DIR=$ME/.cache/inductor
 export APPTAINER_CACHEDIR=$ME/.cache/apptainer   # Marlowe's Apptainer guide: not the 32 GB home
+export MPLCONFIGDIR=$ME/.cache/matplotlib CUDA_CACHE_PATH=$ME/.cache/nv FLASHINFER_WORKSPACE_DIR=$ME/.cache/flashinfer
+export WANDB_CACHE_DIR=$ME/.cache/wandb WANDB_DATA_DIR=$ME/.cache/wandb WANDB_CONFIG_DIR=$ME/.cache/wandb-config
 export KEV_PREFIX_CACHE=0
 export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
