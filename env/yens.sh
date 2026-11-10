@@ -18,7 +18,7 @@ export FLASHINFER_WORKSPACE_DIR=/scratch/users/$USER/.cache/flashinfer
 export KEV_PREFIX_CACHE=0                                    # time every filing on its own
 export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
-mkdir -p "$WORK" "$HF_HOME" "$XDG_CACHE_HOME"
+mkdir -p "$WORK/results" "$HF_HOME" "$XDG_CACHE_HOME"   # $WORK/results: label.py and tee write there
 
 # In a terminal, say what was set; jobs and scripts source this quietly
 case $- in

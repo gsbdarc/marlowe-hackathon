@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/bash
 #SBATCH -J ceo-label
 #SBATCH -p gpu
 #SBATCH -G 1
