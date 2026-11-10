@@ -2,6 +2,7 @@
 # Every cache and config goes to scratch, never home. Change DATA if your copy of the data is elsewhere.
 export HACKATHON=/scratch/shared/marlowe_hackathon          # shared, read only: data, models, kev, repo
 export DATA=${DATA:-$HACKATHON/data/jev}                     # Jev-labeled Item 5.02 release (read only)
+export CLASS_DATA=${CLASS_DATA:-$HACKATHON/data}             # train, valid, test1000, built by setup/setup.sh (read only)
 export WORK=${WORK:-/scratch/users/$USER/ceo-turnover}      # your training data, runs and results
 export KEV_HOME=${KEV_HOME:-$HACKATHON/kev}                 # Kev and its Python, prebuilt by setup/setup.sh (read only)
 export HF_HOME=${HF_HOME:-/scratch/users/$USER/.cache/huggingface}   # your Hugging Face settings and lock files
@@ -22,5 +23,5 @@ mkdir -p "$WORK" "$HF_HOME" "$XDG_CACHE_HOME"
 # In a terminal, say what was set; jobs and scripts source this quietly
 case $- in
   *i*) printf '%s paths for this terminal:\n' "Yens"
-       printf '  %-9s %s\n' WORK "$WORK" KEV_HOME "$KEV_HOME" PY "$PY" models "$HF_HUB_CACHE" caches "$XDG_CACHE_HOME" ;;
+       printf '  %-10s %s\n' WORK "$WORK" CLASS_DATA "$CLASS_DATA" KEV_HOME "$KEV_HOME" PY "$PY" models "$HF_HUB_CACHE" caches "$XDG_CACHE_HOME" ;;
 esac

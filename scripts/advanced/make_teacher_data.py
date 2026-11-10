@@ -40,12 +40,12 @@ def teacher_record(rec, answers):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("answers", help="label.py --out file with the teacher's answers on training filings")
-    ap.add_argument("--data", default=os.path.join(os.environ.get("WORK", "."), "data", "train.jsonl"))
+    ap.add_argument("--data", default=os.path.join(os.environ.get("CLASS_DATA", "."), "train.jsonl"))
     ap.add_argument("--out", help="default: $WORK/data/teacher-<name of the answers file>.jsonl")
     a = ap.parse_args()
-    data_dir = os.path.dirname(os.path.abspath(a.data))
     name = os.path.splitext(os.path.basename(a.answers))[0]
-    out = a.out or os.path.join(data_dir, f"teacher-{name}.jsonl")
+    out = a.out or os.path.join(os.environ.get("WORK", "."), "data", f"teacher-{name}.jsonl")
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
 
     answers = {}
     for line in open(a.answers):
