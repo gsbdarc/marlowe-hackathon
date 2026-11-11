@@ -4,6 +4,75 @@
 #   kinds: Inference, Fine-tuning, LoRA, Distillation; add " bonus" for an optional part
 #   concepts: four links to the main ideas the page teaches; anchor is the heading's id on that page (empty for the top)
 #   then: an optional note on the arrow to the next task
+intermediate:
+  - id: I1
+    title: Score before training
+    url: /intermediate/i1/
+    model: Kev-4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40 or H200
+    kinds: [Inference]
+    then: the score to beat
+    concepts:
+      - {name: "Where the labels come from", anchor: where-the-labels-come-from-jev-and-system-one}
+      - {name: "Where the data lives", anchor: where-the-data-lives}
+      - {name: "GPU, batch size and number format", anchor: what-each-option-does}
+      - {name: "What the scores mean", anchor: what-the-scores-mean}
+  - id: I2
+    title: Fine-tune on one GPU
+    url: /intermediate/i2/
+    model: Qwen 4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40 or H200
+    kinds: [Fine-tuning, LoRA]
+    then: the same job on Marlowe
+    concepts:
+      - {name: "What Kev-4B is made of", anchor: what-kev-4b-is-made-of}
+      - {name: "How fine-tuning works", anchor: how-fine-tuning-works}
+      - {name: "GPU memory when training", anchor: what-uses-gpu-memory-when-training}
+      - {name: "Choose on validation, compare on test", anchor: choose-on-validation-compare-on-test}
+  - id: I3
+    title: Fine-tune on one Marlowe GPU
+    url: /intermediate/i3/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100
+    kinds: [Fine-tuning, LoRA]
+    then: the same job on 8 GPUs
+    concepts:
+      - {name: "Getting onto Marlowe", anchor: get-onto-marlowe}
+      - {name: "An H100 against an A40", anchor: compare-with-the-yens}
+      - {name: "Training every weight", anchor: part-2-train-every-weight}
+      - {name: "LoRA or a full fine-tune?", anchor: lora-or-a-full-fine-tune}
+  - id: I4
+    title: Fine-tune on a full node
+    url: /intermediate/i4/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 8 H100s
+    kinds: [Fine-tuning, LoRA bonus]
+    concepts:
+      - {name: "FSDP across 8 GPUs", anchor: why-one-gpu-is-slow-and-what-8-change}
+      - {name: "Speedup and GPU-hours", anchor: compare-with-one-gpu}
+      - {name: "More GPUs: worth it?", anchor: more-gpus-worth-it}
+      - {name: "LoRA on 4 and 8 GPUs (DDP)", anchor: going-further-lora-on-4-and-8-gpus}
+  - id: I5
+    title: Inference at scale
+    url: /intermediate/i5/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100, then 8
+    kinds: [Inference]
+    concepts:
+      - {name: "One shard per GPU", anchor: two-ways-to-use-8-gpus}
+      - {name: "When the job is stopped halfway", anchor: when-the-job-is-stopped-halfway}
+      - {name: "Scaling to more nodes", anchor: scale-it-up}
+      - {name: "The cost against Jev", anchor: how-much-money-you-saved}
 advanced:
   - id: A1
     title: Score before training

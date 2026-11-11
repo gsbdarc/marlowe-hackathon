@@ -56,9 +56,13 @@ up a 🟩 green sticky, or a 🟥 red one if you are stuck.
 | 4 | | [Fine-tune on a full node]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 1 node) | [Inference at scale]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
 | 5 | | [Inference at scale]({{ '/intermediate/i5/' | relative_url }}) (Marlowe, 1 node) | [Distill a student]({{ '/advanced/a5/' | relative_url }}) (Marlowe, 1 H100) |
 
-### The Advanced track at a glance
+### The Intermediate track at a glance
 
 Each card links to its page and to the main ideas the page teaches.
+
+{% include track_map.html track="intermediate" %}
+
+### The Advanced track at a glance
 
 {% include track_map.html track="advanced" %}
 
