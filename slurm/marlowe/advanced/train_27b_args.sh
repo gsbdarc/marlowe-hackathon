@@ -15,6 +15,6 @@ fi
 BASE=Qwen/Qwen3.8-27B
 BASE_REVISION=1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
 # Kev-27B's learning rates: 2e-6 for the backbone, 1e-4 for the new pointer head
-TRAIN_ARGS="--data $WORK/data/train.jsonl --base $BASE --base_revision $BASE_REVISION \
+TRAIN_ARGS="--data $CLASS_DATA/train.jsonl --base $BASE --base_revision $BASE_REVISION \
   --full_ft 1 --weights_dtype bf16 --dtype bf16 --checkpointing 1 --device cuda \
   --lr 2e-6 --head_lr 1e-4 --batch $BATCH --accum $ACCUM --max_state 2048 --max_steps $STEPS --seed 0 ${EXTRA_ARGS:-}"

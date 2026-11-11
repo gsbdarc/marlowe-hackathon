@@ -3,9 +3,9 @@
 Every training job writes logs/gpu-<jobid>.csv (a two-node job, one file per node): nvidia-smi's utilization and
 memory for each GPU every 15 seconds. With no arguments this reads the newest job's logs; or name the files.
 
-    $PY scripts/gpu_util.py                          # the newest job
-    $PY scripts/gpu_util.py logs/gpu-540493.csv      # one job
-    $PY scripts/gpu_util.py logs/gpu-540493.csv logs/gpu-540584-*.csv
+    $PY scripts/advanced/gpu_util.py                          # the newest job
+    $PY scripts/advanced/gpu_util.py logs/gpu-540493.csv      # one job
+    $PY scripts/advanced/gpu_util.py logs/gpu-540493.csv logs/gpu-540584-*.csv
 
 The average includes the minutes the job spends loading the model and saving it, when the GPUs wait.
 """

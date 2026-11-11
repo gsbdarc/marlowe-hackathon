@@ -59,7 +59,8 @@ def score(sample, path):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("runs", nargs="+")
-    ap.add_argument("--sample", default=os.path.join(os.environ.get("WORK", "."), "data", "test1000.parquet"))
+    ap.add_argument("--sample", default=os.path.join(os.environ.get("CLASS_DATA") or os.path.join(os.environ.get("WORK", "."), "data"),
+                                                   "test1000.parquet"))
     a = ap.parse_args()
     sample = pd.read_parquet(a.sample)
     sample["status"], sample["why"] = sample.status.astype(int), sample.why.astype(int)

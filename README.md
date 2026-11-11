@@ -14,19 +14,24 @@ scale.
 | Path | What |
 |---|---|
 | `docs/` | the website (Jekyll, just-the-docs), deployed by `.github/workflows/pages.yml` on every push to `main` |
-| `env/` | paths and cache settings for the Yens (`yens.sh`) and Marlowe (`marlowe.sh`) |
-| `scripts/` | setup, data preparation, labeling, scoring, step timing, and the Weights & Biases sidecar |
-| `slurm/train_args.sh` | the training job every checkpoint runs |
-| `slurm/yens/` | Yens training, data preparation, and serving a model to label filings |
-| `slurm/marlowe/` | Marlowe training at 1, 8 and 16 GPUs |
+| `setup/` | instructor setup: models, container, Kev and data on each cluster, run once per cluster ([setup/README.md](setup/README.md)) |
+| `env/` | `yens.sh` and `marlowe.sh`: every path and cache setting. Every job sources one; in a terminal it also prints the paths |
+| `scripts/` | tools the tracks share: `setup_kev.sh` (checks the shared Kev and models), `label.py`, `score.py`, `step_times.py`, `make_kev_data.py` |
+| `scripts/advanced/`, `scripts/intermediate/` | each track's own scripts |
+| `slurm/yens/`, `slurm/marlowe/` | job files, in a folder per track (`advanced/`, `intermediate/`), plus the shared `serve_and_label.slurm` |
+| `slurm/train_args.sh` | training settings the track jobs share |
 
-No data, results or model weights are in this repository. Jev's labeled filings are on the Yens at
-`/scratch/shared/marlowe_hackathon/data/jev` and on Marlowe at
-`/scratch/m000106/gsb_hackathon/ceo-turnover/data/jev`. `.gitignore` is a whitelist: only the paths above are
+## On the clusters
+
+No data, results or model weights are in this repository. `.gitignore` is a whitelist: only the paths above are
 tracked, and data files are ignored everywhere in the tree.
 
-The models are pre-downloaded into a shared cache on each cluster.
-[Models](https://gsbdarc.github.io/marlowe-hackathon/models/) on the website lists them and how to download them again.
+| | Yens | Marlowe |
+|---|---|---|
+| Shared folder, read only: `data/`, `models/`, `kev/`, `containers/` (Marlowe), `repo/` | `/scratch/shared/marlowe_hackathon` | `/scratch/c001/marlowe-hackathon` |
+| Each participant's folder: their clone, `$WORK`, caches | `/scratch/users/<sunet>` | `/scratch/c001/users/<sunet>` |
+
+Instructors fill the shared folders with `setup/setup.sh`: see [setup/README.md](setup/README.md).
 
 ## Build the site locally
 

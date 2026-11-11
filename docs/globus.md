@@ -20,7 +20,7 @@ You will copy `$WORK/data/` (about 270 MB) from the Yens to the same place on Ma
 | | Path |
 |---|---|
 | From (Yens) | `/scratch/users/<sunet>/ceo-turnover/data/` |
-| To (Marlowe) | `/scratch/m000106/gsb_hackathon/<sunet>/ceo-turnover/data/` |
+| To (Marlowe) | `/scratch/c001/users/<sunet>/ceo-turnover/data/` |
 
 {: .note }
 > Jev's labeled filings and the Kev-27B weights are already on Marlowe in the hackathon's shared folders. You only
@@ -59,7 +59,7 @@ The login is saved in your home directory, so you do this once.
 ## Step 3: Find the two collections
 
 ```
-> Use the globus CLI to find the collection IDs for "GSB/DARC yen" and for Marlowe's /scratch, and save them as YEN and MARLOWE in ~/.globus-hackathon.env. Then list /scratch/m000106/gsb_hackathon/ on Marlowe to check access.
+> Use the globus CLI to find the collection IDs for "GSB/DARC yen" and for Marlowe's /scratch, and save them as YEN and MARLOWE in ~/.globus-hackathon.env. Then list /scratch/c001/ on Marlowe to check access.
 ```
 {: .claude }
 
@@ -68,7 +68,7 @@ Read the commands Claude proposes before you approve each one. They should look 
 ```bash
 globus endpoint search "GSB/DARC yen"
 globus endpoint search "Marlowe"
-globus ls "$MARLOWE:/scratch/m000106/gsb_hackathon/"
+globus ls "$MARLOWE:/scratch/c001/"
 ```
 {: .yens }
 
@@ -78,7 +78,7 @@ Run it, sign in again in your laptop's browser, and retry.
 ## Step 4: Copy your training files
 
 ```
-> Start a Globus transfer of /scratch/users/$USER/ceo-turnover/data/ on YEN to /scratch/m000106/gsb_hackathon/$USER/ceo-turnover/data/ on MARLOWE, recursive, labeled "ceo-turnover data", then wait for it to finish and show me the task status.
+> Start a Globus transfer of /scratch/users/$USER/ceo-turnover/data/ on YEN to /scratch/c001/users/$USER/ceo-turnover/data/ on MARLOWE, recursive, labeled "ceo-turnover data", then wait for it to finish and show me the task status.
 ```
 {: .claude }
 
@@ -86,7 +86,7 @@ The commands behind it:
 
 ```bash
 globus transfer "$YEN:/scratch/users/$USER/ceo-turnover/data/" \
-  "$MARLOWE:/scratch/m000106/gsb_hackathon/$USER/ceo-turnover/data/" \
+  "$MARLOWE:/scratch/c001/users/$USER/ceo-turnover/data/" \
   --recursive --label "ceo-turnover data"
 globus task wait <task-id>
 globus task show <task-id>
@@ -98,8 +98,8 @@ A finished transfer shows `Status: SUCCEEDED`. Globus also emails you when a tra
 ## Step 5: Check on Marlowe
 
 ```bash
-ls -lh /scratch/m000106/gsb_hackathon/$USER/ceo-turnover/data/
-wc -l /scratch/m000106/gsb_hackathon/$USER/ceo-turnover/data/*.jsonl
+ls -lh /scratch/c001/users/$USER/ceo-turnover/data/
+wc -l /scratch/c001/users/$USER/ceo-turnover/data/*.jsonl
 ```
 {: .marlowe }
 
