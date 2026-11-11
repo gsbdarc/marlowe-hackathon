@@ -7,25 +7,132 @@ permalink: /task/
 
 # The Task and the Data
 
-## Item 5.02 filings
+## The filings and the three questions
 
-A public company files a Form 8-K within four business days of a major event. **Item 5.02** covers the departure and
-appointment of directors and officers, so every change of CEO since August 2004 has one. Most Item 5.02 filings are
-about someone else (a director, a CFO, a pay change), and the ones that are about the CEO rarely say why the CEO left.
+When a public company's CEO leaves, the company files a Form 8-K that includes an **Item 5.02** section, within four
+business days. Item 5.02 covers every change of directors and officers, so most of these filings are about someone
+else, such as a new director, a CFO who retires, or a change in pay. The ones that are about the CEO rarely say why the
+CEO left.
 
-## Jev's three questions
+**Jev**, TypeSafe's hosted decision model, answered three questions about 296,477 Item 5.02 filings, from August 2004
+to October 2026 (`scripts/questions.py`). Jev reads a filing and chooses among fixed options, giving a probability for
+each:
 
-**Jev** is TypeSafe's hosted decision model. It reads a document and chooses among fixed options, returning a
-probability for each. We asked Jev three questions about every Item 5.02 filing (`scripts/questions.py`):
+1. **Status.** What happens to the CEO? This is the main task. There are eight possible answers: not a CEO change,
+   temporary leave, becomes executive chair, becomes non-executive chair, stays as a director only, takes another role
+   at the company, leaves the company entirely, or an interim CEO steps aside.
+2. **Why.** Why is the CEO leaving, judging only from the filing? There are eight possible reasons: died, illness,
+   pushed out over performance, dismissed over legal or policy violations, retired, new job, other, or no reason
+   given. Most filings give no reason, so this is mostly "no reason given".
+3. **Future.** Was the change announced in advance?
 
-1. **Status:** what happens to the CEO? Not a CEO change, temporary leave, becomes executive chair, becomes
-   non-executive chair, stays as a director only, takes another role at the company, leaves the company entirely, or
-   an interim CEO steps aside.
-2. **Why** the CEO is leaving, judged only from the filing: died, illness, pushed out over performance, dismissed over
-   legal or policy violations, retired, new job, other, or no reason given.
-3. **Future:** is the change announced in advance?
+## Five filings
 
-Status is the main task. Most filings give no reason, so **why** is mostly "no reason given".
+Here are five filings from the test years (2022 to 2026), with Jev's answers. The numbers are Jev's probabilities.
+
+<details markdown="1">
+<summary>1. The filing is about someone else</summary>
+
+**Remitly Global, filed May 13, 2024** ([on EDGAR](https://www.sec.gov/Archives/edgar/data/1782170/000178217024000140/0001782170-24-000140-index.htm))
+
+> Effective May 13, 2024, Joshua Hug transitioned from his role as the Company's Chief Operating Officer to a new role
+> as Vice Chair, in which he will contribute to our company and product strategy and lead other key projects to
+> accelerate customer delivery. Mr. Hug will remain on our board of directors. The change to Mr. Hug's title was
+> approved by the board of directors on May 9, 2024.
+
+- **Status:** not a CEO change, 1.00
+
+The chief operating officer changes jobs, and the CEO isn't mentioned. 87% of filings are like this. Jev answers the
+other two questions as well, but they mean nothing when the CEO stays, so the training files leave them out.
+
+</details>
+
+<details markdown="1">
+<summary>2. The CEO leaves for another job</summary>
+
+**AgEagle Aerial Systems, filed December 21, 2023** ([on EDGAR](https://www.sec.gov/Archives/edgar/data/8504/000149315223045763/0001493152-23-045763-index.htm))
+
+> On December 17, 2023, AgEagle Aerial Systems Inc. (the "Company") received notice (the "Notice") from Mr. Barrett
+> Mooney, the Company's Chief Executive Officer, that he has decided to depart the Company as Chief Executive Officer
+> and Director to pursue another professional opportunity, effective December 31, 2023.
+>
+> The Board of Directors of the Company has retained an executive search firm to recruit a replacement for the Chief
+> Executive Officer position.
+
+- **Status:** leaves the company entirely, 1.00
+- **Why:** a new job, 0.97
+- **Announced in advance:** 0.98
+
+The filing came out on December 21 and the CEO leaves on December 31, so the change was announced in advance.
+
+</details>
+
+<details markdown="1">
+<summary>3. The CEO retires and becomes executive chair</summary>
+
+**OSI Systems, filed May 3, 2024** ([on EDGAR](https://www.sec.gov/Archives/edgar/data/1039065/000110465924057065/0001104659-24-057065-index.htm))
+
+> OSI Systems, Inc. (the "Company") announced today that Chairman and Chief Executive Officer Deepak Chopra has
+> informed the Company's Board of Directors of his plans to retire from his roles as President and Chief Executive
+> Officer by the end of the current calendar year, after the appointment of a successor. Following his retirement as
+> President and CEO, Mr. Chopra will continue to work with the Company as Executive Chairman of the Board.
+>
+> A copy of the press release announcing Mr. Chopra's retirement is attached hereto as Exhibit 99.1 and incorporated
+> herein by this reference.
+
+- **Status:** becomes executive chair, 0.93; stays in another role at the company, 0.07
+- **Why:** retired, 0.99
+- **Announced in advance:** 0.98
+
+</details>
+
+<details markdown="1">
+<summary>4. A close call</summary>
+
+**Huntington Ingalls Industries, filed March 4, 2022** ([on EDGAR](https://www.sec.gov/Archives/edgar/data/1501585/000119312522065623/0001193125-22-065623-index.htm))
+
+> On January 31, 2022, Huntington Ingalls Industries, Inc. (the "Company") filed a Current Report on Form 8-K
+> disclosing that C. Michael Petters would retire from his position as President and Chief Executive Officer
+> (Principal Executive Officer) and transition to his new position as an employee of the Company and Executive Vice
+> Chairman of the Board of Directors, effective March 1, 2022. In connection with the transition, Mr. Petters's (i)
+> annual base salary was increased from $1 to $770,000, effective February 28, 2022 and (ii) the target amount of his
+> 2022 grant of restricted performance stock rights under the Company's 2012 Long-Term Incentive Stock Plan was
+> decreased from $4.40 million the prior year to $1.45 million.
+
+- **Status:** becomes executive chair, 0.56; stays in another role at the company, 0.44
+- **Why:** retired, 0.82; no reason given, 0.15
+- **Announced in advance:** 0.92
+
+"Executive Vice Chairman" isn't quite executive chair and isn't quite another role, so Jev splits its answer between
+the two. Kev trains on both numbers, so it learns that this filing is a close call. This filing also reports a change
+first announced in an earlier 8-K, on January 31. The same CEO change appears in two filings, because the data counts
+filings, not events.
+
+</details>
+
+<details markdown="1">
+<summary>5. Jev gets it wrong</summary>
+
+**HEICO, filed September 29, 2025** ([on EDGAR](https://www.sec.gov/Archives/edgar/data/46619/000004661925000064/0000046619-25-000064-index.htm))
+
+> HEICO Corporation (the "Company") regrets to report that Laurans A. Mendelson, Executive Chairman of the Board of
+> Directors, passed away on September 27, 2025, at the age of 87. Mr. Mendelson served the Company in numerous
+> leadership roles during his tenure, including as Chairman and Chief Executive Officer from 1990 until earlier this
+> year. Following Mr. Mendelson's passing, and in accordance with the Company's long-standing succession plans
+> previously approved by the Board of Directors, Eric A. Mendelson and Victor H. Mendelson, the Company's Co-Vice
+> Chairmen and Co-Chief Executive Officers, were appointed Co-Chairmen of the Board of Directors, effective
+> immediately. They will continue to serve as the Company's Co-Chief Executive Officers. [...]
+
+- **Status:** leaves the company entirely, 0.61; not a CEO change, 0.38
+- **Why:** died, 0.90
+
+The executive chair died. He had been CEO until earlier that year, but the two co-CEOs keep their jobs, so the right
+status is "not a CEO change". Jev leans the other way. Jev's answers are what Kev trains on, so Kev learns to lean
+that way too.
+
+</details>
+
+To print three more CEO changes, picked at random, run `scripts/look.py` as shown in [The data](#the-data).
 
 ## The data
 
