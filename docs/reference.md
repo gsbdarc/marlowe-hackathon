@@ -1,7 +1,8 @@
 ---
 layout: default
 title: "Reference"
-nav_order: 11
+nav_order: 9
+has_children: true
 permalink: /reference/
 ---
 

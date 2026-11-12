@@ -37,29 +37,17 @@ By the end of the day, everyone:
 
 ## The project: CEO turnover in SEC filings
 
-When a public company's CEO leaves, the company files an 8-K under **Item 5.02**. A large hosted model, **Jev**, has
-read every Item 5.02 filing since 2004, about 300,000 of them, and answered three questions about each: what happens
-to the CEO, why, and whether the change was announced in advance.
-
-You will work with open models from the **Kev** family that answer the same questions. Training a Kev model on Jev's
-labels, including how confident Jev was, is distillation: a model you run yourself can then label filings at scale on
-a GPU you control.
-
-Before training, Kev-4B agrees with Jev on 58% of CEO changes. During the day you train, label filings at scale, and
-measure what each costs on the Yens and on Marlowe. [The task and the data]({{ '/task/' | relative_url }}) has the details.
+You teach open models to answer three questions about CEO changes in SEC filings the way a large hosted model, Jev,
+does. [The Project and the Data]({{ '/task/' | relative_url }}) has the details, and
+[Start Here]({{ '/start-here/' | relative_url }}) lists what to read before your first task.
 
 ---
 
 ## Tracks
 
-{: .note }
-> **How the hands-on part works.** It is self-paced: pick one track and work through its tasks in order, at your own
-> speed. Keep the two sticky notes on your table:
->
-> - 🟥 **Red on your laptop when you need help.** An instructor comes to you.
-> - 🟩 **Green on your laptop when you finish a task.** Post your result in
->   [{{ site.slack_channel }}]({{ site.slack_url }}) on Slack too. An instructor comes round to check it, and each
->   checked task counts toward the GPU-hours awarded at the end of the day.
+Pick one track and work through its tasks at your own pace.
+[How the hands-on part works]({{ '/start-here/' | relative_url }}#how-the-hands-on-part-works) explains the
+sticky notes and the check-ins.
 
 | Task | [Beginner]({{ '/beginner/' | relative_url }}) | [Intermediate]({{ '/intermediate/' | relative_url }}) | [Advanced]({{ '/advanced/' | relative_url }}) |
 |---|---|---|---|

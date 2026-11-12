@@ -1,7 +1,8 @@
 ---
 layout: default
 title: "Monitoring Training"
-nav_order: 4
+nav_order: 2
+parent: "Reference"
 permalink: /monitoring/
 ---
 

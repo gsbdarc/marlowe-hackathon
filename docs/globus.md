@@ -1,7 +1,8 @@
 ---
 layout: default
 title: "Moving Data with Globus"
-nav_order: 8
+nav_order: 3
+parent: "Reference"
 permalink: /globus/
 ---
 
@@ -14,7 +15,7 @@ when a task moves work between the Yens and Marlowe:
 |---|---|---|---|
 | [A2]({{ '/advanced/a2/' | relative_url }}), after the workshop | your A1 answers, `results/kev-27b-zeroshot.jsonl` | Yens | Marlowe |
 | [A5]({{ '/advanced/a5/' | relative_url }}) | a student you trained, `runs/a5-<teacher>/` | Marlowe | Yens |
-| [Label with your model]({{ '/label/' | relative_url }}) | a run you trained, `runs/<run>/` | Marlowe | Yens |
+| [Use your trained model]({{ '/label/' | relative_url }}) | a run you trained, `runs/<run>/` | Marlowe | Yens |
 
 Globus copies files between the two clusters directly, without passing them through your laptop. It checks every file
 when the copy finishes and retries if the connection drops. Each storage system is a **collection** in Globus:

@@ -2,6 +2,7 @@
 layout: default
 title: "Models"
 nav_order: 1
+parent: "Reference"
 permalink: /models/
 ---
 

@@ -1,11 +1,21 @@
 ---
 layout: default
-title: "The Task and the Data"
-nav_order: 2
+title: "The Project and the Data"
+nav_order: 1
+parent: "Start Here"
 permalink: /task/
 ---
 
-# The Task and the Data
+# The Project and the Data
+
+When a public company's CEO leaves, the company files an 8-K under **Item 5.02**. A large hosted model, **Jev**, has
+read every Item 5.02 filing since 2004, about 300,000 of them, and answered three questions about each: what happens
+to the CEO, why, and whether the change was announced in advance.
+
+You will work with open models from the **Kev** family that answer the same questions. Training a Kev model on Jev's
+labels, including how confident Jev was, is distillation: a model you run yourself can then label filings at scale on
+a GPU you control. During the day you train, label filings at scale, and measure what each costs on the Yens and on
+Marlowe.
 
 ## Item 5.02 filings
 
@@ -50,7 +60,9 @@ $PY scripts/look.py --examples 3
 
 ## The training files
 
-`scripts/make_kev_data.py` (run by `slurm/yens/00_data.slurm`) writes three files to `$WORK/data/`:
+`setup/setup.sh` builds the training files once on each cluster, with `scripts/make_kev_data.py`, into the class's
+shared, read-only `$CLASS_DATA` folder. `env/yens.sh` and `env/marlowe.sh` both set `$CLASS_DATA`, so every task reads
+the same files:
 
 | File | Records | What |
 |---|---|---|
@@ -58,12 +70,14 @@ $PY scripts/look.py --examples 3
 | `valid.jsonl` | 2,000 | from the validation split, half CEO changes |
 | `test1000.jsonl` | 1,000 | from the test split: 300 not CEO changes and 700 CEO changes spread across the seven statuses |
 
+`valid.parquet` and `test1000.parquet` hold the same filings with Jev's answers, for `scripts/score.py`.
+
 Each record is a request in Kev's API format plus Jev's answer. The **target** is Jev's whole probability
 distribution, not only its top choice: when Jev was torn between two options, the student learns that too. Filings
 that are not CEO changes carry only the status question.
 
-Training drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state` in `slurm/train_args.sh`),
-so each epoch trains on 52,757 records.
+Training drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state 2048`, set in every training
+job), so each epoch trains on 52,757 records.
 
 The test sample oversamples rare statuses so each is measurable, and every filing carries a weight back to the whole
 test split. `scripts/score.py` uses the weights to estimate agreement over all 56,334 test filings.

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Take It Home"
-nav_order: 10
+nav_order: 8
 permalink: /take-home/
 ---
 
