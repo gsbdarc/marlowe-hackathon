@@ -16,7 +16,7 @@ permalink: /reference/
 | `scripts/setup_kev.sh` | checks the shared Kev (commit `53cb0b5`) and the models; it never changes Kev. Instructors build Kev with `setup/setup.sh` |
 | `scripts/questions.py` | Jev's three questions and the text the model reads |
 | `scripts/look.py` | counts and examples from Jev's labels |
-| `scripts/make_kev_data.py` | Jev's labels to Kev training records: `train.jsonl`, `valid.jsonl`, `test1000.jsonl` |
+| `scripts/make_kev_data.py` | Jev's labels to Kev training records: `train.jsonl`, `valid.jsonl`, `test1000.jsonl`, and `valid.parquet` and `test1000.parquet` for scoring |
 | `scripts/label.py` | sends filings to a running Kev server and saves the answers |
 | `scripts/score.py` | agreement with Jev on the test sample |
 | `slurm/train_args.sh` | the Kev-4B training job the Yens and Marlowe scripts share |

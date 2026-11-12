@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH -J i3-full-1gpu
 #SBATCH --account=marlowe-c001
-#SBATCH --partition=preempt
+#SBATCH --partition=batch
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
-#SBATCH --time=00:30:00
+#SBATCH --time=01:20:00
 #SBATCH --output=logs/%x-%j.out
 # Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
 #SBATCH --mail-type=BEGIN,END,FAIL

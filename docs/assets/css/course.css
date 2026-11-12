@@ -1140,6 +1140,31 @@ tspan.personalize-token-unset {
 .main-content .jobid-field + div.highlighter-rouge { margin-top: 0; }
 .main-content span.jobid-token.jobid-unset { background: #fdf1d8; border-radius: 2px; }
 
+/* Option pickers (assets/js/picker.js): drop-downs above a command that rewrite it. Same type, border and focus as
+   the Job ID fields; on a narrow screen the drop-downs wrap onto more lines. */
+.main-content .picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 1rem 0 0.75rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 1rem;
+}
+.main-content .picker label { display: flex; flex-direction: column; gap: 0.25rem; font-weight: 700; color: #3a3733; }
+.main-content .picker select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #b5afa6;
+  border-radius: 5px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+}
+.main-content .picker select:focus { outline: 2px solid #8c1515; outline-offset: 1px; }
+.main-content .picker select:disabled { opacity: 0.45; cursor: not-allowed; }
+.main-content .picker + div.highlighter-rouge { margin-top: 0; }
+.main-content .picker-says { margin-top: 0.5rem; }
+
 /* "Found a problem?" block in the sidebar: a link styled as a button that opens a new GitHub issue with the page
    filled in. */
 .report-issue-button {

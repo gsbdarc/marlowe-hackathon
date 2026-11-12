@@ -8,9 +8,9 @@
 #SBATCH -t 04:00:00
 #SBATCH -o logs/%x-%j.out
 
-# Every setting of exercise 2 in one job, one after another on one GPU, for the room's reference dashboard. Each setting
-# trains for about 10 minutes (finetune_kev.slurm's default for the GPU), then is scored on the validation and the test
-# filings, all in its own W&B run. Participants run one setting at a time with finetune_kev.slurm.
+# Every setting of exercise 2 in one job, one after another on one GPU, for the hackathon's reference dashboard. Each
+# setting trains for about 10 minutes (finetune_kev.slurm's default for the GPU), then is scored on the validation and
+# the test filings, all in its own W&B run. Participants run one setting at a time with finetune_kev.slurm.
 #   sbatch -C GPU_MODEL:H200 slurm/yens/intermediate/finetune_grid.slurm    # about 2 hours on an H200
 # Each setting's log is logs/ceo-finetune-<jobid>-<setting>.out, and its run is $WORK/runs/i2/<jobid>-<setting>.
 set -uo pipefail
