@@ -41,7 +41,7 @@ your table:
 
 | Track | What you do | First task |
 |---|---|---|
-| [Beginner]({{ '/beginner/' | relative_url }}) | for researchers who have not trained a model or used a GPU cluster before | [Beginner]({{ '/beginner/' | relative_url }}) |
+| [Beginner]({{ '/beginner/' | relative_url }}) | for people who have never used a computing cluster or a GPU | [B1. Your first GPU job]({{ '/beginner/b1/' | relative_url }}) |
 | [Intermediate]({{ '/intermediate/' | relative_url }}) | one model, from one GPU to a full node | [I1. Score before training]({{ '/intermediate/i1/' | relative_url }}) |
 | [Advanced]({{ '/advanced/' | relative_url }}) | fine-tune a model too large for one GPU, on one node and then two | [A1. Score before training]({{ '/advanced/a1/' | relative_url }}) |
 
@@ -49,11 +49,11 @@ The tasks in each track:
 
 | Task | [Beginner]({{ '/beginner/' | relative_url }}) | [Intermediate]({{ '/intermediate/' | relative_url }}) | [Advanced]({{ '/advanced/' | relative_url }}) |
 |---|---|---|---|
-| 1 | [Being written]({{ '/beginner/' | relative_url }}) | [Score before training]({{ '/intermediate/i1/' | relative_url }}) (Yens, 1 GPU) | [Score before training]({{ '/advanced/a1/' | relative_url }}) (Yens, 1 H200) |
-| 2 | | [Fine-tune on one GPU]({{ '/intermediate/i2/' | relative_url }}) (Yens, 1 GPU) | [Fine-tune on one node]({{ '/advanced/a2/' | relative_url }}) (Marlowe, 1 H100, then 8 H100s) |
-| 3 | | [Fine-tune on one Marlowe GPU]({{ '/intermediate/i3/' | relative_url }}) (Marlowe, 1 H100) | [Fine-tune on two nodes]({{ '/advanced/a3/' | relative_url }}) (Marlowe, 16 H100s) |
-| 4 | | [Fine-tune on a full node]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 1 node) | [Inference at scale]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
-| 5 | | [Inference at scale]({{ '/intermediate/i5/' | relative_url }}) (Marlowe, 1 node) | [Distill a student]({{ '/advanced/a5/' | relative_url }}) (Marlowe, 1 H100) |
+| 1 | [Your first GPU job]({{ '/beginner/b1/' | relative_url }}) (Yens, 1 GPU) | [Score before training]({{ '/intermediate/i1/' | relative_url }}) (Yens, 1 GPU) | [Score before training]({{ '/advanced/a1/' | relative_url }}) (Yens, 1 H200) |
+| 2 | [Fine-tune the model]({{ '/beginner/b2/' | relative_url }}) (Yens, 1 GPU) | [Fine-tune on one GPU]({{ '/intermediate/i2/' | relative_url }}) (Yens, 1 GPU) | [Fine-tune on one node]({{ '/advanced/a2/' | relative_url }}) (Marlowe, 1 H100, then 8 H100s) |
+| 3 | [Run it on Marlowe]({{ '/beginner/b3/' | relative_url }}) (Marlowe, 1 H100) | [Fine-tune on one Marlowe GPU]({{ '/intermediate/i3/' | relative_url }}) (Marlowe, 1 H100) | [Fine-tune on two nodes]({{ '/advanced/a3/' | relative_url }}) (Marlowe, 16 H100s) |
+| 4 | [Many GPUs at once]({{ '/beginner/b4/' | relative_url }}) (Marlowe, 1 to 8 H100s) | [Fine-tune on a full node]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 1 node) | [Inference at scale]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
+| 5 | [From labels to a finding]({{ '/beginner/b5/' | relative_url }}) (Marlowe, no GPU) | [Inference at scale]({{ '/intermediate/i5/' | relative_url }}) (Marlowe, 1 node) | [Distill a student]({{ '/advanced/a5/' | relative_url }}) (Marlowe, 1 H100) |
 
 Each card in the box below links to a task and to the ideas it covers.
 

@@ -19,6 +19,8 @@ JEV_PER_BILLION = 42.0        # dollars per billion input tokens (I1)
 def load(d):
     shards = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(d, "shard-*_summary.json")))]
     jobs = [json.load(open(p)) for p in glob.glob(os.path.join(d, "job-*.json"))]
+    if not jobs:                  # written when the job ends: a wrong job ID, or a job still running
+        return None
     job = {"gpus": sum(j["gpus"] for j in jobs), "load_seconds": max(j["load_seconds"] for j in jobs)}
     ids = {json.loads(line)["id"] for p in glob.glob(os.path.join(d, "shard-*.jsonl")) for line in open(p)
            if json.loads(line).get("ok")}
@@ -41,7 +43,11 @@ def main():
     print(f"{'job':<10}{'GPUs':>5}{'filings':>9}{'failed':>7}{'filings/s':>10}{'load s':>7}"
           f"{'all hours':>10}{'GPU-hours':>10}{'GPUs $':>8}{'Jev $':>7}")
     for p in a.dirs:
-        shards, job, ids = load(p)
+        loaded = load(p)
+        if loaded is None:
+            print(f"{os.path.basename(p.rstrip('/')):<10}no job-*.json in {p}: a wrong job ID, or the job is still running")
+            continue
+        shards, job, ids = loaded
         n = sum(s["succeeded"] for s in shards)
         failed = sum(s["filings"] - s["succeeded"] for s in shards)
         wall = max((s["wall_seconds"] for s in shards), default=0)   # the job waits for its slowest shard

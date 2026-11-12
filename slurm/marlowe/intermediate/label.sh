@@ -7,6 +7,7 @@
 #   SHARDS=<GPUs>                 split the filings into this many shards; this job labels the first <GPUs> of them
 # More nodes: a job array, one node per task, each labeling the next <GPUs> shards. Two nodes, 16 GPUs:
 #   SHARDS=16 sbatch --array=0-1 slurm/marlowe/intermediate/label_8gpu.slurm
+#   RESULTS_NAME=i5               answers go in $WORK/results/<RESULTS_NAME>/<jobid>
 #   CONCURRENCY=64                filings each label.py keeps in flight (64 is the most a Kev server batches at once)
 set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
@@ -17,7 +18,7 @@ GPUS=$(nvidia-smi -L | wc -l)
 SHARDS=${SHARDS:-$GPUS}
 FIRST=$(( ${SLURM_ARRAY_TASK_ID:-0} * GPUS ))  # this task's first shard: 0, or 8 for the second node of a job array
 if [ $((FIRST + GPUS)) -gt "$SHARDS" ]; then echo "shards $FIRST to $((FIRST + GPUS - 1)) are past SHARDS=$SHARDS" >&2; exit 1; fi
-OUT=$WORK/results/i5/${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}   # one folder for every task of a job array
+OUT=$WORK/results/${RESULTS_NAME:-i5}/${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}   # one folder for every task of a job array
 mkdir -p logs "$OUT"
 nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > "logs/gpu-$SLURM_JOB_ID.csv" &
 PIDS=($!); trap 'kill "${PIDS[@]}" 2>/dev/null || true' EXIT
