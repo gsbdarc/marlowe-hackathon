@@ -19,8 +19,31 @@ It does not write free text, so its answers can go straight into a table.
 
 We sent Jev every Item 5.02 filing since 2004, about 296,000 of them, with three questions: what happens to the
 CEO, why, and whether the change was announced in advance. Labeling them all took about 20 minutes and cost about
-$19. Those answers are this hackathon's labels. Jev is the reference we measure against, not ground truth: a filing
-Jev gets wrong stays wrong in the labels.
+$14.38: about 342 million input tokens, at TypeSafe's $42 per billion. Those answers are this hackathon's labels. Jev
+is the reference we measure against, not ground truth: a filing Jev gets wrong stays wrong in the labels.
+
+### Why a decision model, and not a chat model?
+
+You could paste each filing into a chat model such as ChatGPT or Claude and ask the same three questions. For
+labeling data at scale, a decision model like Jev has five advantages:
+
+- **Every answer is one of your options.** A chat model writes text, which you then have to read and sort, and it can
+  answer outside your options or not at all. Jev's answers go straight into a table, one column per question.
+- **A probability for every option, not one answer.** You see how sure the model is, so you can find the unsure
+  filings and check those by hand. The unsure labels are where the mistakes are: when we labeled every filing with
+  Kev-4B, the filings where it disagreed with Jev were mostly ones it was only 20 to 30% sure of.
+- **The probabilities are what a small model learns from.** Kev trains on Jev's whole spread of probabilities, not
+  only its top choice, so it also learns which filings are close calls. A chat model's one answer would teach it only
+  the answer.
+- **It is cheap and fast at scale.** All 296,477 filings cost $14.38 and took about 20 minutes. Output is free; you
+  pay only for the text you send.
+- **Kev answers in the same format.** A Kev server takes the same requests and returns the same answers, so a Kev you
+  fine-tune can replace Jev without changing any code.
+
+A chat model is the better tool when the question is open-ended, when you need text pulled out of the document (a
+name, a date, a dollar amount), or when you want an explanation rather than a choice. The Intermediate track's
+[I1]({{ '/intermediate/i1/' | relative_url }}#where-the-labels-come-from-jev-and-system-one) has the full version,
+with an example request, how Jev's confidence is measured, and TypeSafe's documentation for each point.
 
 ## Kev: open models you run yourself
 
