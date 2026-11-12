@@ -60,11 +60,9 @@ Pick one track and work through its tasks in order.
 | 4 | | [Fine-tune on a full node]({{ '/intermediate/i4/' | relative_url }}) (Marlowe, 1 node) | [Inference at scale]({{ '/advanced/a4/' | relative_url }}) (Marlowe, 8 H100s) |
 | 5 | | [Inference at scale]({{ '/intermediate/i5/' | relative_url }}) (Marlowe, 1 node) | [Distill a student]({{ '/advanced/a5/' | relative_url }}) (Marlowe, 1 H100) |
 
-### The Advanced track at a glance
+Each card in the box below links to a task and to the ideas it covers.
 
-Each card links to its task and to the ideas it covers.
-
-{% include track_map.html track="advanced" %}
+{% include track_picker.html %}
 
 ---
 

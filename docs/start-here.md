@@ -11,15 +11,17 @@ permalink: /start-here/
 
 Read these in order before your first task.
 
-1. **[The Project and the Data]({{ '/task/' | relative_url }}):** the SEC filings, the three questions Jev answered
+1. Read [The Project and the Data]({{ '/task/' | relative_url }}): the SEC filings, the three questions Jev answered
    about each, the training files, and the Kev models you start from.
-2. **[Key Ideas]({{ '/concepts/' | relative_url }}):** the terms the task pages use. Skim it now and come back to it
-   when a page uses one.
-3. **Your SUNet ID:** type it in the **Your details** box in the sidebar. The commands on every page then show your
-   own paths.
-4. **Slack:** join [{{ site.slack_channel }}]({{ site.slack_url }}). It is where you post results and ask questions.
-5. **How the hands-on part works,** below.
-6. **Pick a track** and open its first task.
+2. Skim [Key Ideas]({{ '/concepts/' | relative_url }}), the terms the task pages use, and come back to it when a page
+   uses one.
+3. Type your SUNet ID in the **Your details** box in the sidebar, so the commands on every page show your own paths.
+4. Join [{{ site.slack_channel }}]({{ site.slack_url }}), where you post results and ask questions.
+5. Read how the hands-on part works, below.
+6. Pick a track and open its first task.
+
+If a command fails, a page is wrong or you spot a typo, click **File an issue** in the sidebar. It opens a GitHub
+issue with the page filled in; add what you ran and what happened. You need a GitHub account to file one.
 
 ---
 
