@@ -76,11 +76,14 @@ To run them under your own group's account, change these lines in each Marlowe j
 Access starts with the faculty PI. Marlowe's [access page](https://marlowe-research.stanford.edu/access/) has the
 current details:
 
-- **Basic Access:** the PI fills in the form personally. It gives a new PI's group 5,000 free GPU-hours for one year,
-  in jobs that can be preempted. Students and postdocs run under the PI's allocation.
-- **Medium and Large Projects:** up to 10,000 GPU-hours per cycle of about 12 weeks, or more, in jobs that are not
-  preempted. A group applies after it has Basic Access. Usage is billed to the PI's research account at Marlowe's
-  [recharge rates](https://marlowe-research.stanford.edu/access/#recharge).
+- **Basic Access:** the PI fills in the form personally. A new PI's group gets 5,000 free GPU-hours for the first full
+  12-week cycle after applying, on the `batch` partition, where jobs are not preempted. After that, Basic Access lets
+  the group run on the `preempt` partition. Students and postdocs run under the PI's allocation.
+- **Medium and Large Projects:** each cycle, a PI with Basic Access can apply for time on `batch`: up to 10,000
+  GPU-hours for a Medium Project, or more for a Large one.
+
+Beyond the free hours, all usage, on `preempt` as well as `batch`, is billed to the PI's research account at Marlowe's
+[recharge rates](https://marlowe-research.stanford.edu/access/#recharge).
 
 A project application ([application guide](https://marlowe-research.stanford.edu/access/application-guide/)) asks for
 the shape of your jobs: their wall time, GPUs and nodes, how many run at once, the storage they need, and scaling
@@ -93,3 +96,19 @@ than a full run, so their numbers are practice, not your project's figures. Meas
 - **GPU utilization and peak memory** (`scripts/advanced/gpu_util.py`) show how well the job uses the GPUs it asks for.
 
 Measure on short runs at two or three scales, multiply up to a full run, and add a margin for reruns and tuning.
+
+For example, a project that labels 3 million filings with Kev-4B and fine-tunes it at three learning rates, using the
+Beginner track's numbers on one H100:
+
+| Work | Measured today | GPU-hours |
+|---|---|---|
+| Label 3 million filings | 36 filings/s per GPU (B4) | 3,000,000 ÷ 36 ÷ 3,600 ≈ 23 |
+| Fine-tune for 5 epochs at each of 3 learning rates | about 5.5 GPU-hours per epoch (B3) | 5 × 3 × 5.5 ≈ 83 |
+| Margin for reruns, half again | | ≈ 53 |
+| **Total** | | **≈ 160** |
+
+That fits well inside a new group's 5,000 free GPU-hours. More GPUs at once barely change the total: in B4, 8 GPUs
+labeled 8.5 times as fast as one, for about the same GPU-hours.
+
+Questions about access or an application go to the Marlowe team, in the `#marlowe-researchers` Slack channel or at
+marlowe-info@stanford.edu.
