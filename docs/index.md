@@ -34,17 +34,17 @@ By the end of the day you will have:
 
 | Time | Session |
 |---|---|
-| 10:00 | Welcome: goals, the three tracks, the Slack channel, a quick login check on the Yens and Marlowe |
-| 10:15 | Talk: an introduction to Marlowe (Marlowe team) |
-| 10:50 | Talk: a social science researcher's Marlowe story |
-| 11:30 | Break; open a terminal on the Yens |
-| 11:40 | **Hands-on 1:** task 1 of your track |
+| 9:30 | Coffee |
+| 10:00 | Welcome, and a check that you can log in to the Yens and Marlowe |
+| 10:15 | An introduction to Marlowe, from the Marlowe team |
+| 10:50 | A social science researcher's Marlowe story |
+| 11:30 | Break |
+| 11:40 | Hands-on: start the first task of your track |
 | 12:30 | Lunch |
-| 1:15 | **Hands-on 2:** task 2 |
-| 2:00 | **Hands-on 3:** task 3 |
+| 1:15 | Hands-on |
 | 2:30 | Break |
-| 2:40 | **Hands-on 4:** tasks 4 and 5 |
-| 4:00 | Awards, templates, next steps for applying |
+| 2:40 | Hands-on |
+| 4:00 | Awards, and next steps for applying for Marlowe |
 
 ---
 
