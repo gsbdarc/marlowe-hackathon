@@ -34,7 +34,7 @@ GPUMON=$!; trap 'kill $GPUMON 2>/dev/null || true' EXIT
 
 # This exercise's project in the room's W&B team. The team's key is in $SHARE/wandb.env. A .env at the top of your
 # clone (git ignores it) overrides it, for a key of your own.
-export WANDB_PROJECT=${WANDB_PROJECT:-exercise-3-marlowe} WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
+export WANDB_PROJECT="${WANDB_PROJECT:-Intermediate Exercise 3}" WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 for f in "$SHARE/wandb.env" .env; do if [ -r "$f" ]; then set -a; source "$f"; set +a; fi; done
 GPU=$(nvidia-smi --query-gpu=name --format=csv,noheader -i 0 | awk '{print tolower($2)}')

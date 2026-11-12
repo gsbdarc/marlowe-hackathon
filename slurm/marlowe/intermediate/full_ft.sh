@@ -32,7 +32,7 @@ if [ ! -f "$INIT/checkpoint/head.pt" ]; then
   (cd "$KEV_HOME/kev" && $PY scripts/merge_lora_checkpoint.py --lora jaredpalmer/kev-4b@v1.0 --out "$INIT" --weights_dtype bf16)
 fi
 
-export WANDB_PROJECT=${WANDB_PROJECT:-$WANDB_DEFAULT} WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
+export WANDB_PROJECT="${WANDB_PROJECT:-$WANDB_DEFAULT}" WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 for f in "$SHARE/wandb.env" .env; do if [ -r "$f" ]; then set -a; source "$f"; set +a; fi; done
 NAME=$USER-h100x$GPUS-full-lr$LR-rps$RECORDS_PER_STEP

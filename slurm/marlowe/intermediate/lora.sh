@@ -39,7 +39,7 @@ fi
 nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > "logs/gpu-$SLURM_JOB_ID.csv" &
 GPUMON=$!; trap 'kill $GPUMON 2>/dev/null || true' EXIT
 
-export WANDB_PROJECT=${WANDB_PROJECT:-lora-ddp} WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
+export WANDB_PROJECT="${WANDB_PROJECT:-Intermediate Exercise 4}" WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 for f in "$SHARE/wandb.env" .env; do if [ -r "$f" ]; then set -a; source "$f"; set +a; fi; done
 NAME=$USER-h100x$GPUS-lora-lr$LR-rps$RECORDS_PER_STEP-$WEIGHTS
