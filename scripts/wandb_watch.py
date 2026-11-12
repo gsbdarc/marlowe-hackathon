@@ -113,7 +113,7 @@ def main():
             run.summary["result"] = line.strip()
             if line.startswith("saved ") and a.run_dir:
                 try:
-                    run.summary.update(final_numbers(a.run_dir, records, per_step))
+                    run.log(final_numbers(a.run_dir, records, per_step))   # logged, not only summary: bar charts list logged keys
                 except (OSError, KeyError, ValueError) as e:
                     print(f"W&B: no training_metrics.json summary ({e})", flush=True)
             run.finish(exit_code=0 if line.startswith("saved ") else 1)
