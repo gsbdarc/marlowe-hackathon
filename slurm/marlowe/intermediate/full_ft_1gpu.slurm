@@ -7,7 +7,7 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 # Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
 #SBATCH --mail-type=BEGIN,END,FAIL

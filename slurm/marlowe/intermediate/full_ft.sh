@@ -7,11 +7,13 @@
 # Settings, set before sbatch:
 #   LR=2e-5                learning rate
 #   RECORDS_PER_STEP=16    filings per optimizer step, in total across the GPUs; a multiple of GPUS
-#   STEPS=100              optimizer steps (at least 20: the learning rate warms up over the first 10%)
+#   FILINGS=1600           filings to train on: FILINGS / RECORDS_PER_STEP steps (100 by default)
+#   STEPS=100              or set the optimizer steps directly (at least 20: the learning rate warms up over 10%)
 set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
-LR=${LR:-2e-5} RECORDS_PER_STEP=${RECORDS_PER_STEP:-16} STEPS=${STEPS:-100}
+LR=${LR:-2e-5} RECORDS_PER_STEP=${RECORDS_PER_STEP:-16} FILINGS=${FILINGS:-1600}
+STEPS=${STEPS:-$((FILINGS / RECORDS_PER_STEP))}
 if [ $((RECORDS_PER_STEP % GPUS)) != 0 ]; then echo "RECORDS_PER_STEP must be a multiple of $GPUS" >&2; exit 1; fi
 if [ "$STEPS" -lt 20 ]; then echo "STEPS must be at least 20" >&2; exit 1; fi
 INIT=$WORK/kev-4b-full                 # Kev-4B as full weights: its LoRA adapter merged into Qwen 4B
