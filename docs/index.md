@@ -7,10 +7,10 @@ permalink: /
 
 # Marlowe Hackathon 2026
 
-A one-day, hands-on hackathon for Stanford GSB researchers, run by DARC and the HAI Marlowe team. You start on the
-Yens and then fine-tune an open-weight model across GPUs and nodes on Marlowe, Stanford's H100 cluster. You leave
-with a working Marlowe job, Slurm templates for your own research, and the measurements a Marlowe project
-application asks for.
+Welcome! This is a one-day, hands-on hackathon for Stanford GSB researchers, run by DARC and the HAI Marlowe team. You
+start on the Yens and then fine-tune an open-weight model across GPUs and nodes on Marlowe, Stanford's H100 cluster.
+You leave with a working Marlowe job, Slurm templates for your own research, and a way to measure what your own jobs
+would need on Marlowe.
 
 ---
 
@@ -28,8 +28,8 @@ By the end of the day, everyone:
   ([Monitoring Training]({{ '/monitoring/' | relative_url }})).
 - **Leaves with job files for their own research,** from one GPU to two nodes, and knows what to change in them
   ([Take It Home]({{ '/take-home/' | relative_url }})).
-- **Knows how their PI's group applies for Marlowe,** with the GPU-hour and scaling numbers a project application
-  asks for ([Applying for Marlowe]({{ '/take-home/' | relative_url }}#applying-for-marlowe)).
+- **Knows how their PI's group applies for Marlowe,** and how to measure the GPU-hours and scaling a project
+  application asks for ([Applying for Marlowe]({{ '/take-home/' | relative_url }}#applying-for-marlowe)).
 - **Knows where to get help afterwards:** [RCpedia](https://rcpedia.stanford.edu) for the Yens,
   [Marlowe's documentation](https://marlowe-research.stanford.edu/documentation/) for Marlowe, and the Slack channel.
 

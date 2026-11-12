@@ -84,7 +84,8 @@ current details:
 
 A project application ([application guide](https://marlowe-research.stanford.edu/access/application-guide/)) asks for
 the shape of your jobs: their wall time, GPUs and nodes, how many run at once, the storage they need, and scaling
-evidence, such as the same job timed at more than one scale. The numbers you measure today are that evidence:
+evidence, such as the same job timed at more than one scale. Today's runs are short, a few minutes of training rather
+than a full run, so their numbers are practice, not your project's figures. Measure your own job the same way:
 
 - **Time per step at 1, 8 and 16 GPUs** (`step_times.py`) is a small scaling study.
 - **GPU-hours for a full run:** seconds per step × the steps a full run needs × GPUs ÷ 3,600. `step_times.py` prints
