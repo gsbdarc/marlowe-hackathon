@@ -5,7 +5,8 @@ kev.train prints a line every 10 optimizer steps:
     ep0 step 40/100 loss 0.412 kl 0.087 anchor 0.000 0.311s/rec
 
 This script follows the job's log, sends the loss and the speed to W&B, and stops when training saves or stops. Run on the
-GPU node, W&B also records the node's GPU utilization and memory on its System tab. The train_*.slurm scripts start
+GPU node, W&B also records the node's GPU utilization and memory on its System tab. The Advanced training jobs start
+it through slurm/marlowe/advanced/wandb.sh whenever they find the room's key; the older train_*.slurm templates start
 it when WANDB=1:
 
     WANDB=1 sbatch slurm/yens/01_train_1gpu.slurm
@@ -24,6 +25,7 @@ import wandb
 
 STEP = re.compile(r"ep(\d+) step (\d+)/(\d+) loss ([\d.]+) kl ([\d.]+) anchor ([\d.]+) ([\d.]+)s/rec")
 DONE = ("saved ", "stopped after step", "Traceback")
+STAMP = re.compile(r"^\[\s*\d+:\d{2}\] ")   # the [mm:ss] that slurm/train_args.sh's stamp() adds
 
 
 def follow(path):
@@ -46,10 +48,12 @@ def main():
     ap.add_argument("--project", default=os.environ.get("WANDB_PROJECT", "marlowe-hackathon"))
     a = ap.parse_args()
     run = wandb.init(project=a.project, name=f"{a.name}-{os.environ.get('SLURM_JOB_ID', 'local')}",
-                     config={"gpus": a.gpus, "job": os.environ.get("SLURM_JOB_ID"), "node": os.uname().nodename})
+                     config={"user": os.environ.get("USER"), "gpus": a.gpus, "job": os.environ.get("SLURM_JOB_ID"), "node": os.uname().nodename})
     signal.signal(signal.SIGTERM, lambda *_: (run.finish(exit_code=1), sys.exit(0)))   # the job ended first
     last = None
+    print(f"W&B run: {run.url}", flush=True)
     for line in follow(a.log):
+        line = STAMP.sub("", line)
         if m := STEP.search(line):
             ep, step, steps, loss, _, _, sec_rec = m.groups()   # kl and anchor are unused terms (always 0 here)
             now, step = time.time(), int(step)

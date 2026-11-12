@@ -24,11 +24,12 @@ module load slurm mps
 source env/marlowe.sh
 GPUS=8
 source slurm/marlowe/advanced/train_27b_args.sh
+source slurm/marlowe/advanced/wandb.sh
 job_timer
 RUN=${RUN:-a2-8gpu}
 OUT=$WORK/runs/$RUN
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
-wandb_watch "$RUN"
+wandb_room advanced-a2 "$RUN"
 cd "$KEV_HOME/kev"
 $KEV_HOME/kev/.venv/bin/torchrun --standalone --nproc_per_node 8 -m kev.train $TRAIN_ARGS --out "$OUT" 2>&1 | stamp
