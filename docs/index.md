@@ -7,10 +7,10 @@ permalink: /
 
 # Marlowe Hackathon 2026
 
-A one-day, hands-on hackathon for Stanford GSB researchers, run by DARC and the HAI Marlowe team. You pick one of three
-tracks: each starts on the Yens and then fine-tunes an open-weight model across GPUs and nodes on Marlowe, Stanford's
-H100 cluster. You leave with a working Marlowe job, Slurm templates for your own research, and the measurements a
-Marlowe project application asks for.
+A one-day, hands-on hackathon for Stanford GSB researchers, run by DARC and the HAI Marlowe team. You start on the
+Yens and then fine-tune an open-weight model across GPUs and nodes on Marlowe, Stanford's H100 cluster. You leave
+with a working Marlowe job, Slurm templates for your own research, and the measurements a Marlowe project
+application asks for.
 
 ---
 
@@ -18,10 +18,10 @@ Marlowe project application asks for.
 
 By the end of the day, everyone:
 
-- **Runs GPU jobs on Marlowe,** whatever track they start in.
-- **Scales a job past one GPU and measures what it buys.** Each track runs the same job on one GPU and then on a full
-  Marlowe node of 8 H100s; the Advanced track also spreads one job over two nodes. You compare the time per step,
-  the GPU memory and the GPU-hours at each scale, and see when more GPUs help and when they do not.
+- **Runs GPU jobs on Marlowe.**
+- **Scales a job past one GPU and measures what it buys:** the same job on one GPU and then on a full Marlowe node of
+  8 H100s, comparing the time per step, the GPU memory and the GPU-hours at each scale, to see when more GPUs help
+  and when they do not.
 - **Fine-tunes a model and scores it** against Jev's labels, and posts the result in
   [{{ site.slack_channel }}]({{ site.slack_url }}).
 - **Watches a job while it runs:** its log, its GPUs' use and memory, and its loss in Weights & Biases
