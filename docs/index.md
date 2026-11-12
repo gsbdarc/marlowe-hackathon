@@ -73,8 +73,6 @@ Each card links to its page and to the main ideas the page teaches.
 
 ---
 
----
-
 ## Take it home
 
 Every script here is a template you can adapt: swap in your own documents, questions and labels. [Take It
