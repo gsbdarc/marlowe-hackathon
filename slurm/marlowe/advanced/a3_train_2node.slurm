@@ -34,3 +34,4 @@ srun --kill-on-bad-exit=1 bash -c "nvidia-smi --query-gpu=timestamp,index,name,u
   exec $KEV_HOME/kev/.venv/bin/torchrun --nnodes $SLURM_NNODES --nproc_per_node 8 \
     --rdzv_id $SLURM_JOB_ID --rdzv_backend c10d --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT \
     -m kev.train $TRAIN_ARGS --out $OUT" 2>&1 | stamp
+wandb_wait

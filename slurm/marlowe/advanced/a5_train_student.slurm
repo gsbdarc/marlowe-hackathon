@@ -37,3 +37,4 @@ $PY -m kev.train --data "$DATA" --base Qwen/Qwen3.5-4B-Base \
   --full_ft 0 --lora 16 --lr 5e-5 --epochs 1 --max_steps 100 \
   --weights_dtype bf16 --dtype bf16 --checkpointing 1 --device cuda \
   --batch 1 --accum 16 --max_state 2048 --seed 0 --out "$OUT" 2>&1 | stamp
+wandb_wait

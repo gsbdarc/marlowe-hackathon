@@ -10,7 +10,15 @@ wandb_room() {
   if [ -n "${WANDB_API_KEY:-}" ] || [ "${WANDB_MODE:-}" = offline ]; then
     $PY scripts/wandb_watch.py --log "$PWD/logs/$SLURM_JOB_NAME-$SLURM_JOB_ID.out" --name "$USER-$2" --gpus "${GPUS:-1}" \
       ${3:+--run-dir "$3"} &
+    WANDB_WATCH=$!
   else
     echo "W&B off: no WANDB_API_KEY in $SHARE/wandb.env or .env"
   fi
+}
+# After training: give wandb_watch.py up to two minutes to send the last numbers and close the run, since it reads the
+# log every 5 seconds and the job would otherwise end, and stop it, before it sees the final "saved" line.
+wandb_wait() {
+  [ -n "${WANDB_WATCH:-}" ] || return 0
+  local i
+  for i in $(seq 1 60); do kill -0 "$WANDB_WATCH" 2>/dev/null || return 0; sleep 2; done
 }

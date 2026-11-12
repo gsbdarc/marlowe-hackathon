@@ -29,3 +29,4 @@ gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
 wandb_room advanced-a2 "${RUN:-a2-1gpu}" "$OUT"
 cd "$KEV_HOME/kev"
 $PY -m kev.train $TRAIN_ARGS --out "$OUT" 2>&1 | stamp
+wandb_wait
