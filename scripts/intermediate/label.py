@@ -20,10 +20,15 @@ throughput. A rerun skips filings already answered.
 With --wandb NAME (slurm/yens/intermediate/score_kev.slurm), the run also goes to Weights & Biases: the server's settings, the speed
 and GPU memory every 100 filings, and at the end the peak memory and the mean batch the server ran. Run it on the GPU
 node, as the job does: it reads the GPU with nvidia-smi, and W&B's System tab charts that GPU.
+
+--max-minutes M stops sending filings once M minutes of labeling have passed; the summary then says how many were
+answered and that the run was cut off. --load-seconds S records how long the server took to load the model, so the
+summary also has the job's time to the end of labeling.
 """
 import argparse
 import json
 import os
+import pwd
 import statistics
 import subprocess
 import sys
@@ -68,6 +73,8 @@ def main():
     ap.add_argument("--shard", type=int, default=0, help="which share of the filings to send, 0 to --shards - 1")
     ap.add_argument("--shards", type=int, default=1, help="split the filings into this many shares, one per GPU")
     ap.add_argument("--wandb", metavar="NAME", help="also log the run to Weights & Biases under this name")
+    ap.add_argument("--max-minutes", type=float, default=0, help="stop sending filings after this many minutes of labeling (0 = label them all)")
+    ap.add_argument("--load-seconds", type=float, help="how long the server took to load the model, for the summary")
     a = ap.parse_args()
     if a.data.endswith(".parquet"):
         import pandas as pd
@@ -94,17 +101,20 @@ def main():
         card = requests.get(f"{a.url}/v1/models", timeout=30).json()["models"][0]
         name, _, total = gpu()
         run = wandb.init(name=a.wandb, config={
-            "user": os.environ.get("USER"), "job": os.environ.get("SLURM_JOB_ID"), "gpu": name,
+            "user": pwd.getpwuid(os.getuid()).pw_name,   # what whoami prints: the account the job runs as
+            "job": os.environ.get("SLURM_JOB_ID"), "gpu": name,
             "gpu_memory_gb": round(total, 1), "model": card["run"], "dtype": card["dtype"],
-            "fused": os.environ.get("KEV_FUSED") != "0", "concurrency": a.concurrency, "filings": len(todo)})
+            "fused": os.environ.get("KEV_FUSED") != "0", "concurrency": a.concurrency, "filings": len(todo),
+            "max_minutes": a.max_minutes or None})
         print(f"W&B run: {run.url}", flush=True)
-    start, rows = time.perf_counter(), []
+    start, rows, cut = time.perf_counter(), [], False
     ex = ThreadPoolExecutor(a.concurrency)
     with open(a.out, "a") as f:
         for i, row in enumerate(ex.map(lambda r: ask(a.url, a.model, r, a.timeout), todo), 1):
             f.write(json.dumps(row) + "\n")
             rows.append(row)
-            if i % 100 == 0 or i == len(todo):
+            late = a.max_minutes and time.perf_counter() - start > 60 * a.max_minutes
+            if i % 100 == 0 or i == len(todo) or late:
                 bad = sum(not x["ok"] for x in rows)
                 rate = i / (time.perf_counter() - start)
                 print(f"  {i:,}/{len(todo):,}  {rate:.1f} filings/s  failed {bad}", flush=True)
@@ -115,7 +125,11 @@ def main():
             if i == 20 and all(not x["ok"] for x in rows):
                 ex.shutdown(wait=False, cancel_futures=True)   # do not wait for the requests still queued
                 raise SystemExit(f"stopping: the first 20 requests all failed ({rows[-1]['error']})")
-    ex.shutdown()
+            if late and i < len(todo):
+                cut = True
+                print(f"  stopped at the {a.max_minutes:g}-minute limit: {i:,} of {len(todo):,} filings done", flush=True)
+                break
+    ex.shutdown(wait=not cut, cancel_futures=cut)   # after a cut, don't wait for the filings still being labeled
     ok = [x["seconds"] for x in rows if x["ok"]]
     wall = time.perf_counter() - start
     summary = {"filings": len(todo), "succeeded": len(ok), "wall_seconds": round(wall, 1),
@@ -123,6 +137,10 @@ def main():
                "latency_p50": round(statistics.median(ok), 3) if ok else None,
                "latency_p95": round(sorted(ok)[int(0.95 * (len(ok) - 1))], 3) if ok else None,
                "concurrency": a.concurrency, "shard": a.shard, "shards": a.shards}
+    if a.max_minutes:
+        summary.update(max_minutes=a.max_minutes, cut_off=cut)
+    if a.load_seconds is not None:
+        summary.update(load_seconds=a.load_seconds, total_seconds=round(a.load_seconds + wall, 1))   # load + label
     if run:
         b = requests.get(f"{a.url}/v1/models", timeout=30).json()["models"][0]["batches"]
         summary.update(gpu_memory_peak_gb=round(peak, 1), mean_batch=round(b["requests"] / b["count"], 1) if b["count"] else None)

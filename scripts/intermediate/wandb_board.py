@@ -31,6 +31,8 @@ def i1():
                   ("test/status_agree_on_ceo_changes", "Agreement with Jev on CEO changes"),
                   ("test/ceo_change_f1", "CEO-change F1"))
     speed = bars(("filings_per_second", "Filings per second"),
+                 ("succeeded", "Filings labeled (of 1,000, within 10 minutes)"),
+                 ("total_seconds", "Job time to the end of labeling: load + label (s)"),
                  ("gpu_memory_peak_gb", "Peak GPU memory (GB)"),
                  ("mean_batch", "Average batch the server ran"))
     speed.append(wr.LinePlot(title="Filings per second while labeling", y=["filings_per_second_so_far"]))
@@ -38,6 +40,7 @@ def i1():
         wr.ParallelCoordinatesPlotColumn(metric=wr.Config(k)) for k in ("gpu", "concurrency", "dtype", "fused")] + [
         wr.ParallelCoordinatesPlotColumn(metric=wr.SummaryMetric(k)) for k in ("filings_per_second", "test/status_agree_weighted")])
     columns = ["config:user", "config:gpu", "config:concurrency", "config:dtype", "config:fused",
+               "summary:succeeded", "summary:cut_off", "summary:load_seconds", "summary:wall_seconds", "summary:total_seconds",
                "summary:filings_per_second", "summary:gpu_memory_peak_gb", "summary:test/status_agree_weighted",
                "summary:test/status_agree_on_ceo_changes", "summary:test/ceo_change_f1"]
     sections = [ws.Section(name="Scores", panels=scores, is_open=True),
