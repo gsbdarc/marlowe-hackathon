@@ -19,6 +19,13 @@ export KEV_PREFIX_CACHE=0
 export HF_HUB_DISABLE_UPDATE_CHECK=1                         # Kev pins huggingface_hub below 2.0: skip the hf CLI's upgrade hint
 export PY=$KEV_HOME/kev/.venv/bin/python
 export MARLOWE_ACCOUNT=marlowe-c001
+# The hackathon's nodes, set aside Friday 11/13 from 12:00 to 17:00. While the reservation is open, sbatch uses it by
+# itself; at any other time jobs go to the batch partition like anyone's. A --reservation on the command line wins.
+if scontrol show reservation GSB_Hackathon 2>/dev/null | grep -q "State=ACTIVE"; then
+  export SBATCH_RESERVATION=GSB_Hackathon
+else
+  unset SBATCH_RESERVATION
+fi
 mkdir -p "$WORK/results" "$HF_HOME" "$XDG_CACHE_HOME"   # $WORK/results: label.py and tee write there
 
 # In a terminal, say what was set; jobs and scripts source this quietly
@@ -27,5 +34,6 @@ case $- in
        printf '  shared, read only:\n'
        printf '    %-10s %s\n' CLASS_DATA "$CLASS_DATA" models "$HF_HUB_CACHE" KEV_HOME "$KEV_HOME" PY "$PY"
        printf '  yours:\n'
-       printf '    %-10s %s\n' WORK "$WORK" caches "$XDG_CACHE_HOME" ;;
+       printf '    %-10s %s\n' WORK "$WORK" caches "$XDG_CACHE_HOME"
+       printf '  jobs go to:\n    %s\n' "batch${SBATCH_RESERVATION:+, in the $SBATCH_RESERVATION reservation}" ;;
 esac

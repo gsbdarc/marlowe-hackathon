@@ -1140,6 +1140,31 @@ tspan.personalize-token-unset {
 .main-content .jobid-field + div.highlighter-rouge { margin-top: 0; }
 .main-content span.jobid-token.jobid-unset { background: #fdf1d8; border-radius: 2px; }
 
+/* Option pickers (assets/js/picker.js): drop-downs above a command that rewrite it. Same type, border and focus as
+   the Job ID fields; on a narrow screen the drop-downs wrap onto more lines. */
+.main-content .picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 1rem 0 0.75rem;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 1rem;
+}
+.main-content .picker label { display: flex; flex-direction: column; gap: 0.25rem; font-weight: 700; color: #3a3733; }
+.main-content .picker select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #b5afa6;
+  border-radius: 5px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+}
+.main-content .picker select:focus { outline: 2px solid #8c1515; outline-offset: 1px; }
+.main-content .picker select:disabled { opacity: 0.45; cursor: not-allowed; }
+.main-content .picker + div.highlighter-rouge { margin-top: 0; }
+.main-content .picker-says { margin-top: 0.5rem; }
+
 /* "Found a problem?" block in the sidebar: a link styled as a button that opens a new GitHub issue with the page
    filled in. */
 .report-issue-button {
@@ -1160,3 +1185,34 @@ tspan.personalize-token-unset {
   text-decoration: none;
 }
 .report-issue { padding-bottom: 0.75rem; }
+
+/* Track picker (_includes/track_picker.html): a collapsible box with one button per track; the checked radio shows
+   that track's map. The radios are visually hidden but stay focusable, so the buttons work from the keyboard. */
+.track-picker .tp-body { position: relative; padding: 0.6rem 0 0.2rem; }
+.track-picker .tp-radio { position: absolute; top: 0.6rem; left: 0; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.track-picker .tp-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 0.6rem; }
+.track-picker .tp-button {
+  padding: 0.3rem 0.9rem;
+  border: 1px solid #cfc9c0;
+  border-radius: 999px;
+  background: #fff;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-weight: 700;
+  color: #3a3733;
+  cursor: pointer;
+}
+.track-picker .tp-button:hover { background: #f3f0eb; }
+.track-picker .tp-panel { display: none; }
+.main-content .track-picker p.tp-hint { margin: 0 0 0.4rem; color: #6b665e; }
+#tp-beginner:checked ~ .tp-panel-beginner,
+#tp-intermediate:checked ~ .tp-panel-intermediate,
+#tp-advanced:checked ~ .tp-panel-advanced { display: block; }
+#tp-beginner:checked ~ .tp-hint,
+#tp-intermediate:checked ~ .tp-hint,
+#tp-advanced:checked ~ .tp-hint { display: none; }
+#tp-beginner:checked ~ .tp-buttons .tp-button-beginner,
+#tp-intermediate:checked ~ .tp-buttons .tp-button-intermediate,
+#tp-advanced:checked ~ .tp-buttons .tp-button-advanced { background: #3a3733; border-color: #3a3733; color: #fff; }
+#tp-beginner:focus-visible ~ .tp-buttons .tp-button-beginner,
+#tp-intermediate:focus-visible ~ .tp-buttons .tp-button-intermediate,
+#tp-advanced:focus-visible ~ .tp-buttons .tp-button-advanced { outline: 2px solid #8c1515; outline-offset: 2px; }

@@ -1,9 +1,152 @@
 # The track maps on the home page (_includes/track_map.html). One list per track, one entry per task, in order.
 #   title: what the task does, without the model; model: the model(s), shown as a label
 #   platform: Yens or Marlowe; nodes and gpus: what the task runs on
-#   kinds: Inference, Fine-tuning, LoRA, Distillation; add " bonus" for an optional part
+#   kinds: Inference, Fine-tuning, LoRA, Distillation, Analysis; add " bonus" for an optional part
 #   concepts: four links to the main ideas the page teaches; anchor is the heading's id on that page (empty for the top)
 #   then: an optional note on the arrow to the next task
+beginner:
+  - id: B1
+    title: Your first GPU job
+    url: /beginner/b1/
+    model: Kev-4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40
+    kinds: [Inference]
+    then: train it
+    concepts:
+      - {name: "What a cluster is", anchor: four-words-you-will-use-all-day}
+      - {name: "Logging in with SSH", anchor: step-1-log-in-and-get-the-code}
+      - {name: "Submitting a Slurm job", anchor: step-2-submit-the-job}
+      - {name: "Choosing a GPU", anchor: your-choice-which-gpu}
+      - {name: "Reading the result", anchor: step-3-watch-it-work}
+  - id: B2
+    title: Fine-tune the model
+    url: /beginner/b2/
+    model: Kev-4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40
+    kinds: [Fine-tuning]
+    then: the same job on Marlowe
+    concepts:
+      - {name: "What fine-tuning is", anchor: what-training-means-here}
+      - {name: "Training, validation and test", anchor: three-sets-of-filings}
+      - {name: "Choosing a learning rate", anchor: your-decision-the-learning-rate}
+      - {name: "Deciding on validation", anchor: the-room-decides-on-validation}
+      - {name: "Before and after", anchor: before-and-after-on-test}
+  - id: B3
+    title: Run it on Marlowe
+    url: /beginner/b3/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100
+    kinds: [Fine-tuning]
+    then: many GPUs at once
+    concepts:
+      - {name: "A second cluster", anchor: step-1-log-in-to-marlowe-and-get-the-code}
+      - {name: "Accounts and partitions", anchor: step-2-submit-the-job}
+      - {name: "A40 vs H100 speed", anchor: how-much-faster}
+      - {name: "Spending speed on time or data", anchor: your-decision-spend-the-speed-on-time-or-on-data}
+      - {name: "Compiling for a new GPU", anchor: challenge-run-it-twice}
+  - id: B4
+    title: Many GPUs at once
+    url: /beginner/b4/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1, then 2 to 8 H100s
+    kinds: [Inference]
+    then: a finding
+    concepts:
+      - {name: "Shards: one pile per GPU", anchor: one-gpu-then-several}
+      - {name: "Choosing how many GPUs", anchor: your-decision-how-many-gpus}
+      - {name: "Speedup and GPU-hours", anchor: step-3-compare-the-two}
+      - {name: "Plan your own project", anchor: challenge-plan-your-own-project}
+  - id: B5
+    title: From labels to a finding
+    url: /beginner/b5/
+    model: Kev-4B's labels
+    platform: Marlowe
+    nodes: login node
+    gpus: no GPU
+    kinds: [Analysis]
+    concepts:
+      - {name: "Trends from model labels", anchor: step-1-the-first-look}
+      - {name: "Choosing a question", anchor: your-decision-pick-your-question}
+      - {name: "Trusting model labels", anchor: what-the-room-found}
+      - {name: "Writing your own analysis", anchor: your-own-analysis}
+
+intermediate:
+  - id: I1
+    title: Score before training
+    url: /intermediate/i1/
+    model: Kev-4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40 or H200
+    kinds: [Inference]
+    then: the score to beat
+    concepts:
+      - {name: "Where the labels come from", anchor: where-the-labels-come-from-jev-and-system-one}
+      - {name: "GPU, batch size and number format", anchor: what-each-option-does}
+      - {name: "What fits in GPU memory", anchor: what-fits-in-gpu-memory}
+      - {name: "What the scores mean", anchor: what-the-scores-mean}
+  - id: I2
+    title: Fine-tune on one GPU
+    url: /intermediate/i2/
+    model: Qwen 4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40 or H200
+    kinds: [Fine-tuning, LoRA]
+    then: the same job on Marlowe
+    concepts:
+      - {name: "What LoRA is", anchor: what-lora-is}
+      - {name: "Steps, batch size and learning rate", anchor: steps-batch-size-and-learning-rate}
+      - {name: "Training and validation", anchor: training-and-validation}
+      - {name: "Why only 10 minutes", anchor: why-only-10-minutes}
+  - id: I3
+    title: Fine-tune on one Marlowe GPU
+    url: /intermediate/i3/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100
+    kinds: [Fine-tuning, LoRA]
+    then: the same job on 8 GPUs
+    concepts:
+      - {name: "Getting onto Marlowe", anchor: get-onto-marlowe}
+      - {name: "An H100 against an A40", anchor: compare-with-the-yens}
+      - {name: "Training every weight", anchor: part-2-train-every-weight}
+      - {name: "LoRA or a full fine-tune?", anchor: lora-or-a-full-fine-tune}
+  - id: I4
+    title: Fine-tune on a full node
+    url: /intermediate/i4/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 8 H100s
+    kinds: [Fine-tuning, LoRA bonus]
+    concepts:
+      - {name: "FSDP across 8 GPUs", anchor: why-one-gpu-is-slow-and-what-8-change}
+      - {name: "Speedup and GPU-hours", anchor: compare-with-one-gpu}
+      - {name: "More GPUs: worth it?", anchor: more-gpus-worth-it}
+      - {name: "LoRA on 4 and 8 GPUs (DDP)", anchor: going-further-lora-on-4-and-8-gpus}
+  - id: I5
+    title: Inference at scale
+    url: /intermediate/i5/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100, then 8
+    kinds: [Inference]
+    concepts:
+      - {name: "One shard per GPU", anchor: two-ways-to-use-8-gpus}
+      - {name: "When the job is stopped halfway", anchor: when-the-job-is-stopped-halfway}
+      - {name: "Scaling to more nodes", anchor: scale-it-up}
+      - {name: "The cost against Jev", anchor: how-much-money-you-saved}
 advanced:
   - id: A1
     title: Score before training
