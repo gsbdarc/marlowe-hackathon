@@ -29,10 +29,10 @@ intermediate:
     kinds: [Fine-tuning, LoRA]
     then: the same job on Marlowe
     concepts:
-      - {name: "What Kev-4B is made of", anchor: what-kev-4b-is-made-of}
-      - {name: "How fine-tuning works", anchor: how-fine-tuning-works}
-      - {name: "GPU memory when training", anchor: what-uses-gpu-memory-when-training}
-      - {name: "Choose on validation, compare on test", anchor: choose-on-validation-compare-on-test}
+      - {name: "What LoRA is", anchor: what-lora-is}
+      - {name: "Steps, batch size and learning rate", anchor: steps-batch-size-and-learning-rate}
+      - {name: "Training and validation", anchor: training-and-validation}
+      - {name: "Why only 10 minutes", anchor: why-only-10-minutes}
   - id: I3
     title: Fine-tune on one Marlowe GPU
     url: /intermediate/i3/

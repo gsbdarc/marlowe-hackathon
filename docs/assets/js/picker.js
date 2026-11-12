@@ -7,6 +7,9 @@
  * The code block right after the picker holds the default command, so the page works without JavaScript; its script
  * path (the word ending in .slurm) is kept. A `.picker-says` paragraph right after the code block is rewritten from the
  * picker's `data-says` template: each {name} becomes the chosen option's `data-says`, for the select with that name.
+ *
+ * A select with `data-needs="init=scratch"` applies only while the select named init is set to scratch. Otherwise it is
+ * greyed out, left out of the command, and its {name} becomes its `data-off-says` (empty if it has none).
  */
 (function () {
   'use strict';
@@ -23,6 +26,13 @@
     function render() {
       var env = [], flags = [], sentence = picker.getAttribute('data-says') || '';
       Array.prototype.forEach.call(selects, function (s) {
+        var need = (s.getAttribute('data-needs') || '').split('=');
+        var other = need[0] && picker.querySelector('select[name="' + need[0] + '"]');
+        s.disabled = !!other && other.value !== need[1];
+        if (s.disabled) {
+          sentence = sentence.replace('{' + s.name + '}', s.getAttribute('data-off-says') || '');
+          return;
+        }
         var opt = s.options[s.selectedIndex];
         sentence = sentence.replace('{' + s.name + '}', opt.getAttribute('data-says') || opt.text);
         if (s.value === s.getAttribute('data-default')) return;

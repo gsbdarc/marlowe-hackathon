@@ -1161,6 +1161,7 @@ tspan.personalize-token-unset {
   font-weight: 400;
 }
 .main-content .picker select:focus { outline: 2px solid #8c1515; outline-offset: 1px; }
+.main-content .picker select:disabled { opacity: 0.45; cursor: not-allowed; }
 .main-content .picker + div.highlighter-rouge { margin-top: 0; }
 .main-content .picker-says { margin-top: 0.5rem; }
 
