@@ -77,7 +77,7 @@ Each card links to its page and to the main ideas the page teaches.
 | 1:15 | **Hands-on 2:** task 2 |
 | 2:00 | **Hands-on 3:** task 3 |
 | 2:30 | Break |
-| 2:40 | **Hands-on 4:** task 4 |
+| 2:40 | **Hands-on 4:** tasks 4 and 5 |
 | 4:00 | Awards, templates, next steps for applying |
 
 ---

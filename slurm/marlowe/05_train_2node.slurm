@@ -1,11 +1,13 @@
 #!/bin/bash
 #SBATCH -J ceo-cp5
 #SBATCH --account=marlowe-c001
-#SBATCH --partition=preempt
+#SBATCH --partition=batch
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=8
 #SBATCH --exclusive
+#SBATCH --cpus-per-task=96
+#SBATCH --mem=1500G
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 # Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
@@ -13,7 +15,7 @@
 #SBATCH --mail-user=<sunet>@stanford.edu
 
 # Two Marlowe nodes, 16 H100s, one torchrun per node, with resume points.
-#   STOP_AFTER=100 sbatch slurm/marlowe/05_train_2node.slurm   # stops after step 100, as a preemption would
+#   STOP_AFTER=100 sbatch slurm/marlowe/05_train_2node.slurm   # stops after step 100, as a time limit would
 #   sbatch slurm/marlowe/05_train_2node.slurm                  # continues from $OUT/resume to step $STEPS
 # Kev writes a resume point every SAVE_STEPS optimizer steps; --resume 1 continues from the last one. A resumed
 # run must keep the same training arguments (STEPS included); only the save and stop settings may change.

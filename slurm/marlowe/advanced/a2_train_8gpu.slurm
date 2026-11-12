@@ -6,7 +6,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=8
 #SBATCH --exclusive
-#SBATCH --mem=0
+#SBATCH --cpus-per-task=96
+#SBATCH --mem=1500G
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 # Email when the job starts, ends or fails: replace <sunet> with your SUNet ID
@@ -14,7 +15,8 @@
 #SBATCH --mail-user=<sunet>@stanford.edu
 
 # A2, part 2: the same fine-tune on all 8 H100s of one node, sharded with FSDP2: each GPU holds 1/8 of the weights,
-# gradients and optimizer state. --exclusive --mem=0: the whole node and all its memory.
+# gradients and optimizer state. --exclusive: the whole node. batch sets the CPU count from the memory asked for:
+# --mem=0 would ask for 115 CPUs on a 112-CPU node and be refused, so the job asks for 96 CPUs and 1,500 GB.
 #   sbatch slurm/marlowe/advanced/a2_train_8gpu.slurm
 #   RUN=a2-batch2 BATCH=2 ACCUM=1 sbatch slurm/marlowe/advanced/a2_train_8gpu.slurm   # a named run with other settings
 set -euo pipefail
