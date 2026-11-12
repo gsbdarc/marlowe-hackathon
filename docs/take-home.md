@@ -45,7 +45,7 @@ on both sides.
 | `slurm/yens/serve_and_label.slurm` | serving any Kev checkpoint on one Yen GPU and labeling a file of documents |
 | `slurm/yens/01_train_1gpu.slurm` | a fine-tune on one GPU |
 | `slurm/marlowe/04_train_8gpu.slurm` | one full Marlowe node |
-| `slurm/marlowe/05_train_2node.slurm` | several nodes, with resume points for preemptible or time-limited jobs |
+| `slurm/marlowe/05_train_2node.slurm` | several nodes, with resume points for time-limited jobs |
 
 The training arguments live in one place, `slurm/train_args.sh`, so every scale runs the same job. Change the model,
 learning rate or number of steps there.
