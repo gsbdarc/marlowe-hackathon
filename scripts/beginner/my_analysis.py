@@ -3,7 +3,8 @@
     $PY scripts/beginner/my_analysis.py $WORK/results/b4/$ONE $WORK/results/b4/$MINE
 
 Each exercise has a TODO. Until you fill one in, the script says it is not done yet and moves on, so you can run the
-file after every change. The B5 page has hints and a worked answer for each.
+file after every change. The B5 page has hints and a worked answer for each. Each run also puts your progress, your
+Exercise 5 slopes and your charts on the room's W&B board (project beginner-5-analysis, under your SUNet ID).
 """
 import os
 import sys
@@ -17,6 +18,7 @@ from scipy.stats import linregress     # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from findings import load              # noqa: E402
+from wandb_log import analysis         # noqa: E402
 
 pd.set_option("display.width", 120)
 OUT = os.environ.get("WORK", ".")      # where the charts go: $WORK, your folder in scratch
@@ -124,3 +126,11 @@ else:
     print("\nExercise 5: CEO changes per 100 filings, regressed on year, 2004 to 2019\n")
     for name, fit in [("Kev", kev_fit), ("Jev", jev_fit)]:
         print(f"{name}: slope {fit.slope:+.3f} a year, standard error {fit.stderr:.3f}, t = {fit.slope / fit.stderr:.1f}")
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Your progress on the room's board: which exercises are done, your slopes, and your charts. Nothing to change here.
+done = {"e1": per_year is not None, "e2": compare is not None, "e3": kev_line is not None and jev_line is not None,
+        "e4": mine is not None, "e5": kev_fit is not None and jev_fit is not None}
+charts = [os.path.join(OUT, f) for f, e in (("b5-trend.png", "e3"), ("b5-mine.png", "e4")) if done[e]]
+analysis(done, kev_fit, jev_fit, charts)
