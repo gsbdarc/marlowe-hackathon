@@ -13,8 +13,8 @@ Read these in order before your first task.
 
 1. Read [The Project and the Data]({{ '/task/' | relative_url }}): the SEC filings, the three questions Jev answered
    about each, the training files, and the Kev models you start from.
-2. Skim [Key Ideas]({{ '/concepts/' | relative_url }}), the terms the task pages use, and come back to it when a page
-   uses one.
+2. Skim [Key Ideas]({{ '/concepts/' | relative_url }}): what Jev and Kev are, how fine-tuning works, and how a job
+   scales across GPUs. Come back to it when a task page links there.
 3. Type your SUNet ID in the **Your details** box in the sidebar, so the commands on every page show your own paths.
 4. Join [{{ site.slack_channel }}]({{ site.slack_url }}), where you post results and ask questions.
 5. Read how the hands-on part works, below.

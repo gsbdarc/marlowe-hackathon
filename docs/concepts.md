@@ -8,7 +8,8 @@ permalink: /concepts/
 
 # Key Ideas
 
-The terms used on the other pages, and what each means here.
+What Jev and Kev are, how fine-tuning works, and what changes when a job runs on more GPUs. The task pages link
+here when they rely on one of these.
 
 ---
 
@@ -18,26 +19,16 @@ The terms used on the other pages, and what each means here.
 and a set of questions with fixed answer options, and it returns, for each question, a probability for every option.
 It does not write free text, so its answers can go straight into a table.
 
-We sent Jev every Item 5.02 filing since 2004, about 296,000 of them, with three questions: what happens to the
-CEO, why, and whether the change was announced in advance. Labeling them all took about 20 minutes and cost about
-$19. Those answers are this hackathon's labels. Jev is the reference we measure against, not ground truth: a filing
-Jev gets wrong stays wrong in the labels.
+Jev's answers about every Item 5.02 filing are this hackathon's labels ([The Project and the
+Data]({{ '/task/' | relative_url }}) has the questions and the numbers). Jev is the reference we measure against, not
+ground truth: a filing Jev gets wrong stays wrong in the labels.
 
 ## Kev: open models you run yourself
 
 **Kev** is an open family of models built to answer the same kind of questions as Jev, through the same request
 format. The code (a trainer and a server) and the weights are public under Apache 2.0, so a Kev model runs on any GPU
-you have access to. Kev comes in four sizes:
-
-| Model | Built on | Weights |
-|---|---|---|
-| Kev-0.8B | Qwen3.5-0.8B | 1.8 GB |
-| **Kev-4B** | Qwen3.5-4B | 9.5 GB |
-| Kev-9B | Qwen3.5-9B | 19.5 GB |
-| Kev-27B | Qwen3.8-27B | 51 GB |
-
-The tracks use Kev models as reference points: their scores before any training are the bar to beat. Each track's
-pages say which model it scores and which it fine-tunes.
+you have access to. The tracks use Kev models as reference points: their scores before any training are the bar to
+beat. [The Project and the Data]({{ '/task/' | relative_url }}#the-kev-models) lists the four sizes and how each scores.
 
 A model you run yourself has a fixed version for replication, keeps confidential documents on Stanford hardware, and
 costs only GPU time to rerun on new filings or new questions.
@@ -55,8 +46,8 @@ the student puts the same probability on each option as Jev did. It should go do
 ## Fine-tuning, and what "full" means
 
 **Fine-tuning** continues training a model that is already trained, here on CEO turnover. A **full fine-tune** updates
-all of the model's weights, 4 billion for a 4B model. It needs more GPU memory than
-training a small add-on (an adapter) but it can be split across GPUs, which the Marlowe tasks do.
+all of the model's weights, 4 billion for a 4B model, and can be split across GPUs, which the Marlowe tasks do. A
+**LoRA** trains a small adapter on top of the model and leaves its weights frozen, so it needs much less GPU memory.
 
 ## Model checkpoints and resume points
 
@@ -66,7 +57,7 @@ training from it. Training writes one at the end.
 
 A **resume point** is a snapshot of a training job partway through (the weights, the optimizer state, and the position
 in the data), so a job that is stopped or preempted can carry on from there instead of starting over. Labeling jobs
-resume more simply: a rerun skips filings already answered.
+need no resume point: a rerun skips filings already answered.
 
 ## Steps, batches and epochs
 
@@ -75,14 +66,15 @@ resume more simply: a rerun skips filings already answered.
   16 records per step, whatever the number of GPUs.
 - An **epoch** is one pass over the whole training file: 52,757 records (after dropping the longest), so about 3,300 steps.
 
-Today's jobs run 100 steps (about 3% of an epoch). That is enough to measure speed and see the loss fall, but not to
-finish training.
+Today's training jobs are short, about 100 steps or 10 minutes, a few percent of an epoch. That is enough to measure
+speed and see the loss fall, but not to finish training.
 
 ## Scaling across GPUs
 
 On one GPU, the whole model and its training state must fit on that GPU and in the node's memory. With more GPUs,
 `torchrun` starts one copy of the training program per GPU and **FSDP** (fully sharded data parallel) splits the
-weights and optimizer state across them. The GPUs share each step's 16 records, so each step should take less time.
+weights and optimizer state across them. For a LoRA, each GPU holds a whole copy of the model instead (data parallel).
+Either way the GPUs share each step's 16 records, so each step should take less time.
 N GPUs are less than N times faster, because the GPUs exchange results at every step. That exchange is slower across
 nodes than within one, and slower again without a direct link between the GPUs. The Yen GPUs have no such link (they
 talk over the PCIe bus), so on the Yens you train on one GPU. Marlowe's H100s are linked by NVLink, so the scaling

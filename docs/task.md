@@ -225,8 +225,8 @@ The filings are left out on purpose:
 `valid.parquet` and `test1000.parquet` hold the same filings with Jev's answers, for `scripts/score.py`.
 
 Each record is a request in Kev's API format plus Jev's answer. The **target** is Jev's whole probability
-distribution, not only its top choice: when Jev was torn between two options, the student learns that too. Filings
-that are not CEO changes carry only the status question.
+distribution, not only its top choice ([distillation]({{ '/concepts/' | relative_url }}#distillation)). Filings that
+are not CEO changes carry only the status question.
 
 Training drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state 2048`, set in every training
 job), so each epoch trains on 52,757 records.
@@ -334,20 +334,21 @@ what you use.
 
 </details>
 
-## The student: Kev-4B
+## The Kev models
 
 [Kev](https://github.com/jaredpalmer/kev) is an open family of Jev-like models built on Qwen, released under Apache
-2.0. It comes in four sizes, from 0.8B to 27B parameters. We use **Kev-4B**: Qwen3.5-4B (9.3 GB of weights) plus
-Kev's trained adapter and answer head.
+2.0 ([Key Ideas]({{ '/concepts/' | relative_url }}#kev-open-models-you-run-yourself) says why that matters). It comes
+in four sizes. How each agrees with Jev before any training, on 1,000 filings:
 
-How the Kev models agree with Jev before any training, on 1,000 filings:
+| Model | Built on | Weights | Status agreement, all filings (weighted) | Status agreement, CEO changes | Filings per second |
+|---|---|---|---|---|---|
+| Kev-0.8B | Qwen3.5-0.8B | 1.8 GB | 13% | 23% | 18 (A40) |
+| **Kev-4B** | Qwen3.5-4B | 9.5 GB | **88%** | **58%** | **6 (A40)** |
+| Kev-9B | Qwen3.5-9B | 19.5 GB | 85% | 73% | 5 (A40) |
+| Kev-27B | Qwen3.8-27B | 51 GB | 96% | 84% | 6 (H200) |
 
-| Model | Status agreement, all filings (weighted) | Status agreement, CEO changes | Filings per second |
-|---|---|---|---|
-| Kev-0.8B | 13% | 23% | 18 (A40) |
-| **Kev-4B** | **88%** | **58%** | **6 (A40)** |
-| Kev-9B | 85% | 73% | 5 (A40) |
-| Kev-27B | 96% | 84% | 6 (H200) |
+The Beginner and Intermediate tracks start from **Kev-4B**: Qwen3.5-4B plus Kev's trained adapter and answer head.
+The Advanced track scores Kev-27B and fine-tunes its base model.
 
 Kev-4B gets the big call right (is this filing about the CEO at all?) and misses many of the finer ones. It is
 weakest when the CEO leaves the company entirely: it agrees with Jev on only 20% of those.
