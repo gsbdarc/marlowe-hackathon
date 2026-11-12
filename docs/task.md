@@ -157,23 +157,66 @@ $PY scripts/look.py --examples 3
 
 ## The training files
 
-`scripts/make_kev_data.py` (run by `slurm/yens/00_data.slurm`) writes three files to `$WORK/data/`:
+Kev doesn't train on all 296,477 filings Jev labeled. `scripts/make_kev_data.py` draws three files from the three
+splits. DARC ran it once for the class data folder, `$CLASS_DATA`; the Intermediate track copies that folder into
+`$WORK/data` in I1.
 
-| File | Records | What |
-|---|---|---|
-| `train.jsonl` | 54,426 | every CEO change in the train split, plus as many filings that are not CEO changes |
-| `valid.jsonl` | 2,000 | from the validation split, half CEO changes |
-| `test1000.jsonl` | 1,000 | from the test split: 300 not CEO changes and 700 CEO changes spread across the seven statuses |
+| File | Drawn from | Records | Which filings |
+|---|---|---|---|
+| `train.jsonl` | train split, 202,951 filings | 54,426 | all 27,213 CEO changes, plus 27,213 of the 175,738 other filings, picked at random |
+| `valid.jsonl` | validation split, 37,192 | 2,000 | picked at random from the 4,207 CEO changes and as many other filings, so about half are CEO changes |
+| `test1000.jsonl` | test split, 56,334 | 1,000 | 700 CEO changes spread across the seven statuses, and 300 that are not CEO changes |
+
+<style>
+.td { margin: 1.25rem 0 1.5rem; }
+.td-row { margin: 0 0 0.9rem; }
+.td-head { font-size: 0.875rem; line-height: 1.4; margin-bottom: 0.25rem; }
+.td-head b { font-weight: 600; }
+.td-head span { color: #55524d; }
+.td-bar { display: flex; height: 1.5rem; background: #f7f5f2; border: 1px solid #c9c3ba; border-radius: 4px; overflow: hidden; }
+.td-ceo { background: #8c1515; }
+.td-not { background: repeating-linear-gradient(135deg, #8c1515 0 3px, #ecd0d0 3px 7px); }
+.td-ceo-out { background: #ecd0d0; }
+.td-key { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; font-size: 0.8125rem; color: #55524d; margin-top: 0.75rem; }
+.td-key i { display: inline-block; width: 0.9rem; height: 0.9rem; vertical-align: -0.15rem; margin-right: 0.35rem; border: 1px solid #c9c3ba; border-radius: 2px; }
+</style>
+<div class="td" role="img" aria-label="Each split drawn to scale, with the part that goes into its file. Train: 54,426 of 202,951 filings, every CEO change and as many other filings. Validation: 2,000 of 37,192. Test: 1,000 of 56,334.">
+  <div class="td-row">
+    <div class="td-head"><b>Train split</b> 202,951 filings <span>· 54,426 in <code>train.jsonl</code>, 27%</span></div>
+    <div class="td-bar" style="width: 100%"><div class="td-ceo" style="width: 13.41%"></div><div class="td-not" style="width: 13.41%"></div></div>
+  </div>
+  <div class="td-row">
+    <div class="td-head"><b>Validation split</b> 37,192 <span>· 2,000 in <code>valid.jsonl</code>, 5%</span></div>
+    <div class="td-bar" style="width: 18.33%"><div class="td-ceo" style="width: 2.69%"></div><div class="td-not" style="width: 2.69%"></div><div class="td-ceo-out" style="width: 8.62%"></div></div>
+  </div>
+  <div class="td-row">
+    <div class="td-head"><b>Test split</b> 56,334 <span>· 1,000 in <code>test1000.jsonl</code>, 2%</span></div>
+    <div class="td-bar" style="width: 27.76%"><div class="td-ceo" style="width: 1.24%"></div><div class="td-not" style="width: 0.53%"></div><div class="td-ceo-out" style="width: 10.73%"></div></div>
+  </div>
+  <div class="td-key">
+    <span><i style="background: #8c1515"></i>CEO changes in the file</span>
+    <span><i style="background: repeating-linear-gradient(135deg, #8c1515 0 3px, #ecd0d0 3px 7px)"></i>other filings in the file</span>
+    <span><i style="background: #ecd0d0"></i>CEO changes left out</span>
+    <span><i style="background: #f7f5f2"></i>other filings left out</span>
+  </div>
+</div>
+
+The filings are left out on purpose:
+
+- **Training.** 87% of filings are not CEO changes. With every filing in, most of each training step would go to
+  filings that are not about the CEO, the easy call. Keeping as many of those as there are CEO changes means half of
+  every step is a CEO change. The other 148,525 filings that are not CEO changes stay unused.
+- **Scoring.** To score Kev, you label every filing in the file with it. On an A40, Kev-4B labels the 1,000 test filings
+  in about 3 minutes; all 56,334 would take more than 2½ hours. The test sample oversamples rare statuses so each is
+  measurable, and every filing carries a weight back to the whole test split: `scripts/score.py` uses the weights to
+  estimate agreement over all 56,334 test filings.
 
 Each record is a request in Kev's API format plus Jev's answer. The **target** is Jev's whole probability
 distribution, not only its top choice: when Jev was torn between two options, the student learns that too. Filings
 that are not CEO changes carry only the status question.
 
-Training drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state` in `slurm/train_args.sh`),
-so each epoch trains on 52,757 records.
-
-The test sample oversamples rare statuses so each is measurable, and every filing carries a weight back to the whole
-test split. `scripts/score.py` uses the weights to estimate agreement over all 56,334 test filings.
+Training also drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state 2048` in every training
+job), so each epoch trains on 52,757 records.
 
 ## The student: Kev-4B
 
