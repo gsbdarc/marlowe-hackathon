@@ -50,7 +50,7 @@ By the end of the day you will have:
 
 ## Tracks
 
-There are three tracks, Beginner, Intermediate and Advanced, each five tasks long.
+You pick one track, Beginner, Intermediate or Advanced, and work through its five tasks.
 [Pick a track]({{ '/start-here/' | relative_url }}#pick-a-track) on Start Here compares them task by task.
 
 ---
