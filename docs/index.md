@@ -7,31 +7,26 @@ permalink: /
 
 # Marlowe Hackathon 2026
 
-Welcome! This is a one-day, hands-on hackathon for Stanford GSB researchers, run by DARC and the HAI Marlowe team. You
-start on the Yens and then fine-tune an open-weight model across GPUs and nodes on Marlowe, Stanford's H100 cluster.
-You leave with a working Marlowe job, Slurm templates for your own research, and a way to measure what your own jobs
-would need on Marlowe.
+Welcome to the Marlowe Hackathon, a one-day, hands-on event for Stanford GSB researchers, run by DARC and the HAI
+Marlowe team. You fine-tune open-weight models, first on the Yens and then on Marlowe, Stanford's H100 cluster.
 
 ---
 
 ## Objectives
 
-By the end of the day, everyone:
+By the end of the day you will have:
 
-- **Runs GPU jobs on Marlowe.**
-- **Scales a job past one GPU and measures what it buys:** the same job on one GPU and then on a full Marlowe node of
-  8 H100s, comparing the time per step, the GPU memory and the GPU-hours at each scale, to see when more GPUs help
-  and when they do not.
-- **Fine-tunes a model and scores it** against the labels it learned from, and posts the result in
-  [{{ site.slack_channel }}]({{ site.slack_url }}).
-- **Watches a job while it runs:** its log, its GPUs' use and memory, and its loss in Weights & Biases
-  ([Monitoring Training]({{ '/monitoring/' | relative_url }})).
-- **Leaves with job files for their own research,** from one GPU to two nodes, and knows what to change in them
-  ([Take It Home]({{ '/take-home/' | relative_url }})).
-- **Knows how their PI's group applies for Marlowe,** and how to measure the GPU-hours and scaling a project
-  application asks for ([Applying for Marlowe]({{ '/take-home/' | relative_url }}#applying-for-marlowe)).
-- **Knows where to get help afterwards:** [RCpedia](https://rcpedia.stanford.edu) for the Yens,
-  [Marlowe's documentation](https://marlowe-research.stanford.edu/documentation/) for Marlowe, and the Slack channel.
+- run GPU jobs on Marlowe
+- run the same job on one GPU and on a full node of 8 H100s, and compared the time per step, the GPU memory and the
+  GPU-hours
+- fine-tuned a model, scored it, and posted the result in [{{ site.slack_channel }}]({{ site.slack_url }})
+- followed a running job through its log, its GPU use and its loss in Weights & Biases
+  ([Monitoring Training]({{ '/monitoring/' | relative_url }}))
+- job files to adapt for your own research ([Take It Home]({{ '/take-home/' | relative_url }}))
+- an outline of how your PI's group applies for Marlowe and what the application asks for
+  ([Applying for Marlowe]({{ '/take-home/' | relative_url }}#applying-for-marlowe))
+- places to get help afterwards: [RCpedia](https://rcpedia.stanford.edu) for the Yens,
+  [Marlowe's documentation](https://marlowe-research.stanford.edu/documentation/), and the Slack channel
 
 ---
 
@@ -55,7 +50,7 @@ By the end of the day, everyone:
 
 ## Tracks
 
-Pick one track and work through its tasks at your own pace.
+Pick one track and work through its tasks in order.
 
 | Task | [Beginner]({{ '/beginner/' | relative_url }}) | [Intermediate]({{ '/intermediate/' | relative_url }}) | [Advanced]({{ '/advanced/' | relative_url }}) |
 |---|---|---|---|
@@ -67,7 +62,7 @@ Pick one track and work through its tasks at your own pace.
 
 ### The Advanced track at a glance
 
-Each card links to its page and to the main ideas the page teaches.
+Each card links to its task and to the ideas it covers.
 
 {% include track_map.html track="advanced" %}
 
@@ -75,8 +70,8 @@ Each card links to its page and to the main ideas the page teaches.
 
 ## Take it home
 
-Every script here is a template you can adapt: swap in your own documents, questions and labels. [Take It
-Home]({{ '/take-home/' | relative_url }}) shows what to change.
+The scripts and job files are templates: swap in your own documents, questions and labels.
+[Take It Home]({{ '/take-home/' | relative_url }}) shows what to change.
 
 {% if site.show_survey %}
 ---
