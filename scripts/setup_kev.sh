@@ -50,4 +50,4 @@ if have "$m" && have "$t" --exclude "*.safetensors"; then
 else
   echo "Kev-27B not in $CACHE: fine for the Intermediate track; the Advanced track (A1 on) needs it"
 fi
-echo "Kev ready: $KEV_HOME/kev at $(git rev-parse --short HEAD), $(.venv/bin/python --version)"
+echo "Kev ready: $KEV_HOME/kev at $(git -c safe.directory="$PWD" rev-parse --short HEAD), $(.venv/bin/python --version)"

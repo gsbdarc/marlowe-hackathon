@@ -39,7 +39,7 @@ GPUMON=$!; trap 'kill $GPUMON 2>/dev/null || true' EXIT
 
 export WANDB_PROJECT=${WANDB_PROJECT:-lora-ddp} WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
-if [ -r .env ]; then set -a; source ./.env; set +a; fi
+for f in "$SHARE/wandb.env" .env; do if [ -r "$f" ]; then set -a; source "$f"; set +a; fi; done
 NAME=$USER-h100x$GPUS-lora-lr$LR-rps$RECORDS_PER_STEP-$WEIGHTS
 
 ARGS=(--data "$WORK/data/train.jsonl" --base Qwen/Qwen3.5-4B-Base --base_revision 1001bb4d826a52d1f399e183466143f4da7b741b
@@ -50,7 +50,7 @@ if [ -n "${WANDB_API_KEY:-}" ] || [ "${WANDB_MODE:-}" = offline ]; then
   $PY scripts/intermediate/wandb_watch.py --log "$PWD/logs/$SLURM_JOB_NAME-$SLURM_JOB_ID.out" --run-dir "$RUN" --name "$NAME" --gpus "$GPUS" &
   WATCH=$!
 else
-  echo "W&B off: no WANDB_API_KEY in .env"
+  echo "W&B off: no WANDB_API_KEY in $SHARE/wandb.env or .env"
 fi
 echo "Kev from $KEV_DDP ($(git -C "$KEV_DDP" rev-parse --short HEAD)), $GPUS GPU(s), $RECORDS_PER_STEP filings a step, $STEPS steps"
 if [ "$GPUS" = 1 ]; then
