@@ -16,8 +16,8 @@ intermediate:
     then: the score to beat
     concepts:
       - {name: "Where the labels come from", anchor: where-the-labels-come-from-jev-and-system-one}
-      - {name: "Where the data lives", anchor: where-the-data-lives}
       - {name: "GPU, batch size and number format", anchor: what-each-option-does}
+      - {name: "What fits in GPU memory", anchor: what-fits-in-gpu-memory}
       - {name: "What the scores mean", anchor: what-the-scores-mean}
   - id: I2
     title: Fine-tune on one GPU

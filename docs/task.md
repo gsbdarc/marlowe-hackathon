@@ -145,7 +145,8 @@ To print three more CEO changes, picked at random, run `scripts/look.py` as show
 | Test split, 2022-2026 | 56,334 | 6,742 |
 
 Labeling all 296,477 filings with Jev took about 20 minutes and $19. Each filing is the Item 5.02 section of the 8-K
-(no exhibits), a median of 222 words. The data is on the Yens and on Marlowe; it is not in this repository.
+(no exhibits), a median of 222 words. The data is on the Yens and on Marlowe, not in this repository:
+[Where the data is stored](#where-the-data-is-stored) has the folders.
 
 Look at it first:
 
@@ -217,6 +218,109 @@ that are not CEO changes carry only the status question.
 
 Training also drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state 2048` in every training
 job), so each epoch trains on 52,757 records.
+
+## Where the data is stored
+
+The data lives on the clusters, not in this repository. Before the event, DARC fills a class data folder on each
+cluster, `$CLASS_DATA`, with Jev's release (`jev/`) and the five files from [The training files](#the-training-files).
+Everyone can read it, and no one can change it. What you make goes in your own work folder, `$WORK`.
+`source env/yens.sh` on the Yens, or `source env/marlowe.sh` on Marlowe, sets both:
+
+| | Yens | Marlowe |
+|---|---|---|
+| Class data, `$CLASS_DATA` | `/scratch/shared/marlowe_hackathon/data` | `/scratch/c001/marlowe-hackathon/data` |
+| Your work folder, `$WORK` | `/scratch/users/<sunet>/ceo-turnover` | `/scratch/c001/users/<sunet>/ceo-turnover` |
+
+The Advanced track reads the class data in place. The Intermediate track copies it into `$WORK/data` first, in
+[I1]({{ '/intermediate/i1/' | relative_url }}#copy-the-data).
+
+### Scratch is shared storage
+
+Scratch is one large file system, about 100 TB, shared by everyone who uses the Yens. Every Yen machine can see it,
+both the login node you type on and the GPU nodes where Slurm runs your jobs. So a GPU job can read files you made
+or copied from the login node, without copying them again. Your own folder, `/scratch/users/$USER`, is private to
+you by default.
+
+Use scratch for working files, not for keeping things. It isn't backed up, and at each scheduled downtime, about every
+two months, files older than 90 days are deleted.
+
+```bash
+gsbquota /scratch/users/$USER
+```
+{: .yens }
+
+```
+/scratch/users/<sunet>: currently using 40% (40T) of 100T available
+```
+{: .output }
+
+The 40 TB is everyone's use, not just yours, because the space is shared. To see your own, run `du -sh $WORK`.
+
+### Storage on the Yens
+
+| | Path | Size | Kept? | Use it for |
+|---|---|---|---|---|
+| Home | `/home/users/$USER` | 80 GB | yes | small scripts and settings |
+| Project space | `/zfs/projects/...` (also `/yen/projects/...`) | 1 TB for a faculty project, 200 GB for a student project | yes, with snapshots to recover deleted files | data and results you keep and share with your team |
+| Scratch | `/scratch/users/$USER` | about 100 TB, shared | no: files older than 90 days are deleted | large working files: model weights, training runs |
+| Local `/tmp` | `/tmp` on each node | about 1 TB per node | no: cleared when the job ends | fast, throwaway files inside one job |
+
+[Yen storage on RCpedia](https://rcpedia.stanford.edu/_user_guide/storage/) has the details.
+
+{: .warning }
+> Home holds only 80 GB, and Kev-4B's weights alone take about 9 GB. That is why `env/yens.sh` puts Kev, its weights
+> and every cache in scratch. After the hackathon, copy anything you want to keep, such as your results or a model you
+> trained, to a project space.
+
+### Storage on Marlowe
+
+Marlowe's scratch is shared the same way: the login nodes and every compute node see the same files. Each project
+has its own folder in it. The class's project is `c001`, so everyone at the hackathon shares `/scratch/c001`:
+DARC's class folder is `/scratch/c001/marlowe-hackathon`, and yours is `/scratch/c001/users/<sunet>`.
+
+| | Path | Size | Kept? | Use it for |
+|---|---|---|---|---|
+| Home | `/users/$USER` | 32 GB | yes, backed up every 24 hours | small scripts and settings, not large files or conda environments |
+| Project space | `/projects/<project-ID>` | set by the project's allocation, and billed separately | yes, backed up every 24 hours | final results you keep and share with your project |
+| Scratch | `/scratch/<project-ID>`, here `/scratch/c001` | 10 TB for a project by default, shared by everyone in it | no: not backed up, and files may be purged | large working files: model weights, training runs |
+| Node-local scratch | `/local_scratch/$USER.$SLURM_JOB_ID` | not stated in the Marlowe docs | no: wiped when the job ends | fast, throwaway files inside one job |
+
+To see how much of the class's scratch is in use, and how much is yours:
+
+```bash
+module load marlowe-scripts
+storage-quota /scratch/c001
+du -sh $WORK
+```
+{: .marlowe }
+
+As on the Yens, `storage-quota` reports the whole project, everyone's files, and `du -sh $WORK` reports only yours.
+[Filesystems](https://marlowe-research.stanford.edu/documentation/getting-started/filesystems/) in the Marlowe
+documentation has the details.
+
+{: .warning }
+> Home holds only 32 GB. That is why `env/marlowe.sh` puts code, weights, caches and runs in `/scratch/c001`. Scratch
+> isn't backed up, so copy anything you want to keep to a project space.
+
+Two questions about scratch:
+
+<details class="quiz" markdown="1">
+<summary><span class="qnum">1</span><span class="qtext">Is <code>$WORK</code> backed up? What happens to it in three months?</span></summary>
+
+`$WORK` is in scratch, which isn't backed up, and files older than 90 days are deleted at a scheduled downtime. That
+includes any copy of the class data you made, which is no real loss: you can copy it again from `$CLASS_DATA`, as in
+[I1]({{ '/intermediate/i1/' | relative_url }}#copy-the-data). A model you spent hours training is worth copying to a project
+space.
+
+</details>
+
+<details class="quiz" markdown="1">
+<summary><span class="qnum">2</span><span class="qtext"><code>gsbquota /scratch/users/$USER</code> says 100T. Is that your space?</span></summary>
+
+No. Scratch is one pool shared by everyone on the Yens, and `gsbquota` reports the whole pool. `du -sh $WORK` shows
+what you use.
+
+</details>
 
 ## The student: Kev-4B
 
