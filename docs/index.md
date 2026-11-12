@@ -52,8 +52,14 @@ measure what each costs on the Yens and on Marlowe. [The task and the data]({{ '
 
 ## Tracks
 
-Pick one track. Each task ends in a check-in: post your result in [{{ site.slack_channel }}]({{ site.slack_url }}) on Slack and put
-up a 🟩 green sticky, or a 🟥 red one if you are stuck.
+{: .note }
+> **How the hands-on part works.** It is self-paced: pick one track and work through its tasks in order, at your own
+> speed. Keep the two sticky notes on your table:
+>
+> - 🟥 **Red on your laptop when you need help.** An instructor comes to you.
+> - 🟩 **Green on your laptop when you finish a task.** Post your result in
+>   [{{ site.slack_channel }}]({{ site.slack_url }}) on Slack too. An instructor comes round to check it, and each
+>   checked task counts toward the GPU-hours awarded at the end of the day.
 
 | Task | [Beginner]({{ '/beginner/' | relative_url }}) | [Intermediate]({{ '/intermediate/' | relative_url }}) | [Advanced]({{ '/advanced/' | relative_url }}) |
 |---|---|---|---|
