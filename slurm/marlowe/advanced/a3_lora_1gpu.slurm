@@ -28,6 +28,6 @@ job_timer
 OUT=$WORK/runs/a3-lora
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
-wandb_room advanced-a3 a3-lora
+wandb_room advanced-a3 a3-lora "$OUT"
 cd "$KEV_HOME/kev"
 $PY -m kev.train $TRAIN_ARGS $LORA_ARGS --out "$OUT" 2>&1 | stamp

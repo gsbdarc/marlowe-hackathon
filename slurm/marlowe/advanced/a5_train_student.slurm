@@ -29,7 +29,7 @@ OUT=$WORK/runs/a5-$TEACHER
 job_timer
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
-wandb_room advanced-a5 "a5-$TEACHER"
+wandb_room advanced-a5 "a5-$TEACHER" "$OUT"
 cd "$KEV_HOME/kev"
 # A rank-16 LoRA at learning rate 5e-5, as in Kev's recipe for its 4B model, stopped after 100 steps of 16 filings
 # (1,600 filings, about 10 minutes) so the job fits the session. Remove --max_steps 100 and set --epochs 2 for the full recipe.
