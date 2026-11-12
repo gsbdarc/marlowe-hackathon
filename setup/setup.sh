@@ -84,8 +84,8 @@ for name, f in json.load(open(os.path.join(d, "MANIFEST.json")))["files"].items(
         sys.exit(f"checksum does not match MANIFEST.json: {name}")
     print(f"release ok: {name}")
 PY
-if [ -e "$OUT/test1000.parquet" ] && [ -e "$OUT/train.jsonl" ] && [ -e "$OUT/valid.jsonl" ]; then
-  echo "already there: train.jsonl, valid.jsonl, test1000.jsonl, test1000.parquet"
+if [ -e "$OUT/test1000.parquet" ] && [ -e "$OUT/train.jsonl" ] && [ -e "$OUT/valid.jsonl" ] && [ -e "$OUT/valid.parquet" ]; then
+  echo "already there: train.jsonl, valid.jsonl, valid.parquet, test1000.jsonl, test1000.parquet"
 else
   $PY scripts/make_kev_data.py --out "$OUT"
   changed=1

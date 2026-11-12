@@ -36,7 +36,7 @@ done
 if [ ! -f "$WORK/data/test1000.parquet" ] || [ ! -f "$WORK/data/valid.parquet" ]; then
   echo "building the validation and test samples in $WORK/data"
   TMP=$WORK/data/.build-$SLURM_JOB_ID
-  $PY scripts/intermediate/make_kev_data.py --out "$TMP"
+  $PY scripts/make_kev_data.py --out "$TMP"
   mv "$TMP"/valid.jsonl "$TMP"/valid.parquet "$TMP"/test1000.jsonl "$TMP"/test1000.parquet "$WORK/data/"
   rm -rf "$TMP"
 fi
