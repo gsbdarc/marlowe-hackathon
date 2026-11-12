@@ -16,15 +16,22 @@ Marlowe project application asks for.
 
 ## Objectives
 
-The day works if, by the end of it:
+By the end of the day, everyone:
 
-- **Everyone runs a GPU job on Marlowe.** Every track reaches Marlowe, whatever your starting point.
-- **Each track table leaves with a working result:** a model you trained or ran, scored against Jev's labels and
-  posted in [{{ site.slack_channel }}]({{ site.slack_url }}).
-- **Everyone knows where to get help afterwards:** [RCpedia](https://rcpedia.stanford.edu) for the Yens,
+- **Runs GPU jobs on Marlowe,** whatever track they start in.
+- **Scales a job past one GPU and measures what it buys.** Each track runs the same job on one GPU and then on a full
+  Marlowe node of 8 H100s; the Advanced track also spreads one job over two nodes. You compare the time per step,
+  the GPU memory and the GPU-hours at each scale, and see when more GPUs help and when they do not.
+- **Fine-tunes a model and scores it** against Jev's labels, and posts the result in
+  [{{ site.slack_channel }}]({{ site.slack_url }}).
+- **Watches a job while it runs:** its log, its GPUs' use and memory, and its loss in Weights & Biases
+  ([Monitoring Training]({{ '/monitoring/' | relative_url }})).
+- **Leaves with job files for their own research,** from one GPU to two nodes, and knows what to change in them
+  ([Take It Home]({{ '/take-home/' | relative_url }})).
+- **Knows how their PI's group applies for Marlowe,** with the GPU-hour and scaling numbers a project application
+  asks for ([Applying for Marlowe]({{ '/take-home/' | relative_url }}#applying-for-marlowe)).
+- **Knows where to get help afterwards:** [RCpedia](https://rcpedia.stanford.edu) for the Yens,
   [Marlowe's documentation](https://marlowe-research.stanford.edu/documentation/) for Marlowe, and the Slack channel.
-- **Everyone knows how their PI's group signs up for Marlowe,** with the GPU-hour numbers a project application asks
-  for ([Applying for Marlowe]({{ '/take-home/' | relative_url }}#applying-for-marlowe)).
 
 ---
 

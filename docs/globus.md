@@ -7,108 +7,102 @@ permalink: /globus/
 
 # Moving Data with Globus
 
-In this section you copy your training files from the Yens to Marlowe with the Globus command-line tool, with
-Claude Code on the Yens running the commands.
+The class data and models are already on both clusters, so most tasks need no copying. You copy your own files
+when a task moves work between the Yens and Marlowe:
 
-Globus copies files between storage systems directly: the data goes from the Yens to Marlowe without passing through
-your laptop, it checks every file when the copy finishes, and it retries if the connection drops. Each storage system
-appears in Globus as a **collection**. The Yens are the `GSB/DARC yen` collection; Marlowe's `/scratch` is a
-collection you find by searching for Marlowe.
+| Task | What you copy | From | To |
+|---|---|---|---|
+| [A2]({{ '/advanced/a2/' | relative_url }}), after the workshop | your A1 answers, `results/kev-27b-zeroshot.jsonl` | Yens | Marlowe |
+| [A5]({{ '/advanced/a5/' | relative_url }}) | a student you trained, `runs/a5-<teacher>/` | Marlowe | Yens |
+| [Label with your model]({{ '/label/' | relative_url }}) | a run you trained, `runs/<run>/` | Marlowe | Yens |
 
-You will copy `$WORK/data/` (about 270 MB) from the Yens to the same place on Marlowe:
+Globus copies files between the two clusters directly, without passing them through your laptop. It checks every file
+when the copy finishes and retries if the connection drops. Each storage system is a **collection** in Globus:
 
-| | Path |
-|---|---|
-| From (Yens) | `/scratch/users/<sunet>/ceo-turnover/data/` |
-| To (Marlowe) | `/scratch/c001/users/<sunet>/ceo-turnover/data/` |
+| Cluster | Collection | ID | Your folder (`$WORK`) |
+|---|---|---|---|
+| Yens | `GSB/DARC yen` | `2556f515-7a87-407b-a24d-18ed16237588` | `/scratch/users/<sunet>/ceo-turnover` |
+| Marlowe | `Marlowe /scratch directories` | `56ac92ca-0bad-4009-baaa-513525b3e648` | `/scratch/c001/users/<sunet>/ceo-turnover` |
 
-{: .note }
-> Jev's labeled filings and the Kev-27B weights are already on Marlowe in the hackathon's shared folders. You only
-> copy your own training files.
+Two collections are named `GSB/DARC yen`. Use the ID above: the other one returns an error.
+
+The steps below use the Globus command-line tool on the Yens. You can also make the same copy in a browser at
+[app.globus.org](https://app.globus.org): sign in with Stanford, open the two collections side by side, and drag the
+folder across.
 
 ---
 
-## Step 1: Start Claude Code on the Yens
+## Step 1: Log in to Globus, once
+
+On a Yens login node:
 
 ```bash
-ssh <sunet>@yen.stanford.edu
-cd /scratch/users/$USER/marlowe-hackathon
-ml globus-cli claude-code
-claude
+ml globus-cli
+globus login --no-local-server
 ```
 {: .yens }
 
-If this is your first time using Claude Code on the Yens, sign in with **Continue with SSO** and your Stanford address,
-as in the [Yens onboarding course](https://gsbdarc.github.io/yens-onboarding-2026/day1/claude-code/).
+The Yens have no browser, so `globus login` prints a URL. Open it on your laptop, choose **Stanford University**, sign
+in with your SUNet ID and Duo, and click **Allow**. Globus shows an authorization code: paste it into the terminal.
+The login is saved in your home directory.
 
-## Step 2: Log in to Globus
+## Step 2: Check you can reach both collections
 
-Ask Claude to start the login:
-
-```
-> Run `globus login --no-local-server` and show me the URL it prints.
-```
-{: .claude }
-
-There is no browser on the Yens, so the login runs across both machines. Open the URL in the browser on your laptop,
-choose **Stanford University**, sign in with your SUNet ID and Duo, and click **Allow**. Globus shows an
-authorization code: paste it back into the terminal.
-
-The login is saved in your home directory, so you do this once.
-
-## Step 3: Find the two collections
-
-```
-> Use the globus CLI to find the collection IDs for "GSB/DARC yen" and for Marlowe's /scratch, and save them as YEN and MARLOWE in ~/.globus-hackathon.env. Then list /scratch/c001/ on Marlowe to check access.
-```
-{: .claude }
-
-Read the commands Claude proposes before you approve each one. They should look like this:
+Save the two IDs, then list your folder on each side:
 
 ```bash
-globus endpoint search "GSB/DARC yen"
-globus endpoint search "Marlowe"
-globus ls "$MARLOWE:/scratch/c001/"
+export YEN=2556f515-7a87-407b-a24d-18ed16237588
+export MARLOWE=56ac92ca-0bad-4009-baaa-513525b3e648
+globus ls "$YEN:/scratch/users/$USER/ceo-turnover/"
+globus ls "$MARLOWE:/scratch/c001/users/$USER/"
 ```
 {: .yens }
 
-If `globus ls` says the collection needs more authentication, Globus prints a `globus session consent ...` command.
-Run it, sign in again in your laptop's browser, and retry.
+The first listing on each collection may stop with `Session reauthentication required` and a command to run, for
+example `globus session update stanford.edu`. Run it, sign in again in your laptop's browser, and list again.
 
-## Step 4: Copy your training files
+## Step 3: Start the copy
 
-```
-> Start a Globus transfer of /scratch/users/$USER/ceo-turnover/data/ on YEN to /scratch/c001/users/$USER/ceo-turnover/data/ on MARLOWE, recursive, labeled "ceo-turnover data", then wait for it to finish and show me the task status.
-```
-{: .claude }
-
-The commands behind it:
+A single file, here your A1 answers to Marlowe. Make the folder on Marlowe first, from a Marlowe terminal:
 
 ```bash
-globus transfer "$YEN:/scratch/users/$USER/ceo-turnover/data/" \
-  "$MARLOWE:/scratch/c001/users/$USER/ceo-turnover/data/" \
-  --recursive --label "ceo-turnover data"
+mkdir -p /scratch/c001/users/$USER/ceo-turnover/results
+```
+{: .marlowe }
+
+Then start the transfer from the Yens:
+
+```bash
+globus transfer "$YEN:/scratch/users/$USER/ceo-turnover/results/kev-27b-zeroshot.jsonl" \
+  "$MARLOWE:/scratch/c001/users/$USER/ceo-turnover/results/kev-27b-zeroshot.jsonl" \
+  --label "A1 answers"
+```
+{: .yens }
+
+A folder, here an A5 student back to the Yens, takes `--recursive`. Change `qwen-235b` to the teacher you trained on:
+
+```bash
+globus transfer "$MARLOWE:/scratch/c001/users/$USER/ceo-turnover/runs/a5-qwen-235b/" \
+  "$YEN:/scratch/users/$USER/ceo-turnover/runs/a5-qwen-235b/" \
+  --recursive --label "A5 student"
+```
+{: .yens }
+
+`globus transfer` prints a `Task ID` and returns straight away. The copy runs on Globus's side, so you can close the
+terminal.
+
+## Step 4: Wait for it and check
+
+```bash
 globus task wait <task-id>
 globus task show <task-id>
 ```
 {: .yens }
 
-A finished transfer shows `Status: SUCCEEDED`. Globus also emails you when a transfer finishes.
-
-## Step 5: Check on Marlowe
-
-```bash
-ls -lh /scratch/c001/users/$USER/ceo-turnover/data/
-wc -l /scratch/c001/users/$USER/ceo-turnover/data/*.jsonl
-```
-{: .marlowe }
-
-```
-   1000 .../test1000.jsonl
-  54426 .../train.jsonl
-   2000 .../valid.jsonl
-```
-{: .output }
+A finished copy shows `Status: SUCCEEDED`, and Globus emails you when it ends. Then list the folder on the other
+cluster to see the files there.
 
 {: .tip }
-> The same steps copy results back, for example a model you trained on Marlowe, to run it on the Yens.
+> Claude Code can run these steps for you. Load it on the Yens with `ml claude-code` and start `claude`; the first
+> time, sign in with **Continue with SSO** and your Stanford address. Then ask, for example, to copy your A5 student
+> to the Yens with the Globus CLI. Read each command before you approve it.
