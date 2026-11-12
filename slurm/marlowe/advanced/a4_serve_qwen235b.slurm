@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -J a4-qwen235b-server
 #SBATCH --account=marlowe-c001
-#SBATCH --partition=preempt
+#SBATCH --partition=batch
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=8
