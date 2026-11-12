@@ -35,14 +35,6 @@ By the end of the day, everyone:
 
 ---
 
-## The project: CEO turnover in SEC filings
-
-You teach open models to answer three questions about CEO changes in SEC filings the way a large hosted model, Jev,
-does. [The Project and the Data]({{ '/task/' | relative_url }}) has the details, and
-[Start Here]({{ '/start-here/' | relative_url }}) lists what to read before your first task.
-
----
-
 ## Tracks
 
 Pick one track and work through its tasks at your own pace.
