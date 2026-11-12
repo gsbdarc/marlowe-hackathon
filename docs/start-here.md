@@ -39,11 +39,14 @@ your table:
 
 ## Pick a track
 
-| Track | What you do | First task |
+Each track starts on the Yens and moves to Marlowe. If you have never used a GPU, pick Beginner. If you have run jobs
+on the Yens, pick Intermediate, or Advanced to train a model too large for one GPU.
+
+| Track | For you if | How it goes |
 |---|---|---|
-| [Beginner]({{ '/beginner/' | relative_url }}) | for people who have never used a computing cluster or a GPU | [B1. Your first GPU job]({{ '/beginner/b1/' | relative_url }}) |
-| [Intermediate]({{ '/intermediate/' | relative_url }}) | one model, from one GPU to a full node | [I1. Score before training]({{ '/intermediate/i1/' | relative_url }}) |
-| [Advanced]({{ '/advanced/' | relative_url }}) | fine-tune a model too large for one GPU, on one node and then two | [A1. Score before training]({{ '/advanced/a1/' | relative_url }}) |
+| [Beginner]({{ '/beginner/' | relative_url }}) | you have never used a GPU | Score a 4B model on one Yens GPU and train it, run the same training on Marlowe, label filings since 2004 on several Marlowe GPUs at once, and turn the labels into a research finding. Every step is a script you run. |
+| [Intermediate]({{ '/intermediate/' | relative_url }}) | you have run jobs on the Yens | Score Kev-4B and fine-tune it on one Yens GPU, run the same fine-tune on one H100, train every weight on one H100 and then on a full node of 8, and label every filing on all 8 GPUs at once. You pick the settings and compare what each run costs. |
+| [Advanced]({{ '/advanced/' | relative_url }}) | you have run jobs on the Yens and want to train a model too large for one GPU | Score Kev-27B on a Yens H200, fully fine-tune a 27B model on one Marlowe node and then two, serve a 235B model across a node, and distill a small model from its labels. |
 
 The tasks in each track:
 
