@@ -1,0 +1,29 @@
+{%- comment -%}
+  The tracks at a glance, one at a time: a collapsible box with a button per track that shows that track's map
+  (track_map.html). A track with no entry in _data/tracks.yml shows a link to its page instead. CSS only, no script.
+  Use: {% include track_picker.html %}
+{%- endcomment -%}
+{%- assign tracks = "beginner,intermediate,advanced" | split: "," -%}
+<details class="track-picker">
+<summary>Each track at a glance</summary>
+<div class="tp-body">
+{%- for tr in tracks %}
+<input type="radio" name="track-picker" id="tp-{{ tr }}" class="tp-radio">
+{%- endfor %}
+<div class="tp-buttons" role="group" aria-label="Choose a track">
+{%- for tr in tracks %}
+<label for="tp-{{ tr }}" class="tp-button tp-button-{{ tr }}">{{ tr | capitalize }}</label>
+{%- endfor %}
+</div>
+<p class="tp-hint">Choose a track to see its tasks.</p>
+{%- for tr in tracks %}
+<div class="tp-panel tp-panel-{{ tr }}">
+{%- if site.data.tracks[tr] %}
+{% include track_map.html track=tr %}
+{%- else %}
+<p>The {{ tr | capitalize }} track's overview is still being written. See the <a href="{{ '/' | append: tr | append: '/' | relative_url }}">{{ tr | capitalize }} track page</a>.</p>
+{%- endif %}
+</div>
+{%- endfor %}
+</div>
+</details>

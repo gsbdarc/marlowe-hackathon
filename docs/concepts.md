@@ -1,7 +1,8 @@
 ---
 layout: default
 title: "Key Ideas"
-nav_order: 3
+nav_order: 2
+parent: "Start Here"
 permalink: /concepts/
 ---
 

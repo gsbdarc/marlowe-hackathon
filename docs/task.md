@@ -1,18 +1,27 @@
 ---
 layout: default
-title: "The Task and the Data"
-nav_order: 2
+title: "The Project and the Data"
+nav_order: 1
+parent: "Start Here"
 permalink: /task/
 ---
 
-# The Task and the Data
+# The Project and the Data
+
+When a public company's CEO leaves, the company files an 8-K under **Item 5.02**. A large hosted model, **Jev**, has
+read every Item 5.02 filing since 2004, about 300,000 of them, and answered three questions about each: what happens
+to the CEO, why, and whether the change was announced in advance.
+
+You will work with open models from the **Kev** family that answer the same questions. Training a Kev model on Jev's
+labels, including how confident Jev was, is distillation: a model you run yourself can then label filings at scale on
+a GPU you control. During the day you train, label filings at scale, and measure what each costs on the Yens and on
+Marlowe.
 
 ## The filings and the three questions
 
-When a public company's CEO leaves, the company files a Form 8-K that includes an **Item 5.02** section, within four
-business days. Item 5.02 covers every change of directors and officers, so most of these filings are about someone
-else, such as a new director, a CFO who retires, or a change in pay. The ones that are about the CEO rarely say why the
-CEO left.
+A public company files a Form 8-K within four business days of a major event. Its **Item 5.02** section covers every
+change of directors and officers, so most of these filings are about someone else, such as a new director, a CFO who
+retires, or a change in pay. The ones that are about the CEO rarely say why the CEO left.
 
 **Jev**, TypeSafe's hosted decision model, answered three questions about 296,477 Item 5.02 filings, from August 2004
 to October 2026 (`scripts/questions.py`). Jev reads a filing and chooses among fixed options, giving a probability for
@@ -158,9 +167,10 @@ $PY scripts/look.py --examples 3
 
 ## The training files
 
-Kev doesn't train on all 296,477 filings Jev labeled. `scripts/make_kev_data.py` draws three files from the three
-splits. DARC ran it once for the class data folder, `$CLASS_DATA`; the Intermediate track copies that folder into
-`$WORK/data` in I1.
+Kev doesn't train on all 296,477 filings Jev labeled. `setup/setup.sh` draws three files from the three splits, once
+on each cluster, with `scripts/make_kev_data.py`, into the class's shared, read-only `$CLASS_DATA` folder. `env/yens.sh`
+and `env/marlowe.sh` both set `$CLASS_DATA`, so every track works from the same files; the Intermediate track copies
+them into `$WORK/data` in I1.
 
 | File | Drawn from | Records | Which filings |
 |---|---|---|---|
@@ -212,11 +222,13 @@ The filings are left out on purpose:
   measurable, and every filing carries a weight back to the whole test split: `scripts/score.py` uses the weights to
   estimate agreement over all 56,334 test filings.
 
+`valid.parquet` and `test1000.parquet` hold the same filings with Jev's answers, for `scripts/score.py`.
+
 Each record is a request in Kev's API format plus Jev's answer. The **target** is Jev's whole probability
 distribution, not only its top choice: when Jev was torn between two options, the student learns that too. Filings
 that are not CEO changes carry only the status question.
 
-Training also drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state 2048` in every training
+Training drops the 1,669 records whose filing is longer than 2,048 tokens (`--max_state 2048`, set in every training
 job), so each epoch trains on 52,757 records.
 
 ## Where the data is stored

@@ -1185,3 +1185,34 @@ tspan.personalize-token-unset {
   text-decoration: none;
 }
 .report-issue { padding-bottom: 0.75rem; }
+
+/* Track picker (_includes/track_picker.html): a collapsible box with one button per track; the checked radio shows
+   that track's map. The radios are visually hidden but stay focusable, so the buttons work from the keyboard. */
+.track-picker .tp-body { position: relative; padding: 0.6rem 0 0.2rem; }
+.track-picker .tp-radio { position: absolute; top: 0.6rem; left: 0; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.track-picker .tp-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 0.6rem; }
+.track-picker .tp-button {
+  padding: 0.3rem 0.9rem;
+  border: 1px solid #cfc9c0;
+  border-radius: 999px;
+  background: #fff;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-weight: 700;
+  color: #3a3733;
+  cursor: pointer;
+}
+.track-picker .tp-button:hover { background: #f3f0eb; }
+.track-picker .tp-panel { display: none; }
+.main-content .track-picker p.tp-hint { margin: 0 0 0.4rem; color: #6b665e; }
+#tp-beginner:checked ~ .tp-panel-beginner,
+#tp-intermediate:checked ~ .tp-panel-intermediate,
+#tp-advanced:checked ~ .tp-panel-advanced { display: block; }
+#tp-beginner:checked ~ .tp-hint,
+#tp-intermediate:checked ~ .tp-hint,
+#tp-advanced:checked ~ .tp-hint { display: none; }
+#tp-beginner:checked ~ .tp-buttons .tp-button-beginner,
+#tp-intermediate:checked ~ .tp-buttons .tp-button-intermediate,
+#tp-advanced:checked ~ .tp-buttons .tp-button-advanced { background: #3a3733; border-color: #3a3733; color: #fff; }
+#tp-beginner:focus-visible ~ .tp-buttons .tp-button-beginner,
+#tp-intermediate:focus-visible ~ .tp-buttons .tp-button-intermediate,
+#tp-advanced:focus-visible ~ .tp-buttons .tp-button-advanced { outline: 2px solid #8c1515; outline-offset: 2px; }

@@ -1,59 +1,82 @@
 ---
 layout: default
-title: "Label with Your Model"
-nav_order: 9
+title: "Use Your Trained Model"
+parent: "Reference"
+nav_order: 4
 permalink: /label/
 ---
 
-# Label with Your Model
+# Use Your Trained Model
 
-**Goal:** serve your fine-tuned Kev-4B on a Yen H200, score it against Jev on the test sample, and see how fast it
-labels filings.
+A model you train is a folder under `$WORK/runs/`, and the training job's log names it. This page serves that model,
+scores it against Jev on the 1,000 test filings, and labels more filings with it. The same jobs also serve a Kev
+model as released, by its Hugging Face name.
 
 ---
 
-## Step 1: Score your model
+## Step 1: Score it on the test filings
 
-`serve_and_label.slurm` takes the model to serve and a name for the results. Point it at any finished run:
+`serve_and_label.slurm` starts a Kev server on one GPU, sends it the 1,000 test filings, and scores its answers
+against Jev's. The first argument is the model, the second a name for its answers, which it saves as
+`$WORK/results/<name>.jsonl`.
+
+On Marlowe, for a model you trained there:
 
 ```bash
-sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu cp1
+sbatch slurm/marlowe/serve_and_label.slurm $WORK/runs/<run> my-model
+```
+{: .marlowe }
+
+On the Yens:
+
+```bash
+sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/<run> my-model
 ```
 {: .yens }
 
-The job starts a Kev server on the GPU, sends it the same 1,000 test filings as the
-[zero-shot comparison]({{ '/task/' | relative_url }}), and scores the answers. A run trained on Marlowe works too: copy
-its run directory to the Yens with Globus, or use `slurm/marlowe/serve_and_label.slurm` on Marlowe.
+A model you trained on Marlowe has to be copied to the Yens first, with [Globus]({{ '/globus/' | relative_url }}).
+A 27B model needs the Marlowe job, which asks for enough memory to load it.
 
-## Step 2: Compare with the starting point
+## Step 2: Compare it with where you started
+
+With no arguments, the same job scores Kev-4B as released and saves `$WORK/results/kev-4b-zeroshot.jsonl`. Put the
+two side by side:
 
 ```bash
-$PY scripts/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/cp1.jsonl
+$PY scripts/score.py $WORK/results/kev-4b-zeroshot.jsonl $WORK/results/my-model.jsonl
 ```
-{: .yens }
 
-Did agreement on CEO changes go up? Did "leaves entirely" improve? 100 steps is about 3% of an epoch, so expect a
-change, not the whole gap closed. A longer run is how you would close it.
+`score.py` prints one row per model. Did agreement on CEO changes go up? Did "leaves the company entirely" improve?
+The runs in the tracks are short, about 3% of an epoch for 100 steps, so expect a change, not the whole gap closed.
 
 {: .note }
 > The test filings are from 2022 to 2026 and the training filings from 2004 to 2018, so a gain here is a gain on
 > filings the model has never seen, from years it was not trained on.
 
-## Step 3: Label at scale
+## Step 3: Label more filings
 
-The same job labels any set of filings. Give it a third argument, a file in the format of `test1000.jsonl`, or Jev's
-parquet itself:
+A third argument labels any other file: one in the format of `test1000.jsonl`, or Jev's whole release,
+`$DATA/item502_v1.parquet`. Only the test filings are scored.
 
 ```bash
-sbatch -C GPU_MODEL:H200 slurm/yens/serve_and_label.slurm $WORK/runs/cp1-1gpu cp1-all $DATA/item502_v1.parquet
+sbatch slurm/marlowe/serve_and_label.slurm $WORK/runs/<run> my-model-all $DATA/item502_v1.parquet
 ```
-{: .yens }
+{: .marlowe }
 
-`$WORK/results/cp1-all_summary.json` reports filings per second. At about 6 filings per second, all 296,477 filings
-take about 14 hours on one GPU. The job stops at its 2-hour limit; submit the same command again and it carries on,
-because `label.py` skips filings already answered. To finish in fewer runs, ask for more time with
-`sbatch -t 1-00:00:00 ...` (the `gpu` partition allows up to a day).
+One GPU labels about 6 filings per second, so all 296,477 take about 14 hours. The job stops at its time limit; submit
+the same command again and it carries on, because `label.py` skips filings it has already answered. Or ask for more
+time, for example `sbatch --time=16:00:00 ...`.
+
+To label them in under an hour, use all 8 GPUs of a Marlowe node, one Kev server per GPU, as in
+[I5]({{ '/intermediate/i5/' | relative_url }}):
+
+```bash
+RUN=$WORK/runs/<run> sbatch slurm/marlowe/intermediate/label_8gpu.slurm
+```
+{: .marlowe }
+
+To label your own documents rather than filings, see [Take It Home]({{ '/take-home/' | relative_url }}).
 
 {: .warning }
-> Run one `serve_and_label` job at a time while you test. The server picks a free port, but every job loads the model
-> onto its own GPU, and the Yens' two H200s are shared by everyone in the room.
+> On the Yens, run one `serve_and_label` job at a time. Every job loads the model onto its own GPU, and the Yens' H200s
+> are shared by everyone in the room.

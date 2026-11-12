@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -J ceo-cp3
 #SBATCH --account=marlowe-c001
-#SBATCH --partition=preempt
+#SBATCH --partition=batch
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=1
@@ -15,7 +15,7 @@
 
 # The Yens training job on one H100 on Marlowe. Compare its time per step with the Yens.
 #   sbatch slurm/marlowe/03_train_1gpu.slurm
-# Basic access: account marlowe-c001 on the preempt partition (4-hour limit; a preempted job restarts).
+# Account marlowe-c001 on the batch partition (2-day limit).
 set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh

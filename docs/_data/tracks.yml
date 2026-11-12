@@ -1,9 +1,83 @@
 # The track maps on the home page (_includes/track_map.html). One list per track, one entry per task, in order.
 #   title: what the task does, without the model; model: the model(s), shown as a label
 #   platform: Yens or Marlowe; nodes and gpus: what the task runs on
-#   kinds: Inference, Fine-tuning, LoRA, Distillation; add " bonus" for an optional part
+#   kinds: Inference, Fine-tuning, LoRA, Distillation, Analysis; add " bonus" for an optional part
 #   concepts: four links to the main ideas the page teaches; anchor is the heading's id on that page (empty for the top)
 #   then: an optional note on the arrow to the next task
+beginner:
+  - id: B1
+    title: Your first GPU job
+    url: /beginner/b1/
+    model: Kev-4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40
+    kinds: [Inference]
+    then: train it
+    concepts:
+      - {name: "What a cluster is", anchor: four-words-you-will-use-all-day}
+      - {name: "Logging in with SSH", anchor: step-1-log-in-and-get-the-code}
+      - {name: "Submitting a Slurm job", anchor: step-2-submit-the-job}
+      - {name: "Choosing a GPU", anchor: your-choice-which-gpu}
+      - {name: "Reading the result", anchor: step-3-watch-it-work}
+  - id: B2
+    title: Fine-tune the model
+    url: /beginner/b2/
+    model: Kev-4B
+    platform: Yens
+    nodes: 1 node
+    gpus: 1 A40
+    kinds: [Fine-tuning]
+    then: the same job on Marlowe
+    concepts:
+      - {name: "What fine-tuning is", anchor: what-training-means-here}
+      - {name: "Training, validation and test", anchor: three-sets-of-filings}
+      - {name: "Choosing a learning rate", anchor: your-decision-the-learning-rate}
+      - {name: "Deciding on validation", anchor: the-room-decides-on-validation}
+      - {name: "Before and after", anchor: before-and-after-on-test}
+  - id: B3
+    title: Run it on Marlowe
+    url: /beginner/b3/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1 H100
+    kinds: [Fine-tuning]
+    then: many GPUs at once
+    concepts:
+      - {name: "A second cluster", anchor: step-1-log-in-to-marlowe-and-get-the-code}
+      - {name: "Accounts and partitions", anchor: step-2-submit-the-job}
+      - {name: "A40 vs H100 speed", anchor: how-much-faster}
+      - {name: "Spending speed on time or data", anchor: your-decision-spend-the-speed-on-time-or-on-data}
+      - {name: "Compiling for a new GPU", anchor: challenge-run-it-twice}
+  - id: B4
+    title: Many GPUs at once
+    url: /beginner/b4/
+    model: Kev-4B
+    platform: Marlowe
+    nodes: 1 node
+    gpus: 1, then 2 to 8 H100s
+    kinds: [Inference]
+    then: a finding
+    concepts:
+      - {name: "Shards: one pile per GPU", anchor: one-gpu-then-several}
+      - {name: "Choosing how many GPUs", anchor: your-decision-how-many-gpus}
+      - {name: "Speedup and GPU-hours", anchor: step-3-compare-the-two}
+      - {name: "Plan your own project", anchor: challenge-plan-your-own-project}
+  - id: B5
+    title: From labels to a finding
+    url: /beginner/b5/
+    model: Kev-4B's labels
+    platform: Marlowe
+    nodes: login node
+    gpus: no GPU
+    kinds: [Analysis]
+    concepts:
+      - {name: "Trends from model labels", anchor: step-1-the-first-look}
+      - {name: "Choosing a question", anchor: your-decision-pick-your-question}
+      - {name: "Trusting model labels", anchor: what-the-room-found}
+      - {name: "Writing your own analysis", anchor: your-own-analysis}
+
 intermediate:
   - id: I1
     title: Score before training
