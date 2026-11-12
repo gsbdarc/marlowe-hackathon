@@ -38,8 +38,6 @@ By the end of the day, everyone:
 ## Tracks
 
 Pick one track and work through its tasks at your own pace.
-[How the hands-on part works]({{ '/start-here/' | relative_url }}#how-the-hands-on-part-works) explains the
-sticky notes and the check-ins.
 
 | Task | [Beginner]({{ '/beginner/' | relative_url }}) | [Intermediate]({{ '/intermediate/' | relative_url }}) | [Advanced]({{ '/advanced/' | relative_url }}) |
 |---|---|---|---|
