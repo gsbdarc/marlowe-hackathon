@@ -4,8 +4,8 @@
 # The settings match I3 Part 2 and I4's full fine-tunes (100 steps of 16 filings, lr 2e-5), so every method trains on
 # the same 1,600 filings, in the same order, 16 a step, and score_test.slurm compares them on the same test filings.
 # Kev's own trainer runs LoRA on one GPU only. The data-parallel version is scripts/intermediate/kev-lora-ddp.patch,
-# applied to a second checkout of Kev next to yours ($KEV_HOME/kev-lora-ddp, made here the first time; it uses Kev's
-# own Python).
+# applied to your own copy of Kev's code ($ME/kev-lora-ddp, under 1 MB, made here the first time). The shared Kev in
+# $KEV_HOME is read only, so the patch can't go there; the copy runs with the shared Kev's Python.
 # Settings, set before sbatch:
 #   LR=2e-5                learning rate
 #   RECORDS_PER_STEP=16    filings per optimizer step, in total across the GPUs; a multiple of GPUS
@@ -15,12 +15,14 @@ set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
 LR=${LR:-2e-5} RECORDS_PER_STEP=${RECORDS_PER_STEP:-16} STEPS=${STEPS:-100} WEIGHTS=${WEIGHTS:-fp32}
-KEV_DDP=${KEV_DDP:-$KEV_HOME/kev-lora-ddp}
+KEV_DDP=${KEV_DDP:-$ME/kev-lora-ddp}
 if [ $((RECORDS_PER_STEP % GPUS)) != 0 ]; then echo "RECORDS_PER_STEP must be a multiple of $GPUS" >&2; exit 1; fi
 if [ "$STEPS" -lt 20 ]; then echo "STEPS must be at least 20" >&2; exit 1; fi
-if [ ! -d "$KEV_DDP" ]; then           # first time: a second checkout of Kev, with the data-parallel patch
-  git -C "$KEV_HOME/kev" worktree add --detach "$KEV_DDP" HEAD
-  git -C "$KEV_DDP" apply "$PWD/scripts/intermediate/kev-lora-ddp.patch"
+if [ ! -d "$KEV_DDP" ]; then           # first time: your own copy of Kev's code, with the data-parallel patch
+  NEW=$KEV_DDP.$SLURM_JOB_ID           # built aside and moved into place, in case two of your jobs start at once
+  mkdir -p "$NEW" && cp -r "$KEV_HOME/kev/kev" "$NEW/"
+  git -C "$NEW" apply "$PWD/scripts/intermediate/kev-lora-ddp.patch"   # git apply works outside a git checkout too
+  mv -T "$NEW" "$KEV_DDP" 2>/dev/null || rm -rf "$NEW"                  # another job got there first: use its copy
 fi
 if ! grep -q "def sum_gradients" "$KEV_DDP/kev/full_ft.py"; then
   echo "$KEV_DDP has no data-parallel LoRA: git -C $KEV_DDP apply $PWD/scripts/intermediate/kev-lora-ddp.patch" >&2; exit 1
@@ -52,7 +54,7 @@ if [ -n "${WANDB_API_KEY:-}" ] || [ "${WANDB_MODE:-}" = offline ]; then
 else
   echo "W&B off: no WANDB_API_KEY in $SHARE/wandb.env or .env"
 fi
-echo "Kev from $KEV_DDP ($(git -C "$KEV_DDP" rev-parse --short HEAD)), $GPUS GPU(s), $RECORDS_PER_STEP filings a step, $STEPS steps"
+echo "Kev's code from $KEV_DDP (the shared Kev's, with kev-lora-ddp.patch), $GPUS GPU(s), $RECORDS_PER_STEP filings a step, $STEPS steps"
 if [ "$GPUS" = 1 ]; then
   (cd "$KEV_DDP" && $PY -m kev.train "${ARGS[@]}")
 else
