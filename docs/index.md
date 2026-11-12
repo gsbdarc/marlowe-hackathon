@@ -35,6 +35,24 @@ By the end of the day, everyone:
 
 ---
 
+## Schedule
+
+| Time | Session |
+|---|---|
+| 10:00 | Welcome: goals, the three tracks, the Slack channel, a quick login check on the Yens and Marlowe |
+| 10:15 | Talk: an introduction to Marlowe (Marlowe team) |
+| 10:50 | Talk: a social science researcher's Marlowe story |
+| 11:30 | Break; open a terminal on the Yens |
+| 11:40 | **Hands-on 1:** task 1 of your track |
+| 12:30 | Lunch |
+| 1:15 | **Hands-on 2:** task 2 |
+| 2:00 | **Hands-on 3:** task 3 |
+| 2:30 | Break |
+| 2:40 | **Hands-on 4:** tasks 4 and 5 |
+| 4:00 | Awards, templates, next steps for applying |
+
+---
+
 ## Tracks
 
 Pick one track and work through its tasks at your own pace.
@@ -54,22 +72,6 @@ Each card links to its page and to the main ideas the page teaches.
 {% include track_map.html track="advanced" %}
 
 ---
-
-## Schedule
-
-| Time | Session |
-|---|---|
-| 10:00 | Welcome: goals, the three tracks, the Slack channel, a quick login check on the Yens and Marlowe |
-| 10:15 | Talk: an introduction to Marlowe (Marlowe team) |
-| 10:50 | Talk: a social science researcher's Marlowe story |
-| 11:30 | Break; open a terminal on the Yens |
-| 11:40 | **Hands-on 1:** task 1 of your track |
-| 12:30 | Lunch |
-| 1:15 | **Hands-on 2:** task 2 |
-| 2:00 | **Hands-on 3:** task 3 |
-| 2:30 | Break |
-| 2:40 | **Hands-on 4:** tasks 4 and 5 |
-| 4:00 | Awards, templates, next steps for applying |
 
 ---
 
