@@ -55,8 +55,8 @@ labeling data at scale, a decision model like Jev has five advantages:
 
 A chat model is the better tool when the question is open-ended, when you need text pulled out of the document (a
 name, a date, a dollar amount), or when you want an explanation rather than a choice. The Intermediate track's
-[I1]({{ '/intermediate/i1/' | relative_url }}#where-the-labels-come-from-jev-and-system-one) has the full version,
-with an example request, how Jev's confidence is measured, and TypeSafe's documentation for each point.
+[I1]({{ '/intermediate/i1/' | relative_url }}#where-the-labels-come-from-jev-and-system-one) shows an example request
+and how Jev's confidence is measured.
 
 ## Five filings
 
