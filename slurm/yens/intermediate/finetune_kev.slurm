@@ -44,32 +44,35 @@ GPU=$(nvidia-smi --query-gpu=name --format=csv,noheader -i 0 | awk '{print tolow
 # Filings to train on: about 10 minutes either way (1.08 s each on an A40, 0.31 s on an H200)
 FILINGS=${FILINGS:-$([ "$GPU" = h200 ] && echo 1920 || echo 512)}
 
-LABEL=() RELEASED=
+WATCH= RESCORE=
+WATCHER=(--evals $EVAL --results "$WORK/results/i2/$ID")   # one W&B run for the job: the training curve, then each set's scores
 if [ -z "$RUN" ]; then                               # train, then score the new adapter
   RUN=$WORK/runs/i2/$ID
-  NAME=$USER-$GPU-$([ "$INIT" = scratch ] && echo "scratch-r$RANK" || echo kev)-lr$LR-rps$RECORDS_PER_STEP-$WEIGHTS
+  NAME=$(whoami)-$GPU-$([ "$INIT" = scratch ] && echo "scratch-r$RANK" || echo kev)-lr$LR-rps$RECORDS_PER_STEP-$WEIGHTS
   ARGS=(--data "$WORK/data/train.jsonl" --base Qwen/Qwen3.5-4B-Base --base_revision 1001bb4d826a52d1f399e183466143f4da7b741b
         --device cuda --dtype bf16 --weights_dtype "$WEIGHTS" --checkpointing 1 --max_state 2048 --seed 0
         --lora "$RANK" --lr "$LR" --batch 1 --accum "$RECORDS_PER_STEP" --max_steps $((FILINGS / RECORDS_PER_STEP)) --out "$RUN")
   if [ "$INIT" = kev ]; then ARGS+=(--init_from jaredpalmer/kev-4b@v1.0); fi
-  if [ -n "$WB" ]; then                              # one W&B run for the job: the training curve, then the scores
+  if [ -n "$WB" ]; then
     export WANDB_RUN_ID=$(python3 -c 'import uuid; print(uuid.uuid4().hex[:12])') WANDB_JOB_TYPE=train
-    $PY scripts/intermediate/wandb_watch.py --log "$PWD/logs/ceo-finetune-$ID.out" --run-dir "$RUN" --name "$NAME" &
+    $PY scripts/intermediate/wandb_watch.py --log "$PWD/logs/ceo-finetune-$ID.out" --run-dir "$RUN" --name "$NAME" "${WATCHER[@]}" &
     WATCH=$!
   fi
   (cd "$KEV_HOME/kev" && $PY -m kev.train "${ARGS[@]}")
-  if [ -n "$WB" ]; then wait $WATCH; echo "$WANDB_RUN_ID" > "$RUN/wandb_run_id"; fi   # so test scores join this run later
+  if [ -n "$WB" ]; then echo "$WANDB_RUN_ID" > "$RUN/wandb_run_id"; fi   # so a later EVAL=test RUN=... job adds to this run
   $PY scripts/step_times.py "$RUN" --per-step "$RECORDS_PER_STEP"
-elif [ -f "$RUN/wandb_run_id" ]; then                # a run trained here: add these scores to its W&B run
-  export WANDB_RUN_ID=$(cat "$RUN/wandb_run_id")
-else                                                 # a released run: score it as its own W&B run
-  RELEASED=1
+elif [ -f "$RUN/wandb_run_id" ]; then                # a run trained by an earlier job: score.py adds these scores to its W&B run
+  export WANDB_RUN_ID=$(cat "$RUN/wandb_run_id"); RESCORE=1
+elif [ -n "$WB" ]; then                              # a released run: one W&B run for its scores
+  export WANDB_RUN_ID=$(python3 -c 'import uuid; print(uuid.uuid4().hex[:12])') WANDB_JOB_TYPE=score
+  $PY scripts/intermediate/wandb_watch.py --name "$(whoami)-$GPU-$(basename "$RUN")" --model "$RUN" "${WATCHER[@]}" &
+  WATCH=$!
 fi
 
 START=$SECONDS
 PORT=$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1])')
 (cd "$KEV_HOME/kev" && exec .venv/bin/python -m kev.serve --run "$RUN" --port "$PORT") > "logs/kev-server-$ID.log" 2>&1 &
-SERVER=$!; trap 'kill $SERVER $GPUMON 2>/dev/null || true' EXIT
+SERVER=$!; trap 'kill $SERVER $GPUMON $WATCH 2>/dev/null || true' EXIT   # a W&B run still open is closed as failed
 for i in $(seq 1 120); do                            # wait up to 10 minutes for the model to load
   curl -sf "http://127.0.0.1:$PORT/v1/models" > /dev/null && break
   kill -0 $SERVER 2>/dev/null || { echo "Kev server stopped; see logs/kev-server-$ID.log" >&2; exit 1; }
@@ -82,9 +85,9 @@ for E in $EVAL; do
     valid) DATA=$WORK/data/valid.jsonl SAMPLE=$WORK/data/valid.parquet ;;
     test) DATA=$WORK/data/test1000.jsonl SAMPLE=$WORK/data/test1000.parquet ;;
   esac
-  if [ -n "$RELEASED" ] && [ -n "$WB" ]; then export WANDB_JOB_TYPE=$E; LABEL=(--wandb "$USER-$GPU-$(basename "$RUN")-$E-$ID"); fi
   echo "scoring the $E filings"
   OUT=$WORK/results/i2/$ID-$E.jsonl
-  $PY scripts/intermediate/label.py --url "http://127.0.0.1:$PORT" --data "$DATA" --out "$OUT" --concurrency 16 "${LABEL[@]}"
-  $PY scripts/intermediate/score.py "$OUT" --sample "$SAMPLE" ${WB:+--wandb --wandb-prefix $E/}
+  $PY scripts/intermediate/label.py --url "http://127.0.0.1:$PORT" --data "$DATA" --out "$OUT" --concurrency 16
+  $PY scripts/intermediate/score.py "$OUT" --sample "$SAMPLE" ${RESCORE:+${WB:+--wandb --wandb-prefix $E/}}
 done
+if [ -n "$WATCH" ]; then wait $WATCH; fi             # the W&B run closes once it has every set's scores

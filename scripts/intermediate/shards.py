@@ -4,6 +4,9 @@ take and cost, against Jev.
     $PY scripts/intermediate/shards.py $WORK/results/i5/<jobid>
     $PY scripts/intermediate/shards.py $WORK/results/i5/<1-GPU jobid> $WORK/results/i5/<8-GPU jobid>     # side by side
 
+With --wandb NAME (label.sh, for a job that is not an array), the job's totals also go to Weights & Biases as one run:
+GPUs, filings, filings per second across all GPUs, load time, and what labeling every filing would take and cost.
+
 Reads <dir>/shard-*_summary.json (label.py) and <dir>/job-*.json (label.sh: GPUs and load time, one per node of a
 job array). Run it again once every task of an array is done: each task prints only what had finished when it did.
 The token counts come from Jev's own record of each filing, jev_input_tokens in $DATA/item502_v1.parquet.
@@ -32,6 +35,7 @@ def main():
     ap.add_argument("dirs", nargs="+")
     ap.add_argument("--gpu-hour", type=float, default=float(os.environ.get("GPU_HOUR", "3.0")),
                     help="dollars per H100-hour to price the GPUs at (default 3, or GPU_HOUR)")
+    ap.add_argument("--wandb", metavar="NAME", help="also log the (one) job's totals to Weights & Biases under this name")
     a = ap.parse_args()
     import pandas as pd
     d = pd.read_parquet(os.path.join(os.environ["DATA"], "item502_v1.parquet"),
@@ -64,6 +68,20 @@ def main():
         print(f"{'':<10}{len(ids):,} answers saved: {mine / 1e6:.1f}M tokens, ${mine / 1e9 * JEV_PER_BILLION:.2f} from Jev;"
               f" the last run labeled {n:,} in {wall / 60:.1f} min on {job['gpus']} GPU(s),"
               f" ${wall / 3600 * job['gpus'] * a.gpu_hour:.2f} at ${a.gpu_hour:.2f}/GPU-hour")
+        if a.wandb:
+            import pwd
+            import wandb
+            run = wandb.init(name=a.wandb, config={"user": pwd.getpwuid(os.getuid()).pw_name,
+                                                   "job": os.environ.get("SLURM_JOB_ID"), "gpus": job["gpus"],
+                                                   "shards": len(shards), "node": os.uname().nodename})
+            run.summary.update({"filings": n, "failed": failed, "filings_per_second": round(rate, 1),
+                                "filings_per_second_per_gpu": round(rate / job["gpus"], 1),
+                                "load_seconds": job["load_seconds"], "label_minutes": round(wall / 60, 1),
+                                "all_filings_hours": round(hours, 2), "all_filings_gpu_hours": round(gpu_hours, 2),
+                                "all_filings_gpu_dollars": round(gpu_hours * a.gpu_hour, 2),
+                                "all_filings_jev_dollars": round(jev, 2)})
+            print(f"W&B run: {run.url}", flush=True)
+            run.finish()
     print(f"\nall hours, GPU-hours, GPUs $: labeling all {corpus:,} filings at the job's rate ({corpus_tokens / 1e6:.0f}M tokens);"
           f" Jev $: the same filings from Jev at ${JEV_PER_BILLION:.0f} per billion input tokens")
 

@@ -20,5 +20,5 @@
 #   sbatch slurm/marlowe/intermediate/full_ft_8gpu.slurm
 #   LR=1e-5 sbatch slurm/marlowe/intermediate/full_ft_8gpu.slurm     # settings: see full_ft.sh
 # The run is $WORK/runs/i4/<jobid>.
-GPUS=8 EXERCISE=i4 WANDB_DEFAULT=exercise-4-fsdp
+GPUS=8 EXERCISE=i4 WANDB_DEFAULT="Intermediate Exercise 4"
 source slurm/marlowe/intermediate/full_ft.sh

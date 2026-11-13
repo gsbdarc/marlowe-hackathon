@@ -966,6 +966,23 @@ tspan.personalize-token-unset {
 .train-fig .tf-s { font-size: 12px; fill: #605c56; font-style: italic; }
 .train-fig .tf-lane { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-anchor: start; fill: #8a857d; }
 
+/* I4: where the weights and the filings sit on 8 GPUs, one row per method. Weights in the dataviz default blue
+   (slot 1), filings in orange (slot 2), a slice held elsewhere dashed; every row is also told in words. */
+.gpu-fig { margin: 1rem 0 1.4rem; border: 1px solid #e4e0da; border-radius: 8px; background: #fcfcfb; padding: 0.6rem; }
+.gpu-fig svg { display: block; width: 100%; height: auto; max-width: 780px; margin: 0 auto; }
+.gpu-fig .g-box { fill: #ffffff; stroke: #b5afa6; stroke-width: 1; }
+.gpu-fig .g-idle { fill: #f4f2ef; stroke: #d6d1ca; stroke-width: 1; stroke-dasharray: 4 3; }
+.gpu-fig .g-w { fill: #2a78d6; }
+.gpu-fig .g-empty { fill: none; stroke: #9cc0ec; stroke-width: 1; stroke-dasharray: 3 2; }
+.gpu-fig .g-f { fill: #eb6834; }
+.gpu-fig text { font-family: "Source Sans 3", system-ui, sans-serif; fill: #3a3733; }
+.gpu-fig .g-head { font-size: 15px; font-weight: 700; }
+.gpu-fig .g-sub { font-size: 12.5px; fill: #605c56; }
+.gpu-fig .g-name { font-size: 11px; font-weight: 600; text-anchor: middle; fill: #55524d; }
+.gpu-fig .g-idle-t { font-size: 12px; font-style: italic; text-anchor: middle; fill: #8a857d; }
+.gpu-fig .g-note { font-size: 13px; text-anchor: middle; fill: #55524d; }
+.gpu-fig .g-leg { font-size: 12.5px; fill: #55524d; }
+
 /* A table whose header should not be bold, for example when the header cells are code (the A2 BATCH and ACCUM table). */
 .main-content table.plain-head th { font-weight: 400; }
 

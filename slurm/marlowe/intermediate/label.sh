@@ -53,4 +53,14 @@ tail -f "$OUT/shard-$FIRST.log" &      # GPU 0's progress, as a sample of all of
 PIDS+=($!)
 for p in "${LABEL[@]}"; do wait "$p"; done
 echo "{\"task\": ${SLURM_ARRAY_TASK_ID:-0}, \"gpus\": $GPUS, \"shards\": $SHARDS, \"run\": \"$RUN\", \"load_seconds\": $LOAD, \"job_seconds\": $((SECONDS - START)), \"concurrency\": $CONCURRENCY}" > "$OUT/job-${SLURM_ARRAY_TASK_ID:-0}.json"
-$PY scripts/intermediate/shards.py "$OUT"
+# The job's totals go to W&B, the room's I5 project, as one run (a job array's tasks each see only part of it: none)
+export WANDB_PROJECT="${WANDB_PROJECT:-Intermediate Exercise 5}" WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
+export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
+for f in "$SHARE/wandb.env" .env; do if [ -r "$f" ]; then set -a; source "$f"; set +a; fi; done
+WB=()
+if [ -z "${SLURM_ARRAY_JOB_ID:-}" ] && { [ -n "${WANDB_API_KEY:-}" ] || [ "${WANDB_MODE:-}" = offline ]; }; then
+  WB=(--wandb "$USER-h100x$GPUS-$(basename "${RUN%@*}")-$SLURM_JOB_ID")
+elif [ -z "${SLURM_ARRAY_JOB_ID:-}" ]; then
+  echo "W&B off: no WANDB_API_KEY in $SHARE/wandb.env or .env"
+fi
+$PY scripts/intermediate/shards.py "$OUT" "${WB[@]}"
