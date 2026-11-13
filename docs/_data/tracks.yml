@@ -127,25 +127,25 @@ intermediate:
     model: Kev-4B
     platform: Marlowe
     nodes: 1 node
-    gpus: 8 H100s
-    kinds: [Fine-tuning, LoRA bonus]
+    gpus: 4 or 8 H100s
+    kinds: [Fine-tuning, LoRA]
     concepts:
+      - {name: "Know the machine", anchor: first-know-the-machine}
+      - {name: "One GPU, DDP or FSDP2?", anchor: put-the-three-together}
       - {name: "FSDP across 8 GPUs", anchor: why-one-gpu-is-slow-and-what-8-change}
-      - {name: "Speedup and GPU-hours", anchor: compare-with-one-gpu}
-      - {name: "More GPUs: worth it?", anchor: more-gpus-worth-it}
-      - {name: "LoRA on 4 and 8 GPUs (DDP)", anchor: going-further-lora-on-4-and-8-gpus}
+      - {name: "Compare with the room", anchor: compare-with-the-room}
   - id: I5
     title: Inference at scale
     url: /intermediate/i5/
     model: Kev-4B
     platform: Marlowe
     nodes: 1 node
-    gpus: 1 H100, then 8
+    gpus: 2 H100s, then 4
     kinds: [Inference]
     concepts:
-      - {name: "One shard per GPU", anchor: two-ways-to-use-8-gpus}
-      - {name: "When the job is stopped halfway", anchor: when-the-job-is-stopped-halfway}
-      - {name: "Scaling to more nodes", anchor: scale-it-up}
+      - {name: "One shard per GPU", anchor: two-ways-to-use-several-gpus}
+      - {name: "2 GPUs against 4", anchor: compare-2-gpus-with-4}
+      - {name: "Scaling to more GPUs and nodes", anchor: scale-it-up}
       - {name: "The cost against Jev", anchor: how-much-money-you-saved}
 advanced:
   - id: A1
