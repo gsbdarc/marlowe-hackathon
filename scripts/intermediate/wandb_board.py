@@ -27,10 +27,10 @@ def bars(*keys):
     return [wr.BarPlot(title=title, metrics=[wr.SummaryMetric(key)], orientation="h") for key, title in keys]
 
 
-def scatter(title, x, y, z=None):
+def scatter(title, x, y, z=None, **kw):
     """One point per run. x, y and z (the points' color) are summary names, or ("config", name) for a setting."""
     m = lambda k: k and (wr.Config(k[1]) if isinstance(k, tuple) else wr.SummaryMetric(k))
-    return wr.ScatterPlot(title=title, x=m(x), y=m(y), z=m(z))
+    return wr.ScatterPlot(title=title, x=m(x), y=m(y), z=m(z), **kw)
 
 
 def by_option(title, key, option):
@@ -76,22 +76,33 @@ def i1():
 
 
 def i2():
+    ceo = "valid/status_agree_on_ceo_changes"
+    held_out = [scatter("Validation against test: agreement, weighted", "valid/status_agree_weighted", "test/status_agree_weighted"),
+                scatter("Validation against test: agreement on CEO changes", ceo, "test/status_agree_on_ceo_changes")]
+    training = [wr.LinePlot(title="Training loss", y=["loss"]),
+                scatter("Final training loss against validation agreement on CEO changes", "loss", ceo),
+                wr.LinePlot(title="Seconds per filing", y=["seconds_per_item"])]
+    settings = [scatter("Learning rate against validation agreement on CEO changes", ("config", "lr"), ceo, log_x=True),
+                scatter("Filings per step against validation agreement on CEO changes", ("config", "accum"), ceo),
+                scatter("Adapter rank against validation agreement on CEO changes", ("config", "lora"), ceo),
+                by_option("Validation agreement on CEO changes by number format", ceo, "weights_dtype"),
+                by_option("Validation agreement on CEO changes by GPU", ceo, "gpu")]
     scores = bars(("valid/status_agree_weighted", "Validation: agreement, weighted"),
-                  ("valid/status_agree_on_ceo_changes", "Validation: agreement on CEO changes"),
+                  (ceo, "Validation: agreement on CEO changes"),
                   ("test/status_agree_weighted", "Test: agreement, weighted"),
                   ("test/status_agree_on_ceo_changes", "Test: agreement on CEO changes"))
-    training = [wr.LinePlot(title="Training loss", y=["loss"]),
-                wr.LinePlot(title="Seconds per filing", y=["seconds_per_item"])]
-    settings = wr.ParallelCoordinatesPlot(title="Settings against validation agreement on CEO changes", columns=[
+    compare = wr.ParallelCoordinatesPlot(title="Settings against validation agreement on CEO changes", columns=[
         wr.ParallelCoordinatesPlotColumn(metric=wr.Config(k)) for k in ("gpu", "lora", "lr", "accum", "weights_dtype")] + [
-        wr.ParallelCoordinatesPlotColumn(metric=wr.SummaryMetric("valid/status_agree_on_ceo_changes"))])
+        wr.ParallelCoordinatesPlotColumn(metric=wr.SummaryMetric(ceo))])
     columns = ["config:user", "config:gpu", "config:init_from", "config:lora", "config:lr", "config:accum",
-               "config:weights_dtype", "config:max_steps", "summary:valid/status_agree_weighted",
+               "config:weights_dtype", "config:max_steps", "summary:loss", "summary:valid/status_agree_weighted",
                "summary:valid/status_agree_on_ceo_changes", "summary:test/status_agree_weighted",
                "summary:test/status_agree_on_ceo_changes"]
-    sections = [ws.Section(name="Scores", panels=scores, is_open=True),
+    sections = [ws.Section(name="Validation against test", panels=held_out, is_open=True),
                 ws.Section(name="Training", panels=training, is_open=True),
-                ws.Section(name="Compare settings", panels=[settings], is_open=True)]
+                ws.Section(name="What each setting does", panels=settings, is_open=True),
+                ws.Section(name="Scores, run by run", panels=scores, is_open=True),
+                ws.Section(name="Compare settings", panels=[compare], is_open=True)]
     # Sorted by validation, the set settings are chosen on
     return sections, columns, ws.Ordering(ws.Summary("valid/status_agree_weighted"), ascending=False)
 
