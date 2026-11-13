@@ -35,7 +35,7 @@ STAMP = re.compile(r"^\[\s*\d+:\d{2}\] ")   # the [mm:ss] that slurm/train_args.
 def follow(path):
     while not os.path.exists(path):
         time.sleep(5)
-    with open(path) as f:
+    with open(path, encoding="utf-8", errors="replace") as f:  # two ranks writing one log at once can cut a character in half
         while True:
             line = f.readline()
             if line:
