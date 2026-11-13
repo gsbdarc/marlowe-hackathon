@@ -49,6 +49,7 @@ for g in "${!PORTS[@]}"; do
     > "$OUT/shard-$((FIRST + g)).log" 2>&1 &
   LABEL+=($!)
 done
+touch "$OUT/shard-$FIRST.log"         # exists before tail opens it: the labelers above may not have started yet
 tail -f "$OUT/shard-$FIRST.log" &      # GPU 0's progress, as a sample of all of them
 PIDS+=($!)
 for p in "${LABEL[@]}"; do wait "$p"; done
