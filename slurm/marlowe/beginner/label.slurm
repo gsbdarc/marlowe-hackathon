@@ -26,4 +26,6 @@
 # B5's challenge labels with your own trained model instead, and keeps its answers apart:
 #   RUN=$WORK/runs/b3/<jobid> RESULTS_NAME=b5 sbatch --reservation=GSB_Hackathon slurm/marlowe/beginner/label.slurm
 RESULTS_NAME=${RESULTS_NAME:-b4} SHARDS=8
+# The job's speed goes to the room's W&B board as one run, in the Beginner Exercise 4 project, not I5's
+export WANDB_PROJECT="${WANDB_PROJECT:-Beginner Exercise 4}"
 source slurm/marlowe/intermediate/label.sh

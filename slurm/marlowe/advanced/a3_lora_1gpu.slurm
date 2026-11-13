@@ -21,11 +21,14 @@ module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FA
 source env/marlowe.sh
 GPUS=1
 source slurm/marlowe/advanced/train_27b_args.sh
+source slurm/marlowe/advanced/wandb.sh
 # The LoRA settings come after TRAIN_ARGS, so they replace its --full_ft 1 and --lr 2e-6
 LORA_ARGS="--full_ft 0 --lora 16 --lr 2e-4"
 job_timer
 OUT=$WORK/runs/a3-lora
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
+wandb_room advanced-a3 a3-lora "$OUT"
 cd "$KEV_HOME/kev"
 $PY -m kev.train $TRAIN_ARGS $LORA_ARGS --out "$OUT" 2>&1 | stamp
+wandb_wait

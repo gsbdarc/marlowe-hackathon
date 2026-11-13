@@ -83,44 +83,28 @@ srun --jobid <jobid> --overlap --pty nvidia-smi
 ```
 {: .yens }
 
-## Weights & Biases (optional)
+## Weights & Biases
 
-[Weights & Biases](https://wandb.ai) (W&B) draws the loss, the speed and the GPUs' utilization and memory as charts in
-your browser, and puts runs side by side, which makes the scaling comparison easy to see.
+[Weights & Biases](https://wandb.ai) (W&B) is a website that records every training run: its settings, its loss and
+speed as it trains, and its GPUs' utilization and memory, drawn as charts. It puts runs side by side, which makes a
+scaling comparison easy to see.
+
+The track jobs report to the hackathon's W&B team, [Marlowe-Hackathon on W&B](https://forge.coreweave.com/wandb/Marlowe-Hackathon), with one shared key that the
+organizers keep in `wandb.env` in the hackathon's shared folder on each cluster. Each job reads that file before it
+starts, so there is nothing to set up. A line `WANDB_API_KEY=<key>` in a `.env` file at the top of your clone, which
+git ignores, overrides it. If the job cannot find a key, its log says `W&B off` and the job runs without W&B.
 
 Kev's trainer does not talk to W&B itself. `scripts/wandb_watch.py` runs alongside the training on the same node,
-reads the log lines above as they appear, and sends the loss and the speed to W&B. Because it runs on the GPU node, W&B also records that
-node's GPUs on the run's **System** tab.
+reads the log lines above as they appear, and sends the loss and the speed to W&B every 10 optimizer steps. Because it
+runs on the GPU node, W&B also records that node's GPUs on the run's **System** tab. The job's log shows a `W&B run:`
+line with a link to the run.
 
-**Once:** create a free account at [wandb.ai](https://wandb.ai) with your Stanford email, copy your API key from
-[wandb.ai/authorize](https://wandb.ai/authorize), and log in on each cluster:
-
-```bash
-source env/yens.sh
-$KEV_HOME/kev/.venv/bin/wandb login
-```
-{: .yens }
-
-```bash
-source env/marlowe.sh
-$KEV_HOME/kev/.venv/bin/wandb login
-```
-{: .marlowe }
-
-The key is saved in `~/.netrc` in your home directory. Never put it in this repository or in a script.
-
-**Then** add `WANDB=1` in front of any training job:
-
-```bash
-WANDB=1 sbatch slurm/yens/01_train_1gpu.slurm
-```
-{: .yens }
-
-The run appears in your W&B project `marlowe-hackathon`, named after the run and job ID (for example
-`cp1-1gpu-873242`). Charts update every 10 steps.
+After the hackathon, use a key of your own: create a free account at [wandb.ai](https://wandb.ai), copy your key from
+[wandb.ai/authorize](https://wandb.ai/authorize), and put it in `.env` in your clone or run
+`$KEV_HOME/kev/.venv/bin/wandb login` once on each cluster. Never commit a key to a repository. The older templates in
+`slurm/yens/` and `slurm/marlowe/` send a run to W&B only when you submit with `WANDB=1 sbatch ...`.
 
 {: .note }
-> If compute nodes cannot reach wandb.ai, the run will fail to connect. Submit with
-> `WANDB=1 WANDB_MODE=offline sbatch ...`: the run is written to `wandb/` in the repository, and
-> `$KEV_HOME/kev/.venv/bin/wandb sync wandb/offline-run-*` from an interactive Yen node or the Marlowe login node uploads
-> it afterward.
+> If compute nodes cannot reach wandb.ai, submit with `WANDB_MODE=offline sbatch ...`: the run is written to a `wandb/`
+> folder (under `$WORK` for the track jobs), and `$KEV_HOME/kev/.venv/bin/wandb sync <that folder>/offline-run-*` from an interactive Yen node or the
+> Marlowe login node uploads it afterward.

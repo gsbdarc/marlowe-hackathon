@@ -28,8 +28,8 @@ permalink: /reference/
 | GPU partition | `gpu`, with `-C GPU_MODEL:H200` for the H200s | `batch`, account `marlowe-c001` |
 | GPUs | 2 H200 (141 GB) on yen-gpu4; A40s and A30s on the other GPU nodes | 8 H100 (80 GB) per node |
 | Time limit | 1 day | 2 days on `batch` |
-| Memory per CPU | at most 4,000 MB on `gpu` | see `scontrol show partition batch` |
-| Before a GPU job | nothing | `module load slurm mps` |
+| Memory per CPU | at most 4,000 MB on `gpu` | 13,000 MB by default on `batch` |
+| Before a GPU job | nothing | nothing: every job file loads `slurm mps` |
 
 Common commands:
 
@@ -44,8 +44,9 @@ tail -f logs/<name>-<jobid>.out
 ## Reservations
 
 On the day, each cluster holds GPUs for this class only, so your jobs do not wait behind the rest of Stanford. A job
-uses them when you add `--reservation=` and the reservation's name after `sbatch`; every command on the track pages
-already has it.
+uses them when you add `--reservation=` and the reservation's name after `sbatch`. The Beginner commands write it
+out. On Marlowe, `source env/marlowe.sh` adds it by itself while the reservation is open, so if you sourced it before
+12:00, source it again after.
 
 | | Yens | Marlowe |
 |---|---|---|

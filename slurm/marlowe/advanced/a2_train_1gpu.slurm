@@ -21,9 +21,12 @@ module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FA
 source env/marlowe.sh
 GPUS=1
 source slurm/marlowe/advanced/train_27b_args.sh
+source slurm/marlowe/advanced/wandb.sh
 job_timer
 OUT=$WORK/runs/${RUN:-a2-1gpu}
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
+wandb_room advanced-a2 "${RUN:-a2-1gpu}" "$OUT"
 cd "$KEV_HOME/kev"
 $PY -m kev.train $TRAIN_ARGS --out "$OUT" 2>&1 | stamp
+wandb_wait
