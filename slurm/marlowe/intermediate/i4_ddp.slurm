@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J i4-challenge-ddp
+#SBATCH -J i4-ddp
 #SBATCH --account=marlowe-c001
 #SBATCH --partition=batch
 #SBATCH --nodes=1
@@ -14,12 +14,12 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=<sunet>@stanford.edu
 
-# Intermediate I4, the 10-minute challenge: train on the same 10,000 filings as everyone else, on one node's 8 H100s,
+# Intermediate I4: train on the same 10,000 filings as everyone else, on one node's 8 H100s (about 10 minutes),
 # then score the model on the 2,000 validation and 1,000 test filings. The scores join the training run in W&B.
 # This one: a LoRA fine-tune, data parallel (DDP), as lora_8gpu.slurm. Settings: LR, RECORDS_PER_STEP: 16, 40 or 80 (see lora.sh).
-#   sbatch slurm/marlowe/intermediate/challenge_ddp.slurm
+#   sbatch slurm/marlowe/intermediate/i4_ddp.slurm
 # The run is $WORK/runs/lora-ddp/<jobid>.
 GPUS=8 EXERCISE=i4
 FILINGS=${FILINGS:-10000} EVAL=${EVAL-valid test}
-export WANDB_RUN_GROUP=${WANDB_RUN_GROUP:-10-minute challenge}
+export WANDB_RUN_GROUP=${WANDB_RUN_GROUP:-10,000 filings}
 source slurm/marlowe/intermediate/lora.sh
