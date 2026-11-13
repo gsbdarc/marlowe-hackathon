@@ -12,7 +12,8 @@
  * default command.
  *
  * A select with `data-needs="init=scratch"` applies only while the select named init is set to scratch. Otherwise it is
- * greyed out, left out of the command, and its {name} becomes its `data-off-says` (empty if it has none).
+ * greyed out, left out of the command, and its {name} becomes its `data-off-says` (empty if it has none). Several
+ * values may be listed, `data-needs="init=scratch|base"`: it applies while init is set to any of them.
  */
 (function () {
   'use strict';
@@ -31,7 +32,7 @@
       Array.prototype.forEach.call(selects, function (s) {
         var need = (s.getAttribute('data-needs') || '').split('=');
         var other = need[0] && picker.querySelector('select[name="' + need[0] + '"]');
-        s.disabled = !!other && other.value !== need[1];
+        s.disabled = !!other && need[1].split('|').indexOf(other.value) < 0;
         if (s.disabled) {
           sentence = sentence.replace('{' + s.name + '}', s.getAttribute('data-off-says') || '');
           return;
