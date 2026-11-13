@@ -26,7 +26,7 @@ nvidia-smi --query-gpu=timestamp,name,utilization.gpu,memory.used,memory.total -
 # The beginner board in the room's W&B team. scripts/beginner/wandb_key.sh finds the team's key: the hackathon's shared
 # wandb.env, or a line WANDB_API_KEY=... in .env at the top of the repo (git ignores it). Without a key the job still
 # runs; it just does not reach the board.
-export WANDB_PROJECT=${WANDB_PROJECT:-beginner-1-score}
+export WANDB_PROJECT="${WANDB_PROJECT:-Beginner Exercise 1}"
 export WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 GPU=$(nvidia-smi --query-gpu=name --format=csv,noheader -i 0 | awk '{print tolower($2)}')

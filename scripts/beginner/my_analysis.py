@@ -4,7 +4,7 @@
 
 Each exercise has a TODO. Until you fill one in, the script says it is not done yet and moves on, so you can run the
 file after every change. The B5 page has hints and a worked answer for each. Each run also puts your progress, your
-Exercise 5 slopes and your charts on the room's W&B board (project beginner-5-analysis, under your SUNet ID).
+Exercise 5 slopes and your charts on the room's W&B board (project Beginner Exercise 5, under your SUNet ID).
 """
 import os
 import sys

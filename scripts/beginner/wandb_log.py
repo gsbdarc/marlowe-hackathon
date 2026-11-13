@@ -1,22 +1,15 @@
-"""Put the Beginner track's B4 and B5 results on the room's W&B board. W&B is optional here: without a key, or if W&B
-fails, this prints one line and whatever called it carries on.
-
-    $PY scripts/beginner/wandb_log.py label $WORK/results/b4/<jobid>     # B4: label.slurm runs this when it finishes
-
-my_analysis.py (B5) calls analysis() itself, every time it runs.
+"""Put B5's results on the room's W&B board: my_analysis.py calls analysis() every time it runs. W&B is optional here:
+without a key, or if W&B fails, this prints one line and the script carries on. (B4's jobs log themselves, through the
+I5 job's shards.py.)
 
 The key is found the same way as scripts/beginner/wandb_key.sh: WANDB_API_KEY if it is set, else the line
 WANDB_API_KEY=... in the hackathon's shared wandb.env ($SHARE on Marlowe), else in .env at the top of the repo.
 WANDB_PROJECT, if set, sends the run to another project (instructors test with WANDB_PROJECT=beginner-smoke-test).
 """
-import glob
-import json
 import os
 import re
-import sys
 
 ENTITY = os.environ.get("WANDB_ENTITY", "Marlowe-Hackathon")
-ALL_FILINGS = 296_477
 
 
 def key():
@@ -68,46 +61,12 @@ def finish(run, what):
         print(f"W&B: could not finish the run: {type(e).__name__}: {e}")
 
 
-def label(d):
-    """B4: one run per labeling job, with the numbers shards.py prints for it."""
-    jobs = [json.load(open(p)) for p in glob.glob(os.path.join(d, "job-*.json"))]
-    shards = [json.load(open(p)) for p in glob.glob(os.path.join(d, "shard-*_summary.json"))]
-    wall = max((s["wall_seconds"] for s in shards), default=0)
-    if not jobs or not wall:
-        print(f"W&B: nothing to log in {d} (no job-*.json, or no labeling time)")
-        return
-    gpus = sum(j["gpus"] for j in jobs)
-    n = sum(s["succeeded"] for s in shards)
-    rate = n / wall
-    jobid = os.path.basename(d.rstrip("/"))
-    user = os.environ.get("USER", "me")
-    run = start("beginner-4-label", f"{user}-{gpus}gpu-{jobid}",
-                config={"gpus": gpus, "job": jobid, "model": jobs[0].get("run"), "user": user})
-    if run is None:
-        return
-    try:
-        run.summary.update({
-            "gpus": gpus,
-            "filings": n,
-            "failed": sum(s["filings"] - s["succeeded"] for s in shards),
-            "filings_per_s": round(rate, 1),
-            "filings_per_s_per_gpu": round(rate / gpus, 1),
-            "load_seconds": max(j["load_seconds"] for j in jobs),
-            "minutes": round(wall / 60, 1),
-            "all_filings_hours": round(ALL_FILINGS / rate / 3600, 2),
-            "all_filings_gpu_hours": round(ALL_FILINGS / rate / 3600 * gpus, 2),
-        })
-    except Exception as e:
-        print(f"W&B: could not log the numbers: {type(e).__name__}: {e}")
-    finish(run, "this job")
-
-
 def analysis(done, kev_fit, jev_fit, charts):
     """B5: one run per person, updated each time my_analysis.py runs. done maps each exercise to True once it is
     filled in; kev_fit and jev_fit are Exercise 5's regressions (or None); charts are PNGs to show if they exist."""
     user = os.environ.get("USER", "me")
     n = sum(done.values())
-    run = start("beginner-5-analysis", user, run_id=re.sub(r"[^A-Za-z0-9_-]", "-", f"b5-{user}"), config={"user": user})
+    run = start("Beginner Exercise 5", user, run_id=re.sub(r"[^A-Za-z0-9_-]", "-", f"b5-{user}"), config={"user": user})
     if run is None:
         return
     try:
@@ -125,9 +84,3 @@ def analysis(done, kev_fit, jev_fit, charts):
         print(f"W&B: could not log the results: {type(e).__name__}: {e}")
     finish(run, f"your progress ({n} of {len(done)} exercises)")
 
-
-if __name__ == "__main__":
-    if len(sys.argv) == 3 and sys.argv[1] == "label":
-        label(sys.argv[2])
-    else:
-        sys.exit(__doc__)
