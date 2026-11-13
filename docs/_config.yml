@@ -19,7 +19,7 @@ slack_url: "https://stanford.enterprise.slack.com/archives/C0CFQ9T0KCY"
 event_date: "November 13, 2026"
 
 # Show the post-class survey link (sidebar and home page). Set to true on the day of the event.
-show_survey: false
+show_survey: true
 
 exclude:
   - Gemfile
