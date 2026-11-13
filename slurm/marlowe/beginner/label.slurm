@@ -26,8 +26,6 @@
 # B5's challenge labels with your own trained model instead, and keeps its answers apart:
 #   RUN=$WORK/runs/b3/<jobid> RESULTS_NAME=b5 sbatch --reservation=GSB_Hackathon slurm/marlowe/beginner/label.slurm
 RESULTS_NAME=${RESULTS_NAME:-b4} SHARDS=8
+# The job's speed goes to the room's W&B board as one run, in the Beginner Exercise 4 project, not I5's
+export WANDB_PROJECT="${WANDB_PROJECT:-Beginner Exercise 4}"
 source slurm/marlowe/intermediate/label.sh
-# This job's speed on the room's W&B board (project beginner-4-label, run <sunet>-<N>gpu-<jobid>). Without a key, or if
-# W&B fails, it prints one line; the answers above are already saved.
-export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
-$PY scripts/beginner/wandb_log.py label "$OUT" || true

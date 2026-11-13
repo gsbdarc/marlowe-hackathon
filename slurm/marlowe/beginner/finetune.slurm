@@ -36,7 +36,7 @@ GPUMON=$!; trap 'kill $GPUMON 2>/dev/null || true' EXIT
 # The beginner board in the room's W&B team. scripts/beginner/wandb_key.sh finds the team's key: the hackathon's shared
 # wandb.env, or a line WANDB_API_KEY=... in .env at the top of the repo (git ignores it). Without a key the job still
 # runs; it just does not reach the board.
-export WANDB_PROJECT=${WANDB_PROJECT:-beginner-3-marlowe} WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
+export WANDB_PROJECT="${WANDB_PROJECT:-Beginner Exercise 3}" WANDB_ENTITY=${WANDB_ENTITY:-Marlowe-Hackathon}
 export WANDB_DIR=$WORK WANDB_CACHE_DIR=$XDG_CACHE_HOME/wandb WANDB_CONFIG_DIR=$XDG_CACHE_HOME/wandb-config
 source scripts/beginner/wandb_key.sh                 # the room's key: the shared wandb.env, or your .env
 GPU=$(nvidia-smi --query-gpu=name --format=csv,noheader -i 0 | awk '{print tolower($2)}')
