@@ -8,6 +8,9 @@
  * path (the word ending in .slurm) is kept. A `.picker-says` paragraph right after the code block is rewritten from the
  * picker's `data-says` template: each {name} becomes the chosen option's `data-says`, for the select with that name.
  *
+ * A select with `data-script` chooses the script itself: its value is the script's path, which replaces the one in the
+ * default command.
+ *
  * A select with `data-needs="init=scratch"` applies only while the select named init is set to scratch. Otherwise it is
  * greyed out, left out of the command, and its {name} becomes its `data-off-says` (empty if it has none).
  */
@@ -24,7 +27,7 @@
     var selects = picker.querySelectorAll('select');
 
     function render() {
-      var env = [], flags = [], sentence = picker.getAttribute('data-says') || '';
+      var env = [], flags = [], run = script, sentence = picker.getAttribute('data-says') || '';
       Array.prototype.forEach.call(selects, function (s) {
         var need = (s.getAttribute('data-needs') || '').split('=');
         var other = need[0] && picker.querySelector('select[name="' + need[0] + '"]');
@@ -35,11 +38,12 @@
         }
         var opt = s.options[s.selectedIndex];
         sentence = sentence.replace('{' + s.name + '}', opt.getAttribute('data-says') || opt.text);
+        if (s.hasAttribute('data-script')) { run = s.value; return; }
         if (s.value === s.getAttribute('data-default')) return;
         if (s.hasAttribute('data-env')) env.push(s.getAttribute('data-env') + '=' + s.value);
         if (s.hasAttribute('data-flag')) flags.push(s.getAttribute('data-flag') + s.value);
       });
-      code.textContent = env.concat(['sbatch'], flags, [script]).join(' ');
+      code.textContent = env.concat(['sbatch'], flags, [run]).join(' ');
       if (says) says.textContent = sentence;
     }
     Array.prototype.forEach.call(selects, function (s) { s.addEventListener('change', render); });

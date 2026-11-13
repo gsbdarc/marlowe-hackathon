@@ -9,12 +9,16 @@
 # Settings, set before sbatch:
 #   LR=2e-5                learning rate
 #   RECORDS_PER_STEP=16    filings per optimizer step, in total across the GPUs; a multiple of GPUS
-#   STEPS=100              optimizer steps (at least 20: the learning rate warms up over the first 10%)
+#   FILINGS=1600           filings to train on: FILINGS / RECORDS_PER_STEP steps (100 by default)
+#   STEPS=100              or set the optimizer steps directly (at least 20: the learning rate warms up over 10%)
+#   EVAL="valid test"      score the run after training, on one GPU, as I3 does (off by default: score_test.slurm)
 #   WEIGHTS=fp32           the frozen backbone's weights (fp32, as in I2 and I3 Part 1, or bf16)
 set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
-LR=${LR:-2e-5} RECORDS_PER_STEP=${RECORDS_PER_STEP:-16} STEPS=${STEPS:-100} WEIGHTS=${WEIGHTS:-fp32}
+LR=${LR:-2e-5} RECORDS_PER_STEP=${RECORDS_PER_STEP:-16} FILINGS=${FILINGS:-1600} WEIGHTS=${WEIGHTS:-fp32}
+STEPS=${STEPS:-$((FILINGS / RECORDS_PER_STEP))}
+EVAL=${EVAL-} ID=$SLURM_JOB_ID EXERCISE=${EXERCISE:-i4}
 KEV_DDP=${KEV_DDP:-$ME/kev-lora-ddp}
 if [ $((RECORDS_PER_STEP % GPUS)) != 0 ]; then echo "RECORDS_PER_STEP must be a multiple of $GPUS" >&2; exit 1; fi
 if [ "$STEPS" -lt 20 ]; then echo "STEPS must be at least 20" >&2; exit 1; fi
@@ -48,7 +52,10 @@ ARGS=(--data "$WORK/data/train.jsonl" --base Qwen/Qwen3.5-4B-Base --base_revisio
       --init_from jaredpalmer/kev-4b@v1.0 --lora 16 --weights_dtype "$WEIGHTS" --dtype bf16 --checkpointing 1 --device cuda
       --max_state 2048 --seed 0 --lr "$LR" --batch 1 --accum $((RECORDS_PER_STEP / GPUS)) --max_steps "$STEPS" --out "$RUN")
 WATCH=
+WB=
 if [ -n "${WANDB_API_KEY:-}" ] || [ "${WANDB_MODE:-}" = offline ]; then
+  WB=1                                 # one W&B run for the job: the training curve, then the scores (with EVAL)
+  export WANDB_RUN_ID=$(python3 -c 'import uuid; print(uuid.uuid4().hex[:12])') WANDB_JOB_TYPE=train
   $PY scripts/intermediate/wandb_watch.py --log "$PWD/logs/$SLURM_JOB_NAME-$SLURM_JOB_ID.out" --run-dir "$RUN" --name "$NAME" --gpus "$GPUS" &
   WATCH=$!
 else
@@ -62,4 +69,8 @@ else
 fi
 if [ -n "$WATCH" ]; then wait $WATCH; fi
 $PY scripts/step_times.py "$RUN" --per-step "$RECORDS_PER_STEP"
-echo "score it: RUNS=\"lora-${GPUS}gpu=$RUN\" sbatch slurm/marlowe/intermediate/score_test.slurm"
+if [ -n "$EVAL" ]; then
+  source slurm/marlowe/intermediate/score_run.sh
+else
+  echo "score it: RUNS=\"lora-${GPUS}gpu=$RUN\" sbatch slurm/marlowe/intermediate/score_test.slurm"
+fi
