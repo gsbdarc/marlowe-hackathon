@@ -21,6 +21,7 @@ set -euo pipefail
 module load slurm mps                  # mps avoids CUDA_ERROR_MPS_CONNECTION_FAILED (Marlowe docs)
 source env/marlowe.sh
 source slurm/train_args.sh             # job_timer, stamp, gpu_log
+source slurm/marlowe/advanced/wandb.sh
 TEACHER=${1:?name the teacher, for example qwen-235b}
 DATA=$WORK/data/teacher-$TEACHER.jsonl
 OUT=$WORK/runs/a5-$TEACHER
@@ -28,6 +29,7 @@ OUT=$WORK/runs/a5-$TEACHER
 job_timer
 mkdir -p logs && rm -rf "$OUT"
 gpu_log "logs/gpu-$SLURM_JOB_ID.csv"
+wandb_room advanced-a5 "a5-$TEACHER" "$OUT"
 cd "$KEV_HOME/kev"
 # A rank-16 LoRA at learning rate 5e-5, as in Kev's recipe for its 4B model, stopped after 100 steps of 16 filings
 # (1,600 filings, about 10 minutes) so the job fits the session. Remove --max_steps 100 and set --epochs 2 for the full recipe.
@@ -35,3 +37,4 @@ $PY -m kev.train --data "$DATA" --base Qwen/Qwen3.5-4B-Base \
   --full_ft 0 --lora 16 --lr 5e-5 --epochs 1 --max_steps 100 \
   --weights_dtype bf16 --dtype bf16 --checkpointing 1 --device cuda \
   --batch 1 --accum 16 --max_state 2048 --seed 0 --out "$OUT" 2>&1 | stamp
+wandb_wait

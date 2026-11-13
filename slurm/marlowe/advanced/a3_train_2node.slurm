@@ -22,14 +22,16 @@ module load slurm mps
 source env/marlowe.sh
 GPUS=16
 source slurm/marlowe/advanced/train_27b_args.sh
+source slurm/marlowe/advanced/wandb.sh
 job_timer
 OUT=$WORK/runs/a3-2node
 mkdir -p logs && rm -rf "$OUT"
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1) MASTER_PORT=29500
-wandb_watch a3-2node
+wandb_room advanced-a3 a3-2node "$OUT"
 cd "$KEV_HOME/kev"
 # On each node: log its GPUs to logs/gpu-<jobid>-<node>.csv, then start its 8 trainer processes
 srun --kill-on-bad-exit=1 bash -c "nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 15 > $OLDPWD/logs/gpu-$SLURM_JOB_ID-\$(hostname -s).csv &
   exec $KEV_HOME/kev/.venv/bin/torchrun --nnodes $SLURM_NNODES --nproc_per_node 8 \
     --rdzv_id $SLURM_JOB_ID --rdzv_backend c10d --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT \
     -m kev.train $TRAIN_ARGS --out $OUT" 2>&1 | stamp
+wandb_wait
