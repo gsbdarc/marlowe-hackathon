@@ -3,7 +3,8 @@
 Everyone at the hackathon shares one W&B key, so W&B's own User column is the same for every run; the table shows config.user, the
 SUNet ID each job records. Scores live in each run's summary (score.py), which W&B's default workspace doesn't chart,
 so this saves a view named "Board" with a runs table and charts of those numbers: for I1, mostly scatter plots
-(one point per run) of speed against agreement, batch size, latency and memory, and bars averaged by option.
+(one point per run) of speed against agreement, batch size, latency and memory, and bars averaged by option. I3 and I4
+open with "Who is leading", the runs sorted by validation agreement on CEO changes; I5 sorts by filings per second.
 
 DARC runs it once per exercise, from a login node, with W&B's wandb-workspaces package in a small environment of its
 own (not Kev's):
@@ -107,7 +108,82 @@ def i2():
     return sections, columns, ws.Ordering(ws.Summary("valid/status_agree_weighted"), ascending=False)
 
 
-LAYOUTS = {1: i1, 2: i2}
+def leading(*keys):
+    """The leaderboard: one bar per run, in the table's order (best first)."""
+    return ws.Section(name="Who is leading", panels=bars(*keys), is_open=True)
+
+
+def i3():
+    ceo = "valid/status_agree_on_ceo_changes"
+    held_out = [scatter("Validation against test: agreement on CEO changes", ceo, "test/status_agree_on_ceo_changes"),
+                scatter("Validation against test: agreement, weighted", "valid/status_agree_weighted", "test/status_agree_weighted")]
+    training = [wr.LinePlot(title="Training loss", y=["loss"]),
+                scatter("Final training loss against validation agreement on CEO changes", "loss", ceo),
+                wr.LinePlot(title="Seconds per filing", y=["seconds_per_item"])]
+    settings = [by_option("Validation agreement on CEO changes: LoRA (16) or full fine-tune", ceo, "lora"),
+                scatter("Learning rate against validation agreement on CEO changes", ("config", "lr"), ceo, log_x=True),
+                scatter("Filings per step against validation agreement on CEO changes", ("config", "accum"), ceo),
+                scatter("Steps against validation agreement on CEO changes", ("config", "max_steps"), ceo)]
+    compare = wr.ParallelCoordinatesPlot(title="Settings against validation agreement on CEO changes", columns=[
+        wr.ParallelCoordinatesPlotColumn(metric=wr.Config(k)) for k in ("lora", "lr", "accum", "max_steps")] + [
+        wr.ParallelCoordinatesPlotColumn(metric=wr.SummaryMetric(ceo))])
+    columns = ["config:user", "config:lora", "config:lr", "config:accum", "config:max_steps", "config:weights_dtype",
+               "summary:loss", "summary:valid/status_agree_on_ceo_changes", "summary:valid/ceo_change_f1",
+               "summary:valid/status_agree_weighted", "summary:test/status_agree_on_ceo_changes"]
+    sections = [leading((ceo, "Validation: agreement on CEO changes"), ("valid/ceo_change_f1", "Validation: CEO-change F1"),
+                        ("valid/status_agree_weighted", "Validation: agreement, weighted")),
+                ws.Section(name="Validation against test", panels=held_out, is_open=True),
+                ws.Section(name="Training", panels=training, is_open=True),
+                ws.Section(name="What each setting does", panels=settings, is_open=True),
+                ws.Section(name="Compare settings", panels=[compare], is_open=True)]
+    return sections, columns, ws.Ordering(ws.Summary(ceo), ascending=False)
+
+
+def i4():
+    ceo = "valid/status_agree_on_ceo_changes"
+    speed = [scatter("Seconds per filing (per GPU) against validation agreement on CEO changes (color: GPUs)",
+                     "seconds_per_item", ceo, ("config", "gpus")),
+             scatter("GPUs against seconds per filing (per GPU)", ("config", "gpus"), "seconds_per_item"),
+             by_option("Seconds per filing (per GPU) by method: LoRA (16) or full fine-tune", "seconds_per_item", "lora")]
+    methods = [by_option("Validation agreement on CEO changes by method: LoRA (16) or full fine-tune", ceo, "lora"),
+               by_option("Validation agreement on CEO changes by GPUs (8: 10,000 filings; 4: 4,800)", ceo, "gpus"),
+               scatter("Learning rate against validation agreement on CEO changes", ("config", "lr"), ceo, log_x=True),
+               scatter("Steps against validation agreement on CEO changes", ("config", "max_steps"), ceo)]
+    training = [wr.LinePlot(title="Training loss", y=["loss"]),
+                wr.LinePlot(title="Seconds per step", y=["seconds_per_step"])]
+    held_out = [scatter("Validation against test: agreement on CEO changes", ceo, "test/status_agree_on_ceo_changes")]
+    columns = ["config:user", "config:gpus", "config:lora", "config:lr", "config:accum", "config:max_steps",
+               "summary:seconds_per_item", "summary:loss", "summary:valid/status_agree_on_ceo_changes",
+               "summary:valid/ceo_change_f1", "summary:test/status_agree_on_ceo_changes"]
+    sections = [leading((ceo, "Validation: agreement on CEO changes"), ("valid/ceo_change_f1", "Validation: CEO-change F1")),
+                ws.Section(name="Method, GPUs and settings", panels=methods, is_open=True),
+                ws.Section(name="Speed", panels=speed, is_open=True),
+                ws.Section(name="Training", panels=training, is_open=True),
+                ws.Section(name="Validation against test", panels=held_out, is_open=True)]
+    return sections, columns, ws.Ordering(ws.Summary(ceo), ascending=False)
+
+
+def i5():
+    gpus = ("config", "gpus")
+    scaling = [scatter("GPUs against filings per second", gpus, "filings_per_second"),
+               scatter("GPUs against filings per second per GPU", gpus, "filings_per_second_per_gpu"),
+               scatter("GPUs against hours to label all 296,477 filings", gpus, "all_filings_hours"),
+               scatter("GPUs against GPU-hours to label all 296,477 filings", gpus, "all_filings_gpu_hours"),
+               scatter("GPUs against load time (s)", gpus, "load_seconds")]
+    cost = bars(("all_filings_gpu_dollars", "GPUs $ for all 296,477 filings, at $3 per GPU-hour"),
+                ("all_filings_jev_dollars", "Jev $ for the same filings"))
+    columns = ["config:user", "config:gpus", "config:node", "summary:filings", "summary:failed",
+               "summary:filings_per_second", "summary:filings_per_second_per_gpu", "summary:load_seconds",
+               "summary:label_minutes", "summary:all_filings_hours", "summary:all_filings_gpu_hours",
+               "summary:all_filings_gpu_dollars"]
+    sections = [leading(("filings_per_second", "Filings per second, all the job's GPUs"),
+                        ("filings_per_second_per_gpu", "Filings per second per GPU")),
+                ws.Section(name="How it scales", panels=scaling, is_open=True),
+                ws.Section(name="What it costs", panels=cost, is_open=True)]
+    return sections, columns, ws.Ordering(ws.Summary("filings_per_second"), ascending=False)
+
+
+LAYOUTS = {1: i1, 2: i2, 3: i3, 4: i4, 5: i5}
 
 
 # wandb-workspaces 0.4.13 builds and reads links without the /wandb/ path this server's W&B app is under
@@ -123,7 +199,7 @@ def library_link(url):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("exercise", type=int, choices=LAYOUTS, help="1 for Intermediate Exercise 1, 2 for Exercise 2")
+    ap.add_argument("exercise", type=int, choices=LAYOUTS, help="the Intermediate exercise, 1 to 5")
     ap.add_argument("--entity", default="Marlowe-Hackathon")
     ap.add_argument("--url", help="the Board view's link, to lay it out again instead of saving a new view")
     a = ap.parse_args()
