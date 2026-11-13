@@ -2,7 +2,8 @@
 
 Everyone at the hackathon shares one W&B key, so W&B's own User column is the same for every run; the table shows config.user, the
 SUNet ID each job records. Scores live in each run's summary (score.py), which W&B's default workspace doesn't chart,
-so this saves a view named "Board" with a runs table and a bar chart per score.
+so this saves a view named "Board" with a runs table and charts of those numbers: for I1, mostly scatter plots
+(one point per run) of speed against agreement, batch size, latency and memory, and bars averaged by option.
 
 DARC runs it once per exercise, from a login node, with W&B's wandb-workspaces package in a small environment of its
 own (not Kev's):
@@ -26,26 +27,51 @@ def bars(*keys):
     return [wr.BarPlot(title=title, metrics=[wr.SummaryMetric(key)], orientation="h") for key, title in keys]
 
 
+def scatter(title, x, y, z=None):
+    """One point per run. x, y and z (the points' color) are summary names, or ("config", name) for a setting."""
+    m = lambda k: k and (wr.Config(k[1]) if isinstance(k, tuple) else wr.SummaryMetric(k))
+    return wr.ScatterPlot(title=title, x=m(x), y=m(y), z=m(z))
+
+
+def by_option(title, key, option):
+    """A bar per value of the option (config), the mean of its runs, with their range."""
+    return wr.BarPlot(title=title, metrics=[wr.SummaryMetric(key)], orientation="v", groupby=wr.Config(option),
+                      groupby_aggfunc="mean", groupby_rangefunc="minmax")
+
+
 def i1():
+    batch = ("config", "concurrency")
+    tradeoff = [scatter("Speed against agreement (color: batch size)", "filings_per_second", "test/status_agree_weighted", batch),
+                scatter("Speed against agreement on CEO changes", "filings_per_second", "test/status_agree_on_ceo_changes", batch)]
+    batches = [scatter("Batch size against filings per second", batch, "filings_per_second"),
+               scatter("Batch size against seconds per filing (median)", batch, "latency_p50"),
+               scatter("Batch size asked for against the batch the server ran", batch, "mean_batch"),
+               scatter("Batch size against peak GPU memory (GB)", batch, "gpu_memory_peak_gb")]
+    speed = [scatter("Seconds per filing (median) against filings per second", "latency_p50", "filings_per_second"),
+             scatter("Peak GPU memory (GB) against filings per second", "gpu_memory_peak_gb", "filings_per_second"),
+             scatter("Job time (s, load + label) against filings labeled", "total_seconds", "succeeded"),
+             wr.LinePlot(title="Filings per second while labeling", y=["filings_per_second_so_far"])]
+    options = [by_option("Filings per second by GPU", "filings_per_second", "gpu"),
+               by_option("Filings per second by number format", "filings_per_second", "dtype"),
+               by_option("Filings per second by fused kernels", "filings_per_second", "fused"),
+               by_option("Peak GPU memory (GB) by number format", "gpu_memory_peak_gb", "dtype")]
     scores = bars(("test/status_agree_weighted", "Agreement with Jev, weighted to all test filings"),
                   ("test/status_agree_on_ceo_changes", "Agreement with Jev on CEO changes"),
-                  ("test/ceo_change_f1", "CEO-change F1"))
-    speed = bars(("filings_per_second", "Filings per second"),
-                 ("succeeded", "Filings labeled (of 1,000, within 10 minutes)"),
-                 ("total_seconds", "Job time to the end of labeling: load + label (s)"),
-                 ("gpu_memory_peak_gb", "Peak GPU memory (GB)"),
-                 ("mean_batch", "Average batch the server ran"))
-    speed.append(wr.LinePlot(title="Filings per second while labeling", y=["filings_per_second_so_far"]))
-    options = wr.ParallelCoordinatesPlot(title="Options against speed and agreement", columns=[
+                  ("filings_per_second", "Filings per second"),
+                  ("succeeded", "Filings labeled (of 1,000, within 10 minutes)"))
+    compare = wr.ParallelCoordinatesPlot(title="Options against speed and agreement", columns=[
         wr.ParallelCoordinatesPlotColumn(metric=wr.Config(k)) for k in ("gpu", "concurrency", "dtype", "fused")] + [
         wr.ParallelCoordinatesPlotColumn(metric=wr.SummaryMetric(k)) for k in ("filings_per_second", "test/status_agree_weighted")])
     columns = ["config:user", "config:gpu", "config:concurrency", "config:dtype", "config:fused",
                "summary:succeeded", "summary:cut_off", "summary:load_seconds", "summary:wall_seconds", "summary:total_seconds",
-               "summary:filings_per_second", "summary:gpu_memory_peak_gb", "summary:test/status_agree_weighted",
-               "summary:test/status_agree_on_ceo_changes", "summary:test/ceo_change_f1"]
-    sections = [ws.Section(name="Scores", panels=scores, is_open=True),
-                ws.Section(name="Speed and GPU memory", panels=speed, is_open=True),
-                ws.Section(name="Compare options", panels=[options], is_open=True)]
+               "summary:filings_per_second", "summary:latency_p50", "summary:mean_batch", "summary:gpu_memory_peak_gb",
+               "summary:test/status_agree_weighted", "summary:test/status_agree_on_ceo_changes", "summary:test/ceo_change_f1"]
+    sections = [ws.Section(name="Speed against agreement", panels=tradeoff, is_open=True),
+                ws.Section(name="What batch size does", panels=batches, is_open=True),
+                ws.Section(name="Speed, waiting and memory", panels=speed, is_open=True),
+                ws.Section(name="Each option on average", panels=options, is_open=True),
+                ws.Section(name="Scores, run by run", panels=scores, is_open=True),
+                ws.Section(name="Compare options", panels=[compare], is_open=True)]
     return sections, columns, ws.Ordering(ws.Summary("filings_per_second"), ascending=False)
 
 
